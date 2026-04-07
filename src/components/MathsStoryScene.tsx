@@ -6,7 +6,11 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Trophy, Sparkles as SparklesIcon, Target, PartyPopper, Plus } from "lucide-react";
+import Lottie from "lottie-react";
 import { MathsStoryPage } from "../data";
+import BeniCharacter from "./BeniCharacter";
+import trophyAnim from "../assets/lottie/lf20_touohxv0.json";
+import checkAnim from "../assets/lottie/lf20_xlkxtmul.json";
 
 interface Props {
   slideIndex: number;
@@ -110,145 +114,189 @@ function Char({
 
 // ─── slide layouts for passive slides ─────────────────────────────────────────
 function PassiveScene({ idx }: { idx: number }) {
-  if (idx === 0) return (
+  if (idx === 0) return ( // Dawn — Beni waking up
     <>
-      {/* Dawn sky */}
-      <Char emoji="🌅" x="8%"  y="8%"  size={70} anim="pulse" delay={0} />
-      <Char emoji={<Star size={26} fill="#FFD93D" stroke="#FFD93D" />} x="62%" y="6%"  size={26} anim="float" delay={0.3} />
-      <Char emoji={<Star size={20} fill="#FFD93D" stroke="#FFD93D" />} x="78%" y="12%" size={20} anim="float" delay={0.7} />
-      <Char emoji="🏡" x="36%" y="30%" size={72} anim="static" delay={0.2} />
-      <Char emoji="🌿" x="68%" y="42%" size={52} anim="sway"   delay={0} />
-      <Char emoji="🦜" x="55%" y="10%" size={54} anim="float" delay={0.5} />
+      <Char emoji="🌅" x="5%"  y="5%"  size={72} anim="pulse" delay={0} />
+      <Char emoji={<Star size={22} fill="#FFD93D" stroke="#FFD93D" />} x="65%" y="4%"  size={22} anim="float" delay={0.3} />
+      <Char emoji={<Star size={16} fill="#FFD93D" stroke="#FFD93D" />} x="80%" y="10%" size={16} anim="float" delay={0.7} />
+      <Char emoji="🏡" x="50%" y="28%" size={68} anim="static" delay={0.2} />
+      <Char emoji="🌿" x="74%" y="40%" size={50} anim="sway"   delay={0} />
+      <Char emoji="🦜" x="76%" y="8%"  size={40} anim="float"  delay={0.5} />
+      {/* Beni character waking up excited */}
+      <motion.div style={{ position: "absolute", left: "4%", bottom: "5%", zIndex: 3 }}
+        initial={{ x: -40, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
+        transition={{ delay: 0.3, type: "spring", bounce: 0.4 }}>
+        <BeniCharacter state="excited" size={68} />
+      </motion.div>
       <Sparkles count={5} colors={["#ffb74d","#ffe082","#fff","#ff7043"]} />
     </>
   );
-  if (idx === 1) return (
+  if (idx === 1) return ( // Mama calls to go to market
     <>
-      <Char emoji="🌴" x="5%"  y="5%"  size={80} anim="sway"   delay={0} />
-      <Char emoji="🌴" x="75%" y="5%"  size={70} anim="sway"   delay={0.4} />
-      <Char emoji="👩" x="22%" y="30%" size={78} anim="bounce" delay={0.1} />
-      <Char emoji="🧒" x="48%" y="35%" size={70} anim="bounce" delay={0.3} />
+      <Char emoji="🌴" x="4%"  y="4%"  size={80} anim="sway"  delay={0} />
+      <Char emoji="🌴" x="76%" y="4%"  size={70} anim="sway"  delay={0.4} />
+      <Char emoji="🏘️" x="55%" y="12%" size={58} anim="static" delay={0.5} />
+      {/* Mama emoji + Beni SVG */}
+      <motion.div style={{ position: "absolute", left: "20%", bottom: "8%" }}
+        initial={{ scale: 0 }} animate={{ scale: 1 }}
+        transition={{ delay: 0.1, type: "spring", bounce: 0.5 }}>
+        <span style={{ fontSize: 72 }}>👩</span>
+      </motion.div>
+      <motion.div style={{ position: "absolute", left: "48%", bottom: "6%", zIndex: 3 }}
+        initial={{ scale: 0 }} animate={{ scale: 1 }}
+        transition={{ delay: 0.3, type: "spring", bounce: 0.5 }}>
+        <BeniCharacter state="excited" size={72} />
+      </motion.div>
       {/* Speech bubble */}
       <motion.div
         initial={{ opacity: 0, scale: 0, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ delay: 0.8, type: "spring", bounce: 0.6 }}
+        transition={{ delay: 0.9, type: "spring", bounce: 0.6 }}
         style={{
-          position: "absolute", left: "18%", top: "5%",
+          position: "absolute", left: "10%", top: "8%",
           background: "#fff", borderRadius: 14, padding: "5px 12px",
           fontSize: 13, fontWeight: 700, color: "#333",
-          boxShadow: "0 3px 12px rgba(0,0,0,0.2)",
+          boxShadow: "0 3px 12px rgba(0,0,0,0.25)",
         }}
-      >
-        Maket tude! 🏪
-      </motion.div>
-      <Char emoji="🏘️" x="55%" y="15%" size={60} anim="static" delay={0.5} />
+      >Maket tude! 🏪</motion.div>
       <Sparkles count={4} colors={["#ffeb3b","#fff","#81c784"]} />
     </>
   );
-  if (idx === 2) return (
+  if (idx === 2) return ( // Walking to market
     <>
-      <Char emoji="🏪" x="62%" y="10%" size={65} anim="pulse" delay={0.6} />
-      <Char emoji="🌿" x="5%"  y="20%" size={58} anim="sway"  delay={0} />
-      <Char emoji="🌿" x="80%" y="30%" size={50} anim="sway"  delay={0.3} />
-      {/* Walking path */}
+      <Char emoji="🏪" x="64%" y="8%" size={66} anim="pulse" delay={0.6} />
+      <Char emoji="🌿" x="4%"  y="18%" size={58} anim="sway"  delay={0} />
+      <Char emoji="🌿" x="82%" y="28%" size={50} anim="sway"  delay={0.3} />
+      {/* Road */}
       <motion.div
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
         transition={{ duration: 1.2, delay: 0.2 }}
-        style={{
-          position: "absolute", bottom: "10%", left: "5%",
-          width: "90%", height: 6, background: "#a0522d",
-          borderRadius: 3, transformOrigin: "left",
-        }}
+        style={{ position: "absolute", bottom: "12%", left: "5%", width: "90%", height: 7, background: "#a0522d", borderRadius: 3, transformOrigin: "left" }}
       />
-      <Char emoji="🚶‍♀️" x="18%" y="38%" size={60} anim="bounce" delay={0} />
-      <Char emoji="🧒"  x="36%" y="40%" size={56} anim="bounce" delay={0.2} />
+      {/* Mama walking */}
+      <motion.div style={{ position: "absolute", left: "14%", bottom: "14%" }}
+        animate={{ x: [0, 6, 0] }} transition={{ duration: 0.5, repeat: Infinity }}>
+        <span style={{ fontSize: 56 }}>👩</span>
+      </motion.div>
+      {/* Beni walking */}
+      <motion.div style={{ position: "absolute", left: "36%", bottom: "12%", zIndex: 3 }}
+        animate={{ x: [0, 6, 0] }} transition={{ duration: 0.5, repeat: Infinity, delay: 0.15 }}>
+        <BeniCharacter state="walk" size={62} />
+      </motion.div>
       <Sparkles count={3} colors={["#fff","#b3e5fc","#c8e6c9"]} />
     </>
   );
   if (idx === 4) return ( // 2 mangoes in basket
     <>
-      <Char emoji="🛒" x="30%" y="20%" size={80} anim="pulse"  delay={0} />
-      <Char emoji="🥭" x="16%" y="10%" size={65} anim="bounce" delay={0.3} />
-      <Char emoji="🥭" x="58%" y="8%"  size={65} anim="bounce" delay={0.5} />
-      {/* "2!" badge */}
+      <Char emoji="🛒" x="30%" y="18%" size={82} anim="pulse"  delay={0} />
+      <Char emoji="🥭" x="14%" y="8%"  size={68} anim="bounce" delay={0.3} />
+      <Char emoji="🥭" x="58%" y="6%"  size={68} anim="bounce" delay={0.5} />
       <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: [0, 1.4, 1] }}
+        initial={{ scale: 0 }} animate={{ scale: [0, 1.4, 1] }}
         transition={{ delay: 0.8, duration: 0.6, times: [0, 0.6, 1] }}
         style={{
-          position: "absolute", right: "10%", top: "8%",
+          position: "absolute", right: "8%", top: "6%",
           background: "#FFD93D", color: "#000", borderRadius: "50%",
-          width: 52, height: 52, display: "flex", alignItems: "center",
-          justifyContent: "center", fontSize: 24, fontWeight: 900,
+          width: 54, height: 54, display: "flex", alignItems: "center",
+          justifyContent: "center", fontSize: 26, fontWeight: 900,
           boxShadow: "0 4px 16px rgba(255,217,61,0.6)",
         }}
       >2</motion.div>
+      <motion.div style={{ position: "absolute", left: "4%", bottom: "4%", zIndex: 3 }}
+        initial={{ scale: 0 }} animate={{ scale: 1 }}
+        transition={{ delay: 0.4, type: "spring", bounce: 0.5 }}>
+        <BeniCharacter state="excited" size={62} />
+      </motion.div>
       <Sparkles count={6} colors={["#FFD93D","#fff","#ff8f00"]} />
     </>
   );
   if (idx === 6) return ( // 3 coconuts
     <>
-      <Char emoji="🛒" x="32%" y="18%" size={80} anim="pulse"  delay={0} />
-      <Char emoji="🥥" x="8%"  y="8%"  size={60} anim="bounce" delay={0.2} />
-      <Char emoji="🥥" x="52%" y="5%"  size={60} anim="bounce" delay={0.4} />
-      <Char emoji="🥥" x="76%" y="10%" size={60} anim="bounce" delay={0.6} />
+      <Char emoji="🛒" x="32%" y="16%" size={82} anim="pulse"  delay={0} />
+      <Char emoji="🥥" x="6%"  y="6%"  size={62} anim="bounce" delay={0.2} />
+      <Char emoji="🥥" x="52%" y="4%"  size={62} anim="bounce" delay={0.4} />
+      <Char emoji="🥥" x="76%" y="8%"  size={62} anim="bounce" delay={0.6} />
       <motion.div
-        initial={{ scale: 0 }}
-        animate={{ scale: [0, 1.4, 1] }}
+        initial={{ scale: 0 }} animate={{ scale: [0, 1.4, 1] }}
         transition={{ delay: 1, duration: 0.6, times: [0, 0.6, 1] }}
         style={{
-          position: "absolute", left: "8%", bottom: "10%",
+          position: "absolute", left: "6%", bottom: "8%",
           background: "#52B788", color: "#fff", borderRadius: "50%",
-          width: 52, height: 52, display: "flex", alignItems: "center",
-          justifyContent: "center", fontSize: 24, fontWeight: 900,
+          width: 54, height: 54, display: "flex", alignItems: "center",
+          justifyContent: "center", fontSize: 26, fontWeight: 900,
           boxShadow: "0 4px 16px rgba(82,183,136,0.6)",
         }}
       >3</motion.div>
+      <motion.div style={{ position: "absolute", right: "4%", bottom: "4%", zIndex: 3 }}
+        initial={{ scale: 0 }} animate={{ scale: 1 }}
+        transition={{ delay: 0.4, type: "spring", bounce: 0.5 }}>
+        <BeniCharacter state="thinking" size={62} flipX />
+      </motion.div>
       <Sparkles count={5} colors={["#a5d6a7","#fff","#FFD93D"]} />
     </>
   );
-  if (idx === 8) return ( // 5 altogether — big celebration
+  if (idx === 8) return ( // 5 altogether — celebration with Beni
     <>
       {["🥭","🥭","🥥","🥥","🥥"].map((e, i) => (
         <Char key={i} emoji={e}
-          x={`${10 + i * 18}%`} y={`${20 + (i % 2) * 20}%`}
-          size={60} anim="bounce" delay={i * 0.15}
+          x={`${8 + i * 17}%`} y={`${8 + (i % 2) * 22}%`}
+          size={58} anim="bounce" delay={i * 0.12}
         />
       ))}
+      {/* Lottie checkmark */}
+      <motion.div style={{ position: "absolute", right: "4%", top: "4%", width: 52, height: 52 }}
+        initial={{ scale: 0 }} animate={{ scale: 1 }}
+        transition={{ delay: 0.6, type: "spring", bounce: 0.7 }}>
+        <Lottie animationData={checkAnim} loop={false} style={{ width: 52, height: 52 }} />
+      </motion.div>
       <motion.div
-        initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: [0, 1.6, 1], opacity: 1 }}
+        initial={{ scale: 0, opacity: 0 }} animate={{ scale: [0, 1.5, 1], opacity: 1 }}
         transition={{ delay: 0.5, duration: 0.7 }}
         style={{
-          position: "absolute", left: "50%", bottom: "8%", transform: "translateX(-50%)",
+          position: "absolute", left: "50%", bottom: "4%", transform: "translateX(-50%)",
           background: "#FFD93D", color: "#000", borderRadius: 24,
-          padding: "6px 22px", fontSize: 26, fontWeight: 900,
+          padding: "5px 18px", fontSize: 24, fontWeight: 900,
           boxShadow: "0 4px 20px rgba(255,217,61,0.7)",
         }}
-      >5 <Star size={22} fill="#FFD93D" stroke="#FFD93D" style={{verticalAlign:"middle"}} /></motion.div>
+      >5 <Star size={20} fill="#FFD93D" stroke="#FFD93D" style={{verticalAlign:"middle"}} /></motion.div>
+      {/* Beni celebrating */}
+      <motion.div style={{ position: "absolute", left: "4%", bottom: "4%", zIndex: 3 }}
+        initial={{ scale: 0 }} animate={{ scale: 1 }}
+        transition={{ delay: 0.3, type: "spring", bounce: 0.5 }}>
+        <BeniCharacter state="correct" size={60} />
+      </motion.div>
       <Sparkles count={8} colors={["#FFD93D","#fff","#52B788","#ff7043","#A8DADC"]} />
     </>
   );
-  if (idx === 9) return ( // your turn
+  if (idx === 9) return ( // your turn — Lottie trophy + Beni pointing
     <>
-      <Char emoji={<Trophy size={90} strokeWidth={1.2} />} x="35%" y="8%"  size={90} anim="bounce" delay={0} />
-      <Char emoji={<SparklesIcon size={44} />} x="8%"  y="10%" size={44} anim="spin"   delay={0.2} />
-      <Char emoji={<SparklesIcon size={44} />} x="76%" y="8%"  size={44} anim="spin"   delay={0.5} />
-      <Char emoji={<Star size={36} fill="#FFD93D" stroke="#FFD93D" />} x="18%" y="50%" size={36} anim="float"  delay={0.3} />
-      <Char emoji={<Star size={36} fill="#FFD93D" stroke="#FFD93D" />} x="65%" y="52%" size={36} anim="float"  delay={0.6} />
+      {/* Lottie trophy centre-stage */}
+      <motion.div style={{ position: "absolute", left: "50%", top: "4%", transform: "translateX(-50%)", width: 90, height: 90 }}
+        initial={{ scale: 0 }} animate={{ scale: 1 }}
+        transition={{ delay: 0.2, type: "spring", bounce: 0.6 }}>
+        <Lottie animationData={trophyAnim} loop style={{ width: 90, height: 90 }} />
+      </motion.div>
+      <Char emoji={<SparklesIcon size={38} />} x="6%"  y="8%"  size={38} anim="spin"  delay={0.2} />
+      <Char emoji={<SparklesIcon size={38} />} x="78%" y="6%"  size={38} anim="spin"  delay={0.5} />
+      <Char emoji={<Star size={30} fill="#FFD93D" stroke="#FFD93D" />} x="16%" y="52%" size={30} anim="float" delay={0.3} />
+      <Char emoji={<Star size={30} fill="#FFD93D" stroke="#FFD93D" />} x="66%" y="54%" size={30} anim="float" delay={0.6} />
+      {/* Beni pointing toward activities */}
+      <motion.div style={{ position: "absolute", left: "2%", bottom: "4%", zIndex: 3 }}
+        initial={{ x: -30, opacity: 0 }} animate={{ x: 0, opacity: 1 }}
+        transition={{ delay: 0.5, type: "spring", bounce: 0.4 }}>
+        <BeniCharacter state="excited" size={66} />
+      </motion.div>
       <motion.div
-        initial={{ scale: 0, y: 20 }}
-        animate={{ scale: 1, y: 0 }}
-        transition={{ delay: 0.4, type: "spring", bounce: 0.6 }}
+        initial={{ scale: 0, y: 20 }} animate={{ scale: 1, y: 0 }}
+        transition={{ delay: 0.5, type: "spring", bounce: 0.6 }}
         style={{
-          position: "absolute", bottom: "6%", left: "50%", transform: "translateX(-50%)",
-          color: "#FFD93D", fontSize: 17, fontWeight: 900,
-          textShadow: "0 2px 12px rgba(0,0,0,0.6)", whiteSpace: "nowrap",
-          letterSpacing: 1,
+          position: "absolute", bottom: "4%", right: "4%",
+          color: "#FFD93D", fontSize: 15, fontWeight: 900,
+          textShadow: "0 2px 12px rgba(0,0,0,0.7)", textAlign: "right",
+          letterSpacing: 0.5, lineHeight: 1.4,
         }}
-      >YU TEM! — YOUR TURN! <Target size={18} style={{verticalAlign:"middle",marginLeft:4}} /></motion.div>
+      >YU TEM!{"\n"}YOUR TURN! <Target size={16} style={{verticalAlign:"middle",marginLeft:3}} /></motion.div>
       <Sparkles count={7} colors={["#FFD93D","#fff","#ce93d8","#80deea"]} />
     </>
   );
@@ -286,7 +334,7 @@ function TapCountScene({
                 initial={{ scale: 0, y: -30 }}
                 animate={{ scale: 1, y: 0 }}
                 transition={{ type: "spring", bounce: 0.7 }}
-                style={{ fontSize: 54, lineHeight: 1 }}
+                className="tap-slot-filled"
               >
                 {emoji}
               </motion.div>
@@ -294,11 +342,12 @@ function TapCountScene({
               <motion.div
                 animate={{ opacity: [0.4, 0.9, 0.4] }}
                 transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
+                className="tap-slot-empty"
                 style={{
-                  width: 54, height: 54, borderRadius: 14,
+                  borderRadius: 14,
                   border: `3px dashed ${color}66`,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 28, opacity: 0.4,
+                  opacity: 0.4,
                 }}
               >
                 ?
@@ -340,8 +389,9 @@ function TapCountScene({
             animate={{ scale: [1, 1.08, 1], y: [0, -6, 0] }}
             transition={{ duration: 1.2, repeat: Infinity, ease: "easeInOut" }}
             onClick={handleTap}
+            className="tap-emoji-main"
             style={{
-              fontSize: 90, lineHeight: 1, background: "none", border: "none",
+              lineHeight: 1, background: "none", border: "none",
               cursor: "pointer", display: "block", userSelect: "none",
               filter: "drop-shadow(0 6px 18px rgba(0,0,0,0.4))",
             }}
@@ -403,7 +453,7 @@ function TapAddScene({
               <motion.div key={i}
                 initial={{ scale: 0 }} animate={{ scale: 1 }}
                 transition={{ delay: i * 0.15, type: "spring", bounce: 0.7 }}
-                style={{ fontSize: 46 }}
+                className="tap-add-emoji"
               >{emojiA}</motion.div>
             ))}
             <div style={{ width: "100%", textAlign: "center", color: "#FFD93D", fontWeight: 700, fontSize: 13 }}>{countA}</div>
@@ -425,12 +475,12 @@ function TapAddScene({
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 1.2, repeat: Infinity }}
               onClick={onTapAdd}
+              className="tap-add-plus"
               style={{
                 background: "linear-gradient(135deg,#52B788,#2d6a4f)",
                 border: "3px solid #a8dadc",
                 borderRadius: "50%",
-                width: 64, height: 64,
-                fontSize: 30, cursor: "pointer",
+                cursor: "pointer",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 boxShadow: "0 4px 20px rgba(82,183,136,0.55)",
               }}
@@ -445,7 +495,7 @@ function TapAddScene({
               <motion.div key={i}
                 initial={{ scale: 0 }} animate={{ scale: 1 }}
                 transition={{ delay: i * 0.15, type: "spring", bounce: 0.7 }}
-                style={{ fontSize: 46 }}
+                className="tap-add-emoji"
               >{emojiB}</motion.div>
             ))}
             <div style={{ width: "100%", textAlign: "center", color: "#A8DADC", fontWeight: 700, fontSize: 13 }}>{countB}</div>
@@ -462,7 +512,7 @@ function TapAddScene({
                 transition={{ delay: i * 0.22, type: "spring", bounce: 0.65 }}
                 style={{ textAlign: "center" }}
               >
-                <div style={{ fontSize: 44 }}>{e}</div>
+                <div className="tap-add-emoji">{e}</div>
                 <motion.div
                   initial={{ scale: 0 }} animate={{ scale: 1 }}
                   transition={{ delay: i * 0.22 + 0.18 }}
@@ -515,7 +565,7 @@ export default function MathsStoryScene({ slideIndex, slide, interactionStep, ad
       transition={{ duration: 0.4, type: "spring", bounce: 0.3 }}
       style={{
         width: "100%",
-        height: 200,
+        height: "clamp(150px, 26vw, 220px)",
         background: bg,
         borderRadius: 20,
         position: "relative",

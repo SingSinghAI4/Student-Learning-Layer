@@ -944,3 +944,250 @@ body {
   color: white;
   box-shadow: 0 1px 4px rgba(0,0,0,0.3);
 }
+
+/* ═══════════════════════════════════════════════════
+   MATHS SCENE INTERACTIVE — BASE SIZES
+═══════════════════════════════════════════════════ */
+.tap-emoji-main  { font-size: 90px; }
+.tap-slot-filled { font-size: 54px; line-height: 1; }
+.tap-slot-empty  { width: 54px; height: 54px; font-size: 28px; }
+.tap-add-emoji   { font-size: 46px; }
+.tap-add-plus    { width: 64px; height: 64px; font-size: 30px; }
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE — TABLET LANDSCAPE  ≤ 1024px
+═══════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  /* Dashboard: hide alerts panel to give more room */
+  .dash-alerts { display: none; }
+  .dash-map    { width: 280px; }
+
+  /* Session AI panel: narrow */
+  .ai-thinking-panel { width: 260px; }
+
+  /* Diagnostic: narrow panel */
+  .diag-right { width: 260px; }
+
+  /* Subject cards: 3 cols */
+  .subj-cards { grid-template-columns: repeat(3, 1fr); max-width: 680px; }
+
+  /* Chapter grid: 2 cols */
+  .chap-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE — TABLET PORTRAIT  ≤ 768px
+═══════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Body scroll for overflowing content */
+  body { overflow-y: auto; }
+  .app { height: auto; min-height: 100vh; overflow: visible; }
+  .screen { position: relative; height: auto; min-height: 100vh; }
+
+  /* Login */
+  .login-card { width: calc(100% - 32px); padding: 28px 24px; border-radius: 24px; }
+  .avatar-grid { grid-template-columns: repeat(3, 1fr); }
+  .grade-grid  { grid-template-columns: repeat(5, 1fr); }
+
+  /* Student bar: compact */
+  .student-bar { padding: 5px 10px 5px 5px; gap: 7px; }
+  .sbar-info   { display: none; }
+  .sbar-divider { display: none; }
+
+  /* Lang toggle: compact */
+  .lang-btn { padding: 5px 10px; font-size: 11px; }
+
+  /* Diagnostic: stack vertically */
+  .diagnostic-screen { flex-direction: column; }
+  .diag-left  { flex: none; width: 100%; padding: 24px 20px; }
+  .diag-right { width: 100%; max-height: 220px; border-left: none; border-top: 1px solid rgba(255,255,255,0.08); }
+  .diag-card  { max-width: 100%; }
+
+  /* Subject screen */
+  .subj-inner  { padding: 20px 20px 16px; gap: 16px; }
+  .subj-cards  { grid-template-columns: repeat(2, 1fr); max-width: 420px; gap: 12px 16px; }
+  .subj-title  { font-size: clamp(20px, 5vw, 28px); }
+
+  /* Chapter screen */
+  .chap-inner { padding: 20px 16px 32px; }
+  .chap-grid  { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .chap-back  { position: static; transform: none; margin-bottom: 12px; display: block; width: fit-content; }
+
+  /* Session screen: stack main + AI panel */
+  .session-screen { flex-direction: column; }
+  .ai-thinking-panel { width: 100%; max-height: 200px; border-left: none; border-top: 1px solid rgba(255,255,255,0.07); flex-direction: row; overflow-x: auto; }
+  .aip-head      { width: 200px; flex-shrink: 0; border-right: 1px solid rgba(255,255,255,0.07); border-bottom: none; }
+  .aip-confidence, .mastery-section { display: none; }
+  .aip-log-scroll { flex: 1; overflow-y: auto; max-height: 200px; }
+  .aip-decision-box { display: none; }
+
+  /* Session top bar: compress */
+  .session-topbar { padding: 10px 14px; gap: 8px; }
+  .offline-pill   { display: none; }
+  .progress-wrap  { margin: 0 10px; }
+  .progress-label { font-size: 9px; }
+  .s-name  { font-size: 13px; }
+  .s-level { display: none; }
+
+  /* Role banner: hide tagline */
+  .role-tagline { display: none; }
+  .role-banner  { padding: 6px 12px; gap: 6px; }
+  .role-desc    { display: none; }
+
+  /* Session content: less padding */
+  .session-content { padding: 12px 16px 80px; gap: 12px; }
+
+  /* Story / activity cards: no side padding bleed */
+  .story-card    { padding: 20px 20px 18px; border-radius: 20px; }
+  .activity-card { padding: 20px 20px 18px; border-radius: 20px; }
+  .story-text    { font-size: 18px; }
+  .act-q         { font-size: 19px; }
+  .act-visual    { font-size: 40px; }
+
+  /* Tutor bubble */
+  .tutor-msg  { max-width: 100%; }
+  .tutor-tok  { font-size: 15px; }
+
+  /* Dashboard: stack map below class */
+  .dash-body  { flex-direction: column; overflow-y: auto; }
+  .dash-map   { width: 100%; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.07); max-height: 280px; overflow-y: auto; flex-direction: row; flex-wrap: wrap; }
+  .dash-class { padding: 14px; }
+  .dash-top   { padding: 10px 16px; }
+  .dp-val     { font-size: 14px; }
+
+  /* Nav tabs: slightly tighter */
+  .nav-tab  { padding: 9px 4px; font-size: 9px; }
+  .nav-icon { font-size: 16px; }
+
+  /* Mascot: smaller on mobile */
+  .mascot-char { font-size: 60px; }
+  .mascot-wrap { bottom: 60px; left: 10px; }
+
+  /* Celebration */
+  .cel-title { font-size: 26px; }
+  .cel-sub   { font-size: 14px; }
+
+  /* Maths scene interactive */
+  .tap-emoji-main  { font-size: 64px; }
+  .tap-slot-filled { font-size: 40px; }
+  .tap-slot-empty  { width: 40px; height: 40px; font-size: 20px; }
+  .tap-add-emoji   { font-size: 34px; }
+  .tap-add-plus    { width: 50px; height: 50px; }
+}
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE — PHONE  ≤ 480px
+═══════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  /* Login */
+  .login-card   { padding: 22px 16px; border-radius: 20px; width: calc(100% - 24px); }
+  .login-title  { font-size: 22px; }
+  .avatar-grid  { grid-template-columns: repeat(3, 1fr); gap: 7px; }
+  .avatar-btn   { padding: 8px 4px; border-radius: 14px; }
+  .avatar-emoji { font-size: 26px; }
+  .grade-grid   { grid-template-columns: repeat(5, 1fr); gap: 5px; }
+  .grade-btn    { padding: 7px 2px; }
+  .grade-num    { font-size: 17px; }
+  .start-btn    { font-size: 16px; padding: 14px; }
+
+  /* Student bar + lang toggle: shrink further */
+  .student-bar    { top: 8px; left: 8px; gap: 5px; padding: 4px 8px 4px 4px; }
+  .sbar-avatar    { width: 28px; height: 28px; font-size: 12px; }
+  .sbar-stat      { gap: 3px; font-size: 11px; }
+  .lang-toggle-wrap { top: 10px; right: 10px; }
+  .lang-btn       { padding: 4px 8px; font-size: 10px; }
+
+  /* Subject screen: 2 col tight */
+  .subj-inner  { padding: 12px 12px 12px; gap: 12px; }
+  .subj-cards  { grid-template-columns: repeat(2, 1fr); gap: 10px 12px; max-width: 100%; }
+  .sc-name-inside { font-size: 9px; padding: 5px 2px; }
+
+  /* Chapter screen */
+  .chap-inner { padding: 14px 12px 24px; }
+  .chap-grid  { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .chap-title { font-size: 20px; }
+  .cc-icon    { font-size: 34px; }
+  .cc-title   { font-size: 13px; }
+
+  /* Session topbar: minimal */
+  .session-topbar { padding: 8px 10px; gap: 6px; }
+  .s-avatar  { width: 34px; height: 34px; font-size: 20px; }
+  .chapter-badge { display: none; }
+  .progress-wrap { margin: 0 6px; }
+
+  /* Role banner: icon-only pills */
+  .role-pill  { padding: 4px 8px; gap: 5px; }
+  .role-label { font-size: 10px; }
+  .role-icon  { font-size: 14px; }
+
+  /* Session content */
+  .session-content { padding: 10px 10px 76px; gap: 10px; }
+
+  /* Story card */
+  .story-card    { padding: 16px 14px 14px; border-radius: 18px; }
+  .story-text    { font-size: 16px; line-height: 1.7; }
+  .story-tr      { font-size: 12px; }
+  .story-btns    { margin-top: 14px; }
+  .btn-primary   { padding: 11px 24px; font-size: 14px; }
+
+  /* Activity card */
+  .activity-card { padding: 16px 14px 14px; border-radius: 18px; }
+  .act-q         { font-size: 17px; }
+  .act-q-tok     { font-size: 12px; }
+  .act-visual    { font-size: 34px; letter-spacing: 5px; margin-bottom: 12px; }
+  /* 2-col options on very small screens for better tap targets */
+  .act-options   { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .act-opt       { padding: 16px 8px 12px; font-size: 28px; border-radius: 16px; }
+  .act-opt-sub   { font-size: 12px; }
+
+  /* Tutor */
+  .tutor-face   { width: 50px; height: 50px; font-size: 30px; }
+  .tutor-bubble { padding: 10px 14px; }
+  .tutor-tok    { font-size: 14px; }
+
+  /* Mascot: hide on very small to save space */
+  .mascot-wrap  { display: none; }
+
+  /* Combo / XP banners */
+  .combo-banner { font-size: 20px; padding: 7px 18px; }
+  .flying-xp    { font-size: 26px; }
+
+  /* Dashboard */
+  .dash-top   { padding: 8px 12px; flex-wrap: wrap; gap: 6px; }
+  .dash-pills { gap: 6px; }
+  .dash-pill  { padding: 4px 10px; }
+  .dp-val     { font-size: 12px; }
+  .dp-lbl     { font-size: 9px; }
+  .dash-map   { flex-direction: column; max-height: none; padding: 12px; }
+  .class-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+  .dash-class { padding: 10px; }
+
+  /* Nav tabs: icon only with very small text */
+  .nav-tab   { padding: 8px 2px; font-size: 0; gap: 0; }
+  .nav-icon  { font-size: 20px; }
+  .nav-tab.active { font-size: 7px; gap: 2px; }
+
+  /* Celebration */
+  .cel-emoji { font-size: 56px; }
+  .cel-title { font-size: 22px; }
+  .cel-sub   { font-size: 13px; max-width: 100%; padding: 0 10px; }
+  .cel-btn   { padding: 12px 32px; font-size: 15px; }
+  .bilum-item { width: 44px; height: 44px; font-size: 22px; }
+
+  /* AI panel: completely hidden on phone — not needed for student view */
+  .ai-thinking-panel { display: none; }
+
+  /* Maths scene interactive — phone sizes */
+  .tap-emoji-main  { font-size: 52px; }
+  .tap-slot-filled { font-size: 32px; }
+  .tap-slot-empty  { width: 32px; height: 32px; font-size: 16px; }
+  .tap-add-emoji   { font-size: 28px; }
+  .tap-add-plus    { width: 44px; height: 44px; }
+
+  /* Diagnostic */
+  .diag-left  { padding: 16px 14px; gap: 16px; }
+  .diag-card  { padding: 20px 16px; }
+  .diag-q-text { font-size: 17px; }
+  .diag-option { font-size: 22px; padding: 11px; }
+  .diag-right { max-height: 180px; }
+}
