@@ -20,6 +20,7 @@ export interface StudentProfile {
 const CLASS_CODE = "PNG1";
 
 // Full pool of bilum items shown in the picker
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BILUM_POOL = [
   "🥭","🐚","🌺","⭐","🪸","🌿","🦋","🌟","🪴","🥥","🌸","🍃","🐦","🌊","🪨",
 ];
@@ -199,6 +200,7 @@ function InitialAvatar({
 }
 
 // ── PROGRESS BAR ───────────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function ProgressBar({ pct }: { pct: number }) {
   const color = pct >= 75 ? "#4ADE80" : pct >= 50 ? "#F5A623" : "#FB923C";
   return (

@@ -62,7 +62,7 @@ export default function SessionScreen({
 
   const { speaking: storySpeaking, speak: speakStory, stop: stopStory } = useSpeech();
   const { speaking: tutorSpeaking, speak: speakTutor } = useSpeech();
-  const { speaking: actSpeaking,   speak: speakAct   } = useSpeech();
+  const { speak: speakAct } = useSpeech();
 
   // ── Interactive story state ──
   // tap-count: interactionStep counts taps up to tapCount

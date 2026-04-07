@@ -3,9 +3,8 @@
  * Replaces the flat emoji row in the story card with a proper illustrated,
  * animated scene stage. Each of the 10 slides gets its own layout.
  */
-import React, { useEffect, useRef, useState } from "react";
-import { motion, AnimatePresence, useAnimation } from "framer-motion";
-import confetti from "canvas-confetti";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { MathsStoryPage } from "../data";
 
 interface Props {

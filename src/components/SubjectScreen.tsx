@@ -836,6 +836,7 @@ function CartoonMascot({ id }: { id: string }): React.ReactElement | null {
 }
 
 // ── SPOTLIGHT PANEL ───────────────────────────────────
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function SpotlightPanel({ subject, meta, bottomRow }: {
   subject: typeof SUBJECTS[0];
   meta: { topics: string[]; fun: string };
