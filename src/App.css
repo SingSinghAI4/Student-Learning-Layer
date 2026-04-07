@@ -194,60 +194,83 @@ body {
     radial-gradient(ellipse 55% 50% at 90% 92%,  rgba(20,70,10,0.45) 0%, transparent 52%),
     radial-gradient(ellipse 42% 60% at 80% 15%,  rgba(15,60,8,0.38) 0%, transparent 48%),
     #0A1A07;
-  flex-direction: column; align-items: center; justify-content: center;
+  flex-direction: column; align-items: center; justify-content: flex-start;
   overflow: hidden;
+  padding-top: 0;
 }
 .subj-inner {
   display: flex; flex-direction: column; align-items: center;
-  gap: 32px; padding: 24px; width: 100%; max-width: 960px; z-index: 1;
+  gap: 20px; padding: 40px 48px 20px; width: 100%; max-width: 1400px; z-index: 1;
+  min-height: 100%; justify-content: center;
 }
-.subj-header { text-align: center; }
-.subj-wave   { font-size: 40px; display: inline-block; margin-bottom: 8px; }
-.subj-greeting { font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.55); margin-bottom: 4px; }
-.subj-title { font-size: 32px; font-weight: 900; color: white; line-height: 1.2; margin-bottom: 4px; }
-.subj-tok   { font-size: 14px; color: rgba(255,255,255,0.4); font-weight: 700; font-style: italic; }
+.subj-header { text-align: center; padding-bottom: 4px; }
+.subj-wave   { display: none; }
+.subj-greeting { font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.5); margin-bottom: 6px; letter-spacing: 0.3px; }
+.subj-title { font-size: clamp(26px, 3vw, 38px); font-weight: 900; color: white; line-height: 1.15; margin-bottom: 6px; }
+.subj-tok   { font-size: 14px; color: rgba(255,255,255,0.38); font-weight: 600; font-style: italic; }
 
-.subj-cards { display: flex; gap: 20px; justify-content: center; width: 100%; }
+.subj-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px 24px;
+  width: 100%;
+  max-width: 900px;
+}
+@media (max-width: 650px) { .subj-cards { grid-template-columns: repeat(3, 1fr); } }
 
+/* Each subject is a circle button */
 .subj-card {
-  flex: 1; max-width: 280px;
-  border-radius: 28px;
-  padding: 32px 24px 24px;
+  background: none;
+  border: none;
   cursor: pointer;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+}
+
+.sc-circle {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  display: flex; align-items: center; justify-content: center;
   overflow: hidden;
-  border: 2px solid rgba(255,255,255,0.08);
-  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  position: relative;
+  transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+  padding: 12%;
+}
+
+.sc-name-inside {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
   text-align: center;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  font-size: 11px; font-weight: 900;
+  line-height: 1;
+  padding: 7px 4px;
+  background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.0) 100%);
+  letter-spacing: 0.2px;
 }
-.subj-card:hover {
-  border-color: var(--sc, rgba(82,183,136,0.6));
-  box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 40px var(--sh, rgba(82,183,136,0.25));
+.subj-card:hover .sc-circle {
+  border-color: var(--sc, #52B788);
+  box-shadow: 0 10px 32px rgba(0,0,0,0.5), 0 0 20px var(--sh, rgba(82,183,136,0.3));
 }
-.subj-card-glow {
-  position: absolute; inset: 0;
-  background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(255,255,255,0.06) 0%, transparent 65%);
-  pointer-events: none;
-}
-.sc-icon  { font-size: 68px; display: block; margin-bottom: 14px; filter: drop-shadow(0 8px 20px rgba(0,0,0,0.4)); }
-.sc-name  { font-size: 24px; font-weight: 900; color: white; margin-bottom: 3px; }
-.sc-tok   { font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.45); font-style: italic; margin-bottom: 8px; }
-.sc-desc  { font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.5); margin-bottom: 16px; letter-spacing: 0.3px; }
-.sc-stars { font-size: 20px; margin-bottom: 12px; letter-spacing: 3px; }
-.star-on  { color: #FFD93D; text-shadow: 0 0 8px rgba(255,217,61,0.7); }
+
+.sc-name { display: none; }
+.sc-tok  { display: none; }
+
+/* keep these for compatibility */
+.sc-desc  { display: none; }
+.sc-stars { display: none; }
+.star-on  { color: #FFD93D; }
 .star-off { color: rgba(255,255,255,0.2); }
-.sc-bar-track { height: 6px; background: rgba(255,255,255,0.1); border-radius: 6px; overflow: hidden; margin-bottom: 5px; }
-.sc-bar-fill  { height: 100%; background: var(--sc, #52B788); border-radius: 6px; box-shadow: 0 0 10px var(--sh, rgba(82,183,136,0.5)); }
-.sc-bar-lbl   { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.35); margin-bottom: 14px; }
-.sc-cta {
-  font-size: 13px; font-weight: 900;
-  color: var(--sc, #52B788);
-  background: rgba(255,255,255,0.06);
-  border: 1.5px solid var(--sc, rgba(82,183,136,0.4));
-  border-radius: 50px; padding: 8px 20px;
-  display: inline-block;
-}
+.sc-bar-track { display: none; }
+.sc-bar-fill  { display: none; }
+.sc-bar-lbl   { display: none; }
+.sc-cta       { display: none; }
+.subj-card-glow { display: none; }
 
 /* ═══════════════════════════════════════════════════
    CHAPTER SELECTION SCREEN
@@ -853,6 +876,37 @@ body {
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
 
 /* ── LANGUAGE TOGGLE ── */
+/* ── STUDENT INFO BAR (top-left) ──────────────────── */
+.student-bar {
+  position: fixed;
+  top: 12px; left: 16px;
+  z-index: 999;
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(10,22,40,0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 50px;
+  padding: 6px 14px 6px 6px;
+}
+.sbar-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: 2px solid;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 900; color: white;
+  flex-shrink: 0;
+}
+.sbar-info { line-height: 1.2; }
+.sbar-name  { font-size: 12px; font-weight: 900; color: white; }
+.sbar-grade { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.45); }
+.sbar-divider {
+  width: 1px; height: 22px;
+  background: rgba(255,255,255,0.15); flex-shrink: 0;
+}
+.sbar-stat {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 13px; font-weight: 900; color: white;
+}
+
 .lang-toggle-wrap {
   position: fixed;
   top: 16px;

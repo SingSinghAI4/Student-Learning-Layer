@@ -330,6 +330,36 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
   // ── Render ──
   return (
     <div className="app">
+      {/* Student info bar — top left */}
+      <div className="student-bar">
+        {/* Avatar */}
+        <div className="sbar-avatar" style={{ background: "#1a3a2a", borderColor: "#52B788" }}>
+          {profile.name.charAt(0).toUpperCase()}
+        </div>
+        {/* Name + grade */}
+        <div className="sbar-info">
+          <div className="sbar-name">{profile.name}</div>
+          <div className="sbar-grade">Grade {profile.grade}</div>
+        </div>
+        {/* Divider */}
+        <div className="sbar-divider"/>
+        {/* Streak */}
+        <div className="sbar-stat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2C12 2 6 8 6 13a6 6 0 0012 0c0-5-6-11-6-11z" fill="#FF6B35"/>
+            <path d="M12 8C12 8 9 12 9 14.5a3 3 0 006 0C15 12 12 8 12 8z" fill="#FFD93D"/>
+          </svg>
+          <span>{profile.streak ?? 0}</span>
+        </div>
+        {/* Stars */}
+        <div className="sbar-stat">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2l2.9 6.4 7 .7-5.1 4.8 1.5 6.9L12 17.7l-6.3 3.1 1.5-6.9L2.1 9.1l7-.7z" fill="#FFD93D"/>
+          </svg>
+          <span>12</span>
+        </div>
+      </div>
+
       {/* Language toggle */}
       <div className="lang-toggle-wrap">
         <button className={`lang-btn${lang === "tok" ? " active" : ""}`} onClick={() => setLang("tok")}>Tok Pisin</button>
@@ -403,11 +433,47 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
 
       {/* Nav tabs */}
       <div className="nav-tabs">
-        <button className={`nav-tab${screen === "subject" || screen === "chapter" ? " active" : ""}`} onClick={() => setScreen("subject")}><span className="nav-icon">🏠</span>Subjects</button>
-        <button className={`nav-tab${screen === "diagnostic"   ? " active" : ""}`} onClick={() => setScreen("diagnostic")}><span className="nav-icon">🎯</span>Diagnostic</button>
-        <button className={`nav-tab${screen === "session"      ? " active" : ""}`} onClick={() => { if (diagPlaced) startSession(); }}><span className="nav-icon">📚</span>Session</button>
-        <button className={`nav-tab${screen === "celebration"  ? " active" : ""}`} onClick={() => setScreen("celebration")}><span className="nav-icon">🎉</span>Celebrate</button>
-        <button className={`nav-tab${screen === "dashboard"    ? " active" : ""}`} onClick={() => setScreen("dashboard")}><span className="nav-icon">📊</span>Class View</button>
+        <button className={`nav-tab${screen === "subject" || screen === "chapter" ? " active" : ""}`} onClick={() => setScreen("subject")}>
+          <span className="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M3 9.5L12 3l9 6.5V21H3V9.5z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+              <rect x="9" y="14" width="6" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
+            </svg>
+          </span>Subjects
+        </button>
+        <button className={`nav-tab${screen === "diagnostic" ? " active" : ""}`} onClick={() => setScreen("diagnostic")}>
+          <span className="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/>
+              <path d="M8 12h2l2-4 2 8 2-4h2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </span>Diagnostic
+        </button>
+        <button className={`nav-tab${screen === "session" ? " active" : ""}`} onClick={() => { if (diagPlaced) startSession(); }}>
+          <span className="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="2"/>
+              <path d="M3 9h18" stroke="currentColor" strokeWidth="2"/>
+              <path d="M10 14l2-2 2 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </span>Session
+        </button>
+        <button className={`nav-tab${screen === "celebration" ? " active" : ""}`} onClick={() => setScreen("celebration")}>
+          <span className="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2l2.9 6.4 7 .7-5.1 4.8 1.5 6.9L12 17.7l-6.3 3.1 1.5-6.9L2.1 9.1l7-.7z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
+            </svg>
+          </span>Celebrate
+        </button>
+        <button className={`nav-tab${screen === "dashboard" ? " active" : ""}`} onClick={() => setScreen("dashboard")}>
+          <span className="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="13" width="5" height="8" rx="1" stroke="currentColor" strokeWidth="2"/>
+              <rect x="10" y="8" width="5" height="13" rx="1" stroke="currentColor" strokeWidth="2"/>
+              <rect x="17" y="3" width="5" height="18" rx="1" stroke="currentColor" strokeWidth="2"/>
+            </svg>
+          </span>Class View
+        </button>
       </div>
     </div>
   );
