@@ -5,6 +5,7 @@ import App from "./App";
 import LoginScreen, { StudentProfile } from "./LoginScreen";
 import ProfileScreen from "./ProfileScreen";
 import reportWebVitals from "./reportWebVitals";
+import AILogPage, { MERI_LOG_DATA, TURA_LOG_DATA } from "./AILogPage";
 
 type RootView = "login" | "profile" | "app";
 
@@ -54,12 +55,16 @@ function Root() {
   );
 }
 
+const pathname = window.location.pathname;
+
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement,
 );
 root.render(
   <React.StrictMode>
-    <Root />
+    {pathname === "/ai-log-meri" ? <AILogPage {...MERI_LOG_DATA} />
+     : pathname === "/ai-log-tura" ? <AILogPage {...TURA_LOG_DATA} />
+     : <Root />}
   </React.StrictMode>,
 );
 

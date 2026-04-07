@@ -130,7 +130,7 @@ export const CHAPTERS: Record<SubjectId, ChapterData[]> = {
   ],
   maths: [
     { id:1, title:"Counting 1-10",   tok:"Kauntim 1-10",     desc:"Numbers · one-to-one",            icon:"1", stars:3, unlocked:true  },
-    { id:2, title:"Adding Up",       tok:"Putim Wantaim",    desc:"Addition with objects",            icon:"+", stars:2, unlocked:true  },
+    { id:2, title:"Adding Up",       tok:"Putim Wantaim",    desc:"Addition at the market",           icon:"+", stars:0, unlocked:true  },
     { id:3, title:"Taking Away",     tok:"Kisim Ausait",     desc:"Subtraction · story problems",    icon:"−", stars:0, unlocked:true  },
     { id:4, title:"Shapes",          tok:"Sip",              desc:"2D shapes · sorting",             icon:"◇", stars:0, unlocked:false },
     { id:5, title:"Measuring",       tok:"Mesarim",          desc:"Length · weight · volume",        icon:"~", stars:0, unlocked:false },
@@ -187,6 +187,395 @@ export const CHAPTERS: Record<SubjectId, ChapterData[]> = {
     { id:6, title:"Healthy Choices",  tok:"Gutpela Laip",        desc:"Food · sport · staying safe",       icon:"H", stars:0, unlocked:false },
   ],
 };
+
+// ── Grade 2 Maths Chapter 2: "Putim Wantaim" (Adding Up) ────────────────────
+
+export interface MathsStoryPage {
+  scene: string;
+  tok: string;
+  en: string;
+  words: string[];
+  // Optional interactivity — student must complete before Next is shown
+  interactive?: "tap-count" | "tap-add";
+  tapEmoji?: string;   // emoji to count (tap-count)
+  tapCount?: number;   // how many to tap
+  tapGroupA?: string;  // left group emoji (tap-add)
+  tapGroupB?: string;  // right group emoji (tap-add)
+  tapCountA?: number;  // left group size
+  tapCountB?: number;  // right group size
+}
+
+// Shared story — Beni at the Goroka market (10 slides, 3 interactive)
+export const MATHS_STORY_PAGES: MathsStoryPage[] = [
+  {
+    scene: "🌅🏡🌿🦜",
+    tok: "Long Satade moning tru, Beni i kirap na amamas tumas.",
+    en: "Early Saturday morning, Beni woke up very excited.",
+    words: ["Long", "Satade", "moning", "tru,", "Beni", "i", "kirap", "na", "amamas", "tumas."],
+  },
+  {
+    scene: "👩‍👦🌴🏘️",
+    tok: "Mama i tok: 'Beni, yumi go long maket tude!' Beni i amamas tru.",
+    en: "Mama said: 'Beni, let us go to the market today!' Beni was so happy.",
+    words: ["Mama", "i", "tok:", "'Beni,", "yumi", "go", "long", "maket", "tude!'", "Beni", "i", "amamas", "tru."],
+  },
+  {
+    scene: "🚶‍♀️🚶🌿🏪",
+    tok: "Beni na Mama i wokabaut i go long maket. Maket i gat planti frut!",
+    en: "Beni and Mama walked to the market. The market had lots of fruit!",
+    words: ["Beni", "na", "Mama", "i", "wokabaut", "i", "go", "long", "maket.", "Maket", "i", "gat", "planti", "frut!"],
+  },
+  {
+    // Interactive — tap each mango to count
+    scene: "🥭",
+    tok: "Mama i lukim mango! Pres wanwan mango bilong kauntim!",
+    en: "Mama saw mangoes! Tap each mango to count them!",
+    words: ["Mama", "i", "lukim", "mango!", "Pres", "wanwan", "mango", "bilong", "kauntim!"],
+    interactive: "tap-count",
+    tapEmoji: "🥭",
+    tapCount: 2,
+  },
+  {
+    scene: "🥭🥭🛒",
+    tok: "Gutpela! 2 mango! Mama i baim 2-pela mango. Beni i holim basket.",
+    en: "Great! 2 mangoes! Mama bought 2 mangoes. Beni held the basket.",
+    words: ["Gutpela!", "2", "mango!", "Mama", "i", "baim", "2-pela", "mango.", "Beni", "i", "holim", "basket."],
+  },
+  {
+    // Interactive — tap each coconut to count
+    scene: "🥥",
+    tok: "Orait, Beni i lukim kokonas tu! Pres wanwan kokonas — kauntim!",
+    en: "Then Beni saw coconuts too! Tap each coconut — count them!",
+    words: ["Orait,", "Beni", "i", "lukim", "kokonas", "tu!", "Pres", "wanwan", "kokonas", "—", "kauntim!"],
+    interactive: "tap-count",
+    tapEmoji: "🥥",
+    tapCount: 3,
+  },
+  {
+    scene: "🥥🥥🥥🛒",
+    tok: "Yes! 3 kokonas! Mama i baim 3 kokonas. Nau basket i gat mango na kokonas.",
+    en: "Yes! 3 coconuts! Mama bought 3 coconuts. Now the basket has mangoes and coconuts.",
+    words: ["Yes!", "3", "kokonas!", "Mama", "i", "baim", "3", "kokonas.", "Nau", "basket", "i", "gat", "mango", "na", "kokonas."],
+  },
+  {
+    // Interactive — tap + to combine groups
+    scene: "🥭🥭➕🥥🥥🥥",
+    tok: "Beni i gat 2 mango na 3 kokonas. Pres PLUS bilong putim wantaim!",
+    en: "Beni has 2 mangoes and 3 coconuts. Tap PLUS to add them together!",
+    words: ["Beni", "i", "gat", "2", "mango", "na", "3", "kokonas.", "Pres", "PLUS", "bilong", "putim", "wantaim!"],
+    interactive: "tap-add",
+    tapGroupA: "🥭",
+    tapCountA: 2,
+    tapGroupB: "🥥",
+    tapCountB: 3,
+  },
+  {
+    scene: "🥭🥭🥥🥥🥥  ＝  5️⃣  ⭐",
+    tok: "5 olgeta! Beni i kauntim gut tru. Gutpela wok, Beni!",
+    en: "5 altogether! Beni counted perfectly. Great work, Beni!",
+    words: ["5", "olgeta!", "Beni", "i", "kauntim", "gut", "tru.", "Gutpela", "wok,", "Beni!"],
+  },
+  {
+    scene: "🎯✨🏆",
+    tok: "Nau EM I YU TEM! Traim askim bilong yu. Yu inap — bai yu winim!",
+    en: "Now it is YOUR TURN! Try the questions. You can do it — you will win!",
+    words: ["Nau", "EM", "I", "YU", "TEM!", "Traim", "askim", "bilong", "yu.", "Yu", "inap", "—", "bai", "yu", "winim!"],
+  },
+];
+
+export interface MathsActivity {
+  mode: "math";
+  label: string;
+  q: string;
+  tok: string;
+  visual: string;
+  difficulty: number;
+  addends: [number, number]; // [leftGroup, rightGroup] — used by TeachMoment
+  emojiA: string;            // emoji for left group
+  emojiB: string;            // emoji for right group
+  options: { val: string; label: string; tok: string }[];
+  correct: string;
+}
+
+// Meri path — support learner: visual emojis, Tok Pisin first, small numbers, story context (8 activities)
+export const MATHS_ACTIVITIES_MERI: MathsActivity[] = [
+  {
+    mode: "math" as const,
+    label: "Lukautim Stori! (Story Check)",
+    q: "In the story — Beni counted 2 mangoes AND 3 coconuts. How many altogether?",
+    tok: "Long stori — Beni i kauntim 2 mango NA 3 kokonas. Hamas olgeta?",
+    visual: "🥭🥭  ➕  🥥🥥🥥  ＝  ❓",
+    difficulty: 1,
+    addends: [2, 3],
+    emojiA: "🥭",
+    emojiB: "🥥",
+    options: [
+      { val: "4", label: "4", tok: "Foa" },
+      { val: "5", label: "5", tok: "Faiv" },
+      { val: "6", label: "6", tok: "Sikis" },
+    ],
+    correct: "5",
+  },
+  {
+    mode: "math" as const,
+    label: "Isi Isi — 1 + 1",
+    q: "Beni finds 1 banana on the tree. He finds 1 more. How many bananas?",
+    tok: "Beni i painim 1 banana long diwai. Em i painim 1 moa. Hamas banana?",
+    visual: "🍌  ➕  🍌  ＝  ❓",
+    difficulty: 1,
+    addends: [1, 1],
+    emojiA: "🍌",
+    emojiB: "🍌",
+    options: [
+      { val: "1", label: "1", tok: "Wan" },
+      { val: "2", label: "2", tok: "Tu" },
+      { val: "3", label: "3", tok: "Tri" },
+    ],
+    correct: "2",
+  },
+  {
+    mode: "math" as const,
+    label: "Kauntim Banana — 2 + 1",
+    q: "Beni has 2 bananas. He finds 1 more on the ground. How many now?",
+    tok: "Beni i gat 2 banana. Em i painim 1 moa long graun. Hamas nau?",
+    visual: "🍌🍌  ➕  🍌  ＝  ❓",
+    difficulty: 1,
+    addends: [2, 1],
+    emojiA: "🍌",
+    emojiB: "🍌",
+    options: [
+      { val: "2", label: "2", tok: "Tu" },
+      { val: "3", label: "3", tok: "Tri" },
+      { val: "4", label: "4", tok: "Foa" },
+    ],
+    correct: "3",
+  },
+  {
+    mode: "math" as const,
+    label: "Maket Askim — 3 + 2",
+    q: "Mama puts 3 coconuts in the basket. Beni adds 2 more. How many in the basket?",
+    tok: "Mama i putim 3 kokonas long basket. Beni i putim 2 moa. Hamas long basket?",
+    visual: "🥥🥥🥥  ➕  🥥🥥  ＝  ❓",
+    difficulty: 1,
+    addends: [3, 2],
+    emojiA: "🥥",
+    emojiB: "🥥",
+    options: [
+      { val: "4", label: "4", tok: "Foa" },
+      { val: "5", label: "5", tok: "Faiv" },
+      { val: "6", label: "6", tok: "Sikis" },
+    ],
+    correct: "5",
+  },
+  {
+    mode: "math" as const,
+    label: "Kauntim Frut — 4 + 1",
+    q: "The market stall has 4 bananas. Mama buys 1 pineapple too. How many fruit altogether?",
+    tok: "Stol i gat 4 banana. Mama i baim 1 painap tu. Hamas frut olgeta?",
+    visual: "🍌🍌🍌🍌  ➕  🍍  ＝  ❓",
+    difficulty: 1,
+    addends: [4, 1],
+    emojiA: "🍌",
+    emojiB: "🍍",
+    options: [
+      { val: "4", label: "4", tok: "Foa" },
+      { val: "6", label: "6", tok: "Sikis" },
+      { val: "5", label: "5", tok: "Faiv" },
+    ],
+    correct: "5",
+  },
+  {
+    mode: "math" as const,
+    label: "Popo na Mango — 2 + 4",
+    q: "Beni picks 2 papayas and puts them with 4 mangoes. How many fruit in the pile?",
+    tok: "Beni i kisim 2 popo na putim wantaim 4 mango. Hamas frut olgeta?",
+    visual: "🍈🍈  ➕  🥭🥭🥭🥭  ＝  ❓",
+    difficulty: 2,
+    addends: [2, 4],
+    emojiA: "🍈",
+    emojiB: "🥭",
+    options: [
+      { val: "5", label: "5", tok: "Faiv" },
+      { val: "7", label: "7", tok: "Sevn" },
+      { val: "6", label: "6", tok: "Sikis" },
+    ],
+    correct: "6",
+  },
+  {
+    mode: "math" as const,
+    label: "Strong Askim — 3 + 3",
+    q: "Beni picks 3 papayas from one tree and 3 from another tree. How many papayas?",
+    tok: "Beni i kisim 3 popo long wanpela diwai na 3 long narapela. Hamas popo?",
+    visual: "🍈🍈🍈  ➕  🍈🍈🍈  ＝  ❓",
+    difficulty: 2,
+    addends: [3, 3],
+    emojiA: "🍈",
+    emojiB: "🍈",
+    options: [
+      { val: "5", label: "5", tok: "Faiv" },
+      { val: "7", label: "7", tok: "Sevn" },
+      { val: "6", label: "6", tok: "Sikis" },
+    ],
+    correct: "6",
+  },
+  {
+    mode: "math" as const,
+    label: "Stori Maths — Beni na Basket",
+    q: "Beni puts 4 mangoes in the basket. Then he adds 2 coconuts. How many things in the basket?",
+    tok: "Beni i putim 4 mango long basket. Orait em i putim 2 kokonas tu. Hamas samting long basket?",
+    visual: "🧺 🥭🥭🥭🥭  ➕  🥥🥥  ＝  ❓",
+    difficulty: 2,
+    addends: [4, 2],
+    emojiA: "🥭",
+    emojiB: "🥥",
+    options: [
+      { val: "5", label: "5", tok: "Faiv" },
+      { val: "6", label: "6", tok: "Sikis" },
+      { val: "7", label: "7", tok: "Sevn" },
+    ],
+    correct: "6",
+  },
+];
+
+// Challenge path — confident learner: harder numbers, no visual scaffold, English primary, word problems (8 activities)
+export const MATHS_ACTIVITIES_SIONE: MathsActivity[] = [
+  {
+    mode: "math" as const,
+    label: "Story Check — Fast!",
+    q: "In the story, Beni counted 2 mangoes and 3 coconuts. What is 2 + 3?",
+    tok: "Long stori, Beni i kauntim 2 mango na 3 kokonas. 2 + 3 = ?",
+    visual: "",
+    difficulty: 2,
+    addends: [2, 3],
+    emojiA: "🥭",
+    emojiB: "🥥",
+    options: [
+      { val: "6", label: "6", tok: "Sikis" },
+      { val: "5", label: "5", tok: "Faiv" },
+      { val: "4", label: "4", tok: "Foa" },
+    ],
+    correct: "5",
+  },
+  {
+    mode: "math" as const,
+    label: "Round 1 — 4 + 3",
+    q: "4 + 3 = ?  Think fast!",
+    tok: "4 + 3 = ?  Tingting kwik!",
+    visual: "",
+    difficulty: 2,
+    addends: [4, 3],
+    emojiA: "🥭",
+    emojiB: "🥥",
+    options: [
+      { val: "6", label: "6", tok: "Sikis" },
+      { val: "8", label: "8", tok: "Et" },
+      { val: "7", label: "7", tok: "Sevn" },
+    ],
+    correct: "7",
+  },
+  {
+    mode: "math" as const,
+    label: "Word Problem — 5 + 4",
+    q: "Beni has 5 mangoes in his bag. At the market he buys 4 more. How many mangoes altogether?",
+    tok: "Beni i gat 5 mango long bag bilong em. Long maket em i baim 4 moa. Hamas mango olgeta?",
+    visual: "",
+    difficulty: 2,
+    addends: [5, 4],
+    emojiA: "🥭",
+    emojiB: "🥭",
+    options: [
+      { val: "8", label: "8", tok: "Et" },
+      { val: "10", label: "10", tok: "Ten" },
+      { val: "9", label: "9", tok: "Nain" },
+    ],
+    correct: "9",
+  },
+  {
+    mode: "math" as const,
+    label: "Flip It — 3 + 5",
+    q: "Mama has 3 fish and 5 sweet potatoes in her market bag. How many food items altogether?",
+    tok: "Mama i gat 3 pis na 5 kaukau long bag bilong em. Hamas kaikai olgeta?",
+    visual: "🐟🐟🐟  ➕  🍠🍠🍠🍠🍠",
+    difficulty: 2,
+    addends: [3, 5],
+    emojiA: "🐟",
+    emojiB: "🍠",
+    options: [
+      { val: "7", label: "7", tok: "Sevn" },
+      { val: "9", label: "9", tok: "Nain" },
+      { val: "8", label: "8", tok: "Et" },
+    ],
+    correct: "8",
+  },
+  {
+    mode: "math" as const,
+    label: "Market Stall — 6 + 2",
+    q: "A market stall has 6 coconuts and 2 papayas. How many items on the stall?",
+    tok: "Wanpela stol long maket i gat 6 kokonas na 2 popo. Hamas samting long stol?",
+    visual: "🥥🥥🥥🥥🥥🥥  ➕  🍈🍈",
+    difficulty: 3,
+    addends: [6, 2],
+    emojiA: "🥥",
+    emojiB: "🍈",
+    options: [
+      { val: "7", label: "7", tok: "Sevn" },
+      { val: "9", label: "9", tok: "Nain" },
+      { val: "8", label: "8", tok: "Et" },
+    ],
+    correct: "8",
+  },
+  {
+    mode: "math" as const,
+    label: "Kina Maths — Real World!",
+    q: "Mama spent K7 on fruit and K3 on fish at the market. How many kina did she spend in total?",
+    tok: "Mama i baim frut K7 na pis K3 long maket. Hamas kina em i baim olgeta?",
+    visual: "",
+    difficulty: 3,
+    addends: [7, 3],
+    emojiA: "💰",
+    emojiB: "💰",
+    options: [
+      { val: "9",  label: "K9",  tok: "Nain Kina" },
+      { val: "11", label: "K11", tok: "Ileven Kina" },
+      { val: "10", label: "K10", tok: "Ten Kina" },
+    ],
+    correct: "10",
+  },
+  {
+    mode: "math" as const,
+    label: "Level Up — 8 + 4",
+    q: "Beni's family harvested 8 coconuts in the morning and 4 in the afternoon. How many altogether?",
+    tok: "Famili bilong Beni i kisim 8 kokonas long moning na 4 long apinun. Hamas olgeta?",
+    visual: "",
+    difficulty: 3,
+    addends: [8, 4],
+    emojiA: "🥥",
+    emojiB: "🥥",
+    options: [
+      { val: "11", label: "11", tok: "Ileven" },
+      { val: "13", label: "13", tok: "Tetin" },
+      { val: "12", label: "12", tok: "Twelv" },
+    ],
+    correct: "12",
+  },
+  {
+    mode: "math" as const,
+    label: "Expert Round — 8 + 5",
+    q: "Beni's uncle sold 8 baskets of corn in the morning and 5 in the afternoon. How many baskets altogether?",
+    tok: "Uncle bilong Beni i salim 8 basket kon long moning na 5 long apinun. Hamas basket olgeta?",
+    visual: "",
+    difficulty: 4,
+    addends: [8, 5],
+    emojiA: "🌽",
+    emojiB: "🌽",
+    options: [
+      { val: "12", label: "12", tok: "Twelv" },
+      { val: "14", label: "14", tok: "Fotiːn" },
+      { val: "13", label: "13", tok: "Tetin" },
+    ],
+    correct: "13",
+  },
+];
 
 export const AVATARS = [
   { emoji: "🦜", name: "Bird of Paradise", tok: "Pisin Paradais" },

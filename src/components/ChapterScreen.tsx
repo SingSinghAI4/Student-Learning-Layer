@@ -200,7 +200,7 @@ export default function ChapterScreen({ profile, subjectId, onSelect, onBack }: 
           </motion.button>
 
           <div className="chap-subject-badge">
-            <span className="csb-icon">{subject.icon}</span>
+            <span className="csb-icon"><SubjectBadgeIcon id={subjectId} color={subject.color} /></span>
             <div>
               <div className="csb-name">{subject.name}</div>
               <div className="csb-tok">{subject.tok}</div>

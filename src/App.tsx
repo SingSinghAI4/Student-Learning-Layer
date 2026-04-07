@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 
 import { Screen, ActivityMode, AIEntry, MasteryItem } from "./types";
-import { DIAG_QUESTIONS, AVATARS, STORY_PAGES, STORY_PAGES_2, ACTIVITIES, ACTIVITIES_2 } from "./data";
+import { DIAG_QUESTIONS, AVATARS, STORY_PAGES, STORY_PAGES_2, ACTIVITIES, ACTIVITIES_2,
+         MATHS_STORY_PAGES, MATHS_ACTIVITIES_MERI, MATHS_ACTIVITIES_SIONE } from "./data";
 import { nowStr } from "./utils";
 import DiagnosticScreen from "./components/DiagnosticScreen";
 import SessionScreen from "./components/SessionScreen";
@@ -13,6 +14,7 @@ import CelebrationScreen from "./components/CelebrationScreen";
 import Dashboard from "./components/Dashboard";
 import SubjectScreen from "./components/SubjectScreen";
 import ChapterScreen from "./components/ChapterScreen";
+import AIPanel from "./components/AIPanel";
 import { SubjectId } from "./data";
 
 
@@ -27,6 +29,7 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
   const [screen, setScreen] = useState<Screen>("subject");
   const [selectedSubject, setSelectedSubject] = useState<SubjectId>("english");
   const [selectedChapter, setSelectedChapter] = useState<number>(1);
+  const [mathsPath, setMathsPath] = useState<"meri" | "sione" | null>(null);
 
   const [selectedAvatar] = useState<number>(profile.avatarIdx);
   const [selectedGrade] = useState<number>(profile.grade);
@@ -97,6 +100,36 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
 
   function handleChapterSelect(chapterId: number) {
     setSelectedChapter(chapterId);
+
+    // Maths Ch.2 — individualised demo (Meri = slow, Sione = fast, others = Meri path)
+    if (selectedSubject === "maths" && chapterId === 2) {
+      // Path determined by student's actual learning history — not by name
+      // High progress (≥55%) + consistent streak (≥3) → challenge path
+      const isConfident = profile.lessonProgress >= 55 && profile.streak >= 3;
+      setMathsPath(isConfident ? "sione" : "meri");
+      const learnerType = isConfident ? "Fast Learner" : "Needs Support";
+      const pathNote = isConfident
+        ? `High prior performance detected. Skipping visual scaffolding. Harder numbers loaded (4+3, 5+4, 6+2, word problem with Kina).`
+        : `Slower response pattern in prior sessions. Visual emoji aids enabled. Tok Pisin first. Smaller numbers (2+1, 3+2, 4+1).`;
+      const langNote = isConfident
+        ? `Language: English primary. Tok Pisin as secondary label only.`
+        : `Language: Tok Pisin first. English translation shown below each question.`;
+      setScreen("session");
+      setSessionMode("story");
+      setStoryPage(0);
+      setSessionProgress(20);
+      setConsecutiveCorrect(0);
+      setConfidence(isConfident ? 68 : 35);
+      setSessionAILog([
+        { type: "info",     label: "Maths Ch.2 — Putim Wantaim",   text: `${profile.name} · Grade 2 Maths · Adding Up. Story: "Beni long Maket".`, time: nowStr() },
+        { type: "decision", label: "AI: Profile Analysis",          text: `${profile.name} — Progress: ${profile.lessonProgress}% · Streak: ${profile.streak} days. Path assigned: ${learnerType}.`, time: nowStr() },
+        { type: "decision", label: "AI: Content Loaded",            text: pathNote, time: nowStr() },
+        { type: "info",     label: "Language Setting",              text: langNote, time: nowStr() },
+      ]);
+      setCurrentDecision(`${profile.name} — ${learnerType} path. Story loading…`);
+      return;
+    }
+
     if (!isNew && profile.placement) {
       // Returning student — skip diagnostic, go straight to session
       const streakBonus = profile.streak >= 5 ? "🔥 5-day streak — AI boosting difficulty." : profile.streak >= 3 ? `${profile.streak}-day streak active.` : "Returning student.";
@@ -121,7 +154,9 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
   // ── Word highlight ──
   useEffect(() => {
     if (sessionMode !== "story") return;
-    const pages = chapter === 1 ? STORY_PAGES : STORY_PAGES_2;
+    const pages = mathsPath != null ? MATHS_STORY_PAGES
+      : chapter === 1 ? STORY_PAGES : STORY_PAGES_2;
+    if (!pages[storyPage]) return;
     const { words } = pages[storyPage];
     setLitWordIdx(0);
     let i = 0;
@@ -197,10 +232,12 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
   }
 
   function handleNextStoryPage() {
-    const pages = chapter === 1 ? STORY_PAGES : STORY_PAGES_2;
+    const isMathsDemo = mathsPath != null;
+    const pages = isMathsDemo ? MATHS_STORY_PAGES
+      : chapter === 1 ? STORY_PAGES : STORY_PAGES_2;
     if (storyPage < pages.length - 1) {
       setStoryPage(p => p + 1);
-      setSessionProgress(p => Math.min(p + 6, chapter === 1 ? 45 : 90));
+      setSessionProgress(p => Math.min(p + 6, isMathsDemo ? 45 : chapter === 1 ? 45 : 90));
     } else {
       setSessionMode("activity");
       setActIdx(0);
@@ -219,7 +256,10 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
     if (actSelected) return;
     const elapsed = Math.round((Date.now() - startTimeRef.current) / 1000);
     setResponseTime(elapsed);
-    const currentActivities = chapter === 1 ? ACTIVITIES : ACTIVITIES_2;
+    const isMathsDemo = mathsPath !== null;
+    const currentActivities = isMathsDemo
+      ? (mathsPath === "sione" ? MATHS_ACTIVITIES_SIONE : MATHS_ACTIVITIES_MERI)
+      : chapter === 1 ? ACTIVITIES : ACTIVITIES_2;
     const act = currentActivities[actIdx];
     const correct = val === act.correct;
 
@@ -261,7 +301,9 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
       setTutorMsg({ tok: `YES! Gutpela wok tru, ${AVATARS[selectedAvatar].tok}!`, en: "YES! Excellent work!" });
 
       setTimeout(() => {
-        const currentActivities = chapter === 1 ? ACTIVITIES : ACTIVITIES_2;
+        const currentActivities = isMathsDemo
+          ? (mathsPath === "sione" ? MATHS_ACTIVITIES_SIONE : MATHS_ACTIVITIES_MERI)
+          : chapter === 1 ? ACTIVITIES : ACTIVITIES_2;
         if (actIdx < currentActivities.length - 1) {
           setActIdx(i => i + 1);
           setActSelected(null);
@@ -269,6 +311,18 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
           setHintsUsed(0);
           startTimeRef.current = Date.now();
           setShowTutor(false);
+          // Maths demo: live AI log on advancement
+          if (isMathsDemo) {
+            if (mathsPath === "sione" && fast && hintsUsed === 0) {
+              addSessionLog({ type: "decision", label: "⚡ AI: Scaffolding Removed", text: `${profile.name} — no hints, fast response. Visual aids hidden. Moving to harder number combination.`, time: nowStr() });
+            } else if (mathsPath === "meri" && !fast) {
+              addSessionLog({ type: "info", label: "⚡ AI: Pace Noted", text: `${profile.name} — slower response (${elapsed}s). Tok Pisin label kept. Visual emoji aids maintained for next question.`, time: nowStr() });
+            }
+          }
+        } else if (isMathsDemo) {
+          // Maths demo complete → celebration
+          addSessionLog({ type: "success", label: "✅ Lesson Complete", text: `${profile.name} finished all ${currentActivities.length} Adding Up activities. Grade 2 Maths Ch.2 — Putim Wantaim ✓`, time: nowStr() });
+          setScreen("celebration");
         } else if (chapter === 1) {
           // Chapter 1 done → transition to Chapter 2
           const diffNote = confidence >= 70
@@ -303,6 +357,7 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
       setConfidence(c => Math.max(c - 8, 5));
       setAccuracy("Needs Support");
 
+      const isMathsDemoWrong = selectedSubject === "maths" && selectedChapter === 2;
       addSessionLog({
         type: "warning",
         label: newWrong >= 2 ? "Pattern Detected" : "Incorrect Response",
@@ -315,11 +370,18 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
       if (newWrong >= 2) {
         setCurrentDecision(`${profile.name} — 2 errors on this concept. Visual support activated.`);
         addSessionLog({ type: "decision", label: "AI Intervention", text: `Visual scaffold activated. Simplified layout. No shame message. ${profile.name} gets full support.`, time: nowStr() });
+        if (isMathsDemoWrong) {
+          addSessionLog({ type: "decision", label: "⚡ AI: Maths Support", text: `Emoji visual restored. Question re-phrased in Tok Pisin. Reducing answer choices from 3 to visual match.`, time: nowStr() });
+        }
         setShowTutor(true);
         setTutorMsg({ tok: "No wari. Yumi lukim dispela wantaim.", en: "No worries. Let's look at this together." });
       } else {
         setShowTutor(true);
-        setTutorMsg({ tok: "Mmm... traim gen. Yu inap!", en: "Hmm... try again. You can do it!" });
+        setTutorMsg(
+          isMathsDemoWrong
+            ? { tok: "Mmm... kauntim gen wantaim mi. Yu inap!", en: "Hmm... count again with me. You can do it!" }
+            : { tok: "Mmm... traim gen. Yu inap!", en: "Hmm... try again. You can do it!" }
+        );
         setCurrentDecision(`${profile.name} — one error, staying at same difficulty. Encouragement active.`);
       }
 
@@ -401,12 +463,9 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
               storyPage={storyPage} litWordIdx={litWordIdx}
               actIdx={actIdx} actSelected={actSelected} actWrong={actWrong}
               sessionProgress={sessionProgress} showTutor={showTutor} tutorMsg={tutorMsg}
-              sessionAILog={sessionAILog} currentDecision={currentDecision}
-              masteryData={masteryData} responseTime={responseTime}
-              hintsUsed={hintsUsed} accuracy={accuracy} confidence={confidence}
               chapter={chapter} consecutiveCorrect={consecutiveCorrect}
+              mathsPath={mathsPath}
               onNextStoryPage={handleNextStoryPage} onActivityAnswer={handleActivityAnswer}
-              logRef={logRef}
             />
           </motion.div>
         )}
@@ -427,6 +486,30 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
               lang={lang} dashFilter={dashFilter}
               setDashFilter={setDashFilter} onSessionEnd={onSessionEnd}
             />
+          </motion.div>
+        )}
+
+        {screen === "ai-monitor" && (
+          <motion.div key="ai-monitor" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}
+            style={{ display: "flex", flex: 1, overflow: "hidden", background: "#0a1a0f" }}>
+            <div style={{ width: "100%", overflowY: "auto", padding: "24px 0" }}>
+              <div style={{ textAlign: "center", color: "#52B788", fontSize: 11, letterSpacing: 2, fontWeight: 700, marginBottom: 12, opacity: 0.6 }}>
+                TEACHER VIEW — NOT VISIBLE TO STUDENT
+              </div>
+              <AIPanel
+                profile={profile}
+                selectedGrade={selectedGrade}
+                responseTime={responseTime}
+                hintsUsed={hintsUsed}
+                accuracy={accuracy}
+                confidence={confidence}
+                sessionMode={sessionMode}
+                masteryData={masteryData}
+                currentDecision={currentDecision}
+                sessionAILog={sessionAILog}
+                logRef={logRef}
+              />
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -473,6 +556,15 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
               <rect x="17" y="3" width="5" height="18" rx="1" stroke="currentColor" strokeWidth="2"/>
             </svg>
           </span>Class View
+        </button>
+        <button className={`nav-tab${screen === "ai-monitor" ? " active" : ""}`} onClick={() => setScreen("ai-monitor")}>
+          <span className="nav-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="3" fill="currentColor"/>
+              <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <path d="M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </span>AI Log
         </button>
       </div>
     </div>

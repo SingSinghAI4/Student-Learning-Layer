@@ -1,11 +1,14 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ActivityMode, AIEntry, MasteryItem } from "../types";
-import { AVATARS, STORY_PAGES, STORY_PAGES_2, ACTIVITIES, ACTIVITIES_2 } from "../data";
+import { ActivityMode } from "../types";
+import { AVATARS, STORY_PAGES, STORY_PAGES_2, ACTIVITIES, ACTIVITIES_2,
+         MATHS_STORY_PAGES, MATHS_ACTIVITIES_MERI, MATHS_ACTIVITIES_SIONE,
+         MathsActivity, MathsStoryPage } from "../data";
 import { StudentProfile } from "../LoginScreen";
-import AIPanel from "./AIPanel";
 import VoiceWaveform from "./VoiceWaveform";
 import { useSpeech } from "../hooks/useSpeech";
+import TeachMoment from "./TeachMoment";
+import MathsStoryScene from "./MathsStoryScene";
 
 interface Props {
   profile: StudentProfile;
@@ -22,18 +25,11 @@ interface Props {
   sessionProgress: number;
   showTutor: boolean;
   tutorMsg: { tok: string; en: string };
-  sessionAILog: AIEntry[];
-  currentDecision: string;
-  masteryData: MasteryItem[];
-  responseTime: number;
-  hintsUsed: number;
-  accuracy: string;
-  confidence: number;
   chapter: number;
   consecutiveCorrect: number;
+  mathsPath?: "meri" | "sione" | null;
   onNextStoryPage: () => void;
   onActivityAnswer: (val: string) => void;
-  logRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export default function SessionScreen({
@@ -51,25 +47,33 @@ export default function SessionScreen({
   sessionProgress,
   showTutor,
   tutorMsg,
-  sessionAILog,
-  currentDecision,
-  masteryData,
-  responseTime,
-  hintsUsed,
-  accuracy,
-  confidence,
   chapter,
   consecutiveCorrect,
+  mathsPath,
   onNextStoryPage,
   onActivityAnswer,
-  logRef,
 }: Props) {
-  const storyPages = chapter === 1 ? STORY_PAGES : STORY_PAGES_2;
-  const activities = chapter === 1 ? ACTIVITIES : ACTIVITIES_2;
+  const isMathsDemo = mathsPath != null;
+  const storyPages = isMathsDemo ? MATHS_STORY_PAGES
+    : chapter === 1 ? STORY_PAGES : STORY_PAGES_2;
+  const activities = isMathsDemo
+    ? (mathsPath === "sione" ? MATHS_ACTIVITIES_SIONE : MATHS_ACTIVITIES_MERI)
+    : chapter === 1 ? ACTIVITIES : ACTIVITIES_2;
 
   const { speaking: storySpeaking, speak: speakStory, stop: stopStory } = useSpeech();
   const { speaking: tutorSpeaking, speak: speakTutor } = useSpeech();
   const { speaking: actSpeaking,   speak: speakAct   } = useSpeech();
+
+  // ── Interactive story state ──
+  // tap-count: interactionStep counts taps up to tapCount
+  // tap-add:   interactionStep goes 0 → 1 when + is tapped
+  const [interactionStep, setInteractionStep] = useState(0);
+  const [addCombined, setAddCombined] = useState(false); // true after tap-add animation done
+
+  // ── TeachMoment state ──
+  const [showTeachMoment, setShowTeachMoment] = useState(false);
+  const [wrongAttemptCount, setWrongAttemptCount] = useState(0); // per activity, selects technique
+  const prevActWrongRef = useRef<string | null>(null);
 
   // ── Pokémon-energy animation state ──
   const [mascotState, setMascotState] = useState<"idle"|"correct"|"wrong"|"excited">("idle");
@@ -118,8 +122,43 @@ export default function SessionScreen({
     }
   }, [consecutiveCorrect]);
 
-  // Floating particles per chapter
-  const particles = chapter === 2
+  // Reset interactive state when story page changes
+  useEffect(() => {
+    setInteractionStep(0);
+    setAddCombined(false);
+  }, [storyPage]);
+
+  // Reset TeachMoment tracking when activity changes
+  useEffect(() => {
+    setShowTeachMoment(false);
+    setWrongAttemptCount(0);
+    prevActWrongRef.current = null;
+  }, [actIdx]);
+
+  // Show TeachMoment on wrong answer (with a short delay for shake to complete)
+  // Increments wrongAttemptCount so each wrong attempt picks a different technique
+  useEffect(() => {
+    if (actWrong && actWrong !== prevActWrongRef.current && sessionMode === "activity" && isMathsDemo) {
+      prevActWrongRef.current = actWrong;
+      setWrongAttemptCount(c => c + 1);
+      const t = setTimeout(() => setShowTeachMoment(true), 520);
+      return () => clearTimeout(t);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [actWrong]);
+
+  // Floating particles per chapter / subject
+  const particles = isMathsDemo ? [
+    { emoji:"🥭", left:"4%",  size:20, dur:9,  delay:0   },
+    { emoji:"🥥", left:"15%", size:22, dur:12, delay:2   },
+    { emoji:"🍌", left:"27%", size:18, dur:8,  delay:1   },
+    { emoji:"🔢", left:"40%", size:16, dur:11, delay:4   },
+    { emoji:"🏪", left:"54%", size:20, dur:10, delay:3   },
+    { emoji:"⭐", left:"66%", size:14, dur:9,  delay:5   },
+    { emoji:"🥭", left:"78%", size:22, dur:13, delay:1.5 },
+    { emoji:"💰", left:"90%", size:18, dur:10, delay:6   },
+    { emoji:"➕", left:"50%", size:16, dur:12, delay:3.5 },
+  ] : chapter === 2
     ? [
         { emoji:"🌊", left:"4%",  size:20, dur:9,  delay:0   },
         { emoji:"🐠", left:"16%", size:22, dur:12, delay:3   },
@@ -309,54 +348,92 @@ export default function SessionScreen({
 
           {/* Story card */}
           <AnimatePresence mode="wait">
-            {sessionMode === "story" && (
-              <motion.div
-                key={`story-${storyPage}`}
-                className="story-card"
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -50 }}
-                transition={{ duration: 0.35 }}
-              >
-                <motion.div
-                  className="story-scene"
-                  key={storyPage}
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.4, type: "spring", bounce: 0.4 }}
-                >
-                  {storyPages[storyPage].scene}
-                </motion.div>
-                <div className="story-text">
-                  {storyPages[storyPage].words.map((w, i) => (
-                    <motion.span
-                      key={i}
-                      className={`story-word${litWordIdx === i ? " lit" : ""}`}
-                      animate={litWordIdx === i ? { scale: 1.18, y: -3 } : { scale: 1, y: 0 }}
-                      transition={{ duration: 0.18 }}
-                    >
-                      {w}{" "}
-                    </motion.span>
-                  ))}
-                </div>
-                {/* Voice waveform — active while narrating */}
-                <div style={{ display: "flex", justifyContent: "center", margin: "10px 0 4px" }}>
-                  <VoiceWaveform active={storySpeaking} lang={lang} size="md" />
-                </div>
+            {sessionMode === "story" && (() => {
+              const page = storyPages[storyPage];
+              const mp = isMathsDemo ? (page as MathsStoryPage) : null;
+              const isTapCount = mp?.interactive === "tap-count";
+              const isTapAdd   = mp?.interactive === "tap-add";
+              const tapTarget  = isTapCount ? (mp?.tapCount ?? 0) : isTapAdd ? 1 : 0;
+              const interactionDone = mp?.interactive ? interactionStep >= tapTarget : true;
 
-                <div className="story-tr">{storyPages[storyPage].en}</div>
-                <div className="story-btns">
-                  <motion.button
-                    className="btn-primary"
-                    onClick={onNextStoryPage}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.96 }}
-                  >
-                    {storyPage < storyPages.length - 1 ? "Next ▶" : "Start Activity! 🎯"}
-                  </motion.button>
-                </div>
-              </motion.div>
-            )}
+              return (
+                <motion.div
+                  key={`story-${storyPage}`}
+                  className="story-card"
+                  initial={{ opacity: 0, x: 50 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -50 }}
+                  transition={{ duration: 0.35 }}
+                >
+                  {/* ── Maths demo: rich animated scene ── */}
+                  {isMathsDemo ? (
+                    <MathsStoryScene
+                      slideIndex={storyPage}
+                      slide={page as MathsStoryPage}
+                      interactionStep={interactionStep}
+                      addCombined={addCombined}
+                      onTapCount={() => setInteractionStep(s => s + 1)}
+                      onTapAdd={() => { setInteractionStep(1); setAddCombined(true); }}
+                    />
+                  ) : (
+                    /* Non-maths: plain emoji scene */
+                    <motion.div
+                      className="story-scene"
+                      key={storyPage}
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.4, type: "spring", bounce: 0.4 }}
+                    >
+                      {page.scene}
+                    </motion.div>
+                  )}
+
+                  {/* Story text */}
+                  <div className="story-text">
+                    {page.words.map((w, i) => (
+                      <motion.span
+                        key={i}
+                        className={`story-word${litWordIdx === i ? " lit" : ""}`}
+                        animate={litWordIdx === i ? { scale: 1.18, y: -3 } : { scale: 1, y: 0 }}
+                        transition={{ duration: 0.18 }}
+                      >
+                        {w}{" "}
+                      </motion.span>
+                    ))}
+                  </div>
+
+                  <div style={{ display: "flex", justifyContent: "center", margin: "8px 0 2px" }}>
+                    <VoiceWaveform active={storySpeaking} lang={lang} size="md" />
+                  </div>
+
+                  <div className="story-tr">{page.en}</div>
+
+                  <div className="story-btns">
+                    {interactionDone ? (
+                      <motion.button
+                        className="btn-primary"
+                        onClick={onNextStoryPage}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.96 }}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ type: "spring", bounce: 0.5 }}
+                      >
+                        {storyPage < storyPages.length - 1 ? "Next ▶" : "Start Activity! 🎯"}
+                      </motion.button>
+                    ) : (
+                      <motion.div
+                        animate={{ opacity: [0.5, 1, 0.5] }}
+                        transition={{ duration: 1, repeat: Infinity }}
+                        style={{ color: "#52B788", fontSize: 13, padding: "10px 0" }}
+                      >
+                        {isTapCount ? `👆 Tap to count all ${mp!.tapCount} items first` : "👆 Tap ➕ to add the groups together"}
+                      </motion.div>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })()}
           </AnimatePresence>
 
           {/* Chapter break card */}
@@ -422,7 +499,7 @@ export default function SessionScreen({
                 <div className="act-options">
                   {activities[actIdx].options.map((opt, i) => {
                     const isCorrect = actSelected === opt.val;
-                    const isWrong = actWrong === opt.val;
+                    const isWrong = !showTeachMoment && actWrong === opt.val;
                     return (
                       <motion.button
                         key={i}
@@ -453,6 +530,25 @@ export default function SessionScreen({
 
         </div>
 
+        {/* ── TeachMoment overlay (fires on wrong answer for maths) ── */}
+        <AnimatePresence>
+          {showTeachMoment && isMathsDemo && (() => {
+            const act = activities[actIdx] as MathsActivity;
+            return (
+              <TeachMoment
+                addends={act.addends}
+                emojiA={act.emojiA}
+                emojiB={act.emojiB}
+                attemptNumber={wrongAttemptCount}
+                onDismiss={() => {
+                  setShowTeachMoment(false);
+                  prevActWrongRef.current = null; // allow re-trigger on next wrong
+                }}
+              />
+            );
+          })()}
+        </AnimatePresence>
+
         {/* ── Mascot character ── */}
         <div className="mascot-wrap">
           <motion.div
@@ -477,20 +573,6 @@ export default function SessionScreen({
         </div>
       </div>
 
-      {/* ── AI Panel ── */}
-      <AIPanel
-        profile={profile}
-        selectedGrade={selectedGrade}
-        responseTime={responseTime}
-        hintsUsed={hintsUsed}
-        accuracy={accuracy}
-        confidence={confidence}
-        sessionMode={sessionMode}
-        masteryData={masteryData}
-        currentDecision={currentDecision}
-        sessionAILog={sessionAILog}
-        logRef={logRef}
-      />
     </div>
   );
 }
