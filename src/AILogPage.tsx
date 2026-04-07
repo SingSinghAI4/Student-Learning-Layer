@@ -6,6 +6,7 @@ interface LogEntry {
   label: string;
   text: string;
   time: string;
+  phase?: string; // e.g. "Story — Slide 4" | "Activity 2" | "Session"
 }
 
 interface MasteryItem { name: string; pct: number; }
@@ -60,14 +61,24 @@ export default function AILogPage({
   mastery, log,
 }: AILogPageProps) {
   const logRef  = useRef<HTMLDivElement>(null);
-  const [blink, setBlink]           = useState(true);
-  const [visibleCount, setVisible]  = useState(0);
+  const [blink, setBlink]     = useState(true);
+  const [visibleCount, setVisible] = useState(0);
+  const done = visibleCount >= log.length;
 
+  // Click anywhere on log panel (or press Space/→) to reveal next entry
+  function revealNext() {
+    setVisible(v => Math.min(v + 1, log.length));
+  }
+
+  // Keyboard: Space or ArrowRight to advance
   useEffect(() => {
-    let i = 0;
-    const iv = setInterval(() => { i++; setVisible(i); if (i >= log.length) clearInterval(iv); }, 160);
-    return () => clearInterval(iv);
-  }, [log.length]);
+    function onKey(e: KeyboardEvent) {
+      if (e.code === "Space" || e.code === "ArrowRight") { e.preventDefault(); revealNext(); }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const iv = setInterval(() => setBlink(b => !b), 530);
@@ -196,19 +207,38 @@ export default function AILogPage({
             background: "#111", borderBottom: "1px solid #555",
             padding: "6px 20px", display: "flex", alignItems: "center", gap: 12, flexShrink: 0,
           }}>
-            <span style={{ color: "#27c93f", fontWeight: 700 }}>● LIVE</span>
+            <span style={{ color: done ? "#555" : "#27c93f", fontWeight: 700 }}>{done ? "● IDLE" : "● LIVE"}</span>
             <span style={{ color: "#333" }}>│</span>
             <span style={{ color: "#ccc" }}>ai-engine/adaptive-session</span>
             <span style={{ color: "#666" }}>│</span>
             <span style={{ color: "#bbb" }}>pid:42811</span>
             <span style={{ color: "#666" }}>│</span>
-            <span style={{ color: "#bbb" }}>{log.length} events</span>
-            <span style={{ marginLeft: "auto", color: "#888", fontSize: 11 }}>↓ scroll</span>
+            <span style={{ color: "#bbb" }}>{visibleCount}/{log.length} events</span>
+            {/* Progress bar */}
+            <div style={{ flex: 1, height: 4, background: "#222", borderRadius: 2, marginLeft: 8, overflow: "hidden" }}>
+              <motion.div
+                animate={{ width: `${(visibleCount / log.length) * 100}%` }}
+                transition={{ duration: 0.3 }}
+                style={{ height: "100%", background: pathCol, borderRadius: 2 }}
+              />
+            </div>
+            {/* Click hint */}
+            {!done && (
+              <span style={{ color: "#555", fontSize: 11, flexShrink: 0 }}>
+                SPACE / → / click
+              </span>
+            )}
           </div>
 
-          {/* Log scroll area */}
-          <div ref={logRef} style={{ flex: 1, overflowY: "auto", padding: "16px 24px 48px", background: "#0d0d0d" }}>
-
+          {/* Log scroll area — click to advance */}
+          <div
+            ref={logRef}
+            onClick={revealNext}
+            style={{
+              flex: 1, overflowY: "auto", padding: "16px 24px 48px", background: "#0d0d0d",
+              cursor: done ? "default" : "pointer",
+            }}
+          >
             {/* Shell prompt + boot */}
             <div style={{ color: "#69ff47", marginBottom: 4 }}>
               root@singsingai:~$ python3 session_engine.py --student={studentName.toLowerCase()} --grade={grade} --subject=maths-ch2
@@ -218,48 +248,67 @@ export default function AILogPage({
             <div style={{ color: "#eee", marginBottom: 2 }}>Curriculum               →  PNG-DoE-2024 · grade{grade} · maths-ch2  <span style={{ color: "#69ff47" }}>✓</span></div>
             <div style={{ color: "#eee", marginBottom: 2 }}>Adaptive engine          →  <span style={{ color: "#69ff47" }}>ACTIVE</span></div>
             <div style={{ color: "#eee", marginBottom: 2 }}>Path resolver            →  <span style={{ color: pathCol }}>{path.toUpperCase()}</span></div>
-            <div style={{ color: "#555", margin: "14px 0 16px" }}>{"─".repeat(88)}</div>
+            <div style={{ color: "#555", margin: "14px 0 16px" }}>{"─".repeat(72)}</div>
 
             {/* Log entries */}
             {log.slice(0, visibleCount).map((e, i) => {
               const lineNum = String(i + 1).padStart(3, "0");
               const sentences = e.text.split(". ").filter(s => s.trim());
+              // Show a phase divider when the phase changes
+              const prevPhase = i > 0 ? log[i - 1].phase : undefined;
+              const showDivider = e.phase && e.phase !== prevPhase;
               return (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.1 }}
-                  style={{ marginBottom: 14, display: "flex", gap: 0 }}
-                >
-                  {/* Line number */}
-                  <span style={{ color: "#666", userSelect: "none", marginRight: 14, flexShrink: 0 }}>{lineNum}</span>
-
-                  {/* Entry content */}
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline" }}>
-                      <span style={{ color: "#ddd" }}>[{e.time}]&nbsp;</span>
-                      <span style={{ color: LEVEL_COLOR[e.type], fontWeight: 700 }}>[{LEVEL_TAG[e.type]}]&nbsp;</span>
-                      <span style={{ color: "#ccc" }}>ai.session.{e.type} ›</span>
-                      <span style={{ color: "#fff", fontWeight: 700 }}>{e.label}</span>
-                    </div>
-                    {sentences.map((s, si) => (
-                      <div key={si} style={{ color: "#f0f0f0", paddingLeft: 20, lineHeight: 1.75, marginTop: 1 }}>
-                        <span style={{ color: "#aaa" }}>│ </span>{s.trim()}{si < sentences.length - 1 ? "." : ""}
+                <div key={i}>
+                  {/* Phase divider */}
+                  {showDivider && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      style={{ color: "#444", fontSize: 11, margin: "16px 0 10px", letterSpacing: 1 }}
+                    >
+                      {"─".repeat(8)} {e.phase} {"─".repeat(8)}
+                    </motion.div>
+                  )}
+                  <motion.div
+                    initial={{ opacity: 0, x: -6 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.18 }}
+                    style={{ marginBottom: 14, display: "flex", gap: 0 }}
+                  >
+                    <span style={{ color: "#444", userSelect: "none", marginRight: 14, flexShrink: 0 }}>{lineNum}</span>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", flexWrap: "wrap", alignItems: "baseline", gap: 4 }}>
+                        <span style={{ color: "#666" }}>[{e.time}]</span>
+                        <span style={{ color: LEVEL_COLOR[e.type], fontWeight: 700 }}>[{LEVEL_TAG[e.type]}]</span>
+                        <span style={{ color: "#888" }}>ai.session ›</span>
+                        <span style={{ color: "#fff", fontWeight: 700 }}>{e.label}</span>
                       </div>
-                    ))}
-                  </div>
-                </motion.div>
+                      {sentences.map((s, si) => (
+                        <div key={si} style={{ color: "#e8e8e8", paddingLeft: 20, lineHeight: 1.8, marginTop: 1 }}>
+                          <span style={{ color: "#555" }}>│ </span>{s.trim()}{si < sentences.length - 1 ? "." : ""}
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                </div>
               );
             })}
 
-            {/* Waiting cursor */}
-            {visibleCount >= log.length && (
+            {/* Waiting cursor / done state */}
+            {done ? (
               <div style={{ display: "flex", marginTop: 6 }}>
                 <span style={{ color: "#333", marginRight: 14 }}>{String(log.length + 1).padStart(3, "0")}</span>
-                <span style={{ color: "#ddd" }}>[{log[log.length - 1]?.time}] [INFO    ] ai.session · awaiting next event&nbsp;</span>
+                <span style={{ color: "#555" }}>[{log[log.length - 1]?.time}] [INFO    ] ai.session · session closed&nbsp;</span>
                 <span style={{ color: "#69ff47", opacity: blink ? 1 : 0 }}>█</span>
               </div>
+            ) : (
+              <motion.div
+                animate={{ opacity: [0.3, 0.8, 0.3] }}
+                transition={{ duration: 1.2, repeat: Infinity }}
+                style={{ color: "#444", fontSize: 11, marginTop: 10, userSelect: "none" }}
+              >
+                ▸ click · space · → to reveal next event ({log.length - visibleCount} remaining)
+              </motion.div>
             )}
           </div>
 
@@ -295,9 +344,9 @@ export const MERI_LOG_DATA: AILogPageProps = {
   chapter: "Ch.2 — Putim Wantaim (Adding Up)",
   path: "Support Path",
   pathColor: "#ffd740",
-  confidence: 38,
+  confidence: 44,
   responseTime: "16s avg",
-  hints: 2,
+  hints: 3,
   accuracy: "75%",
   currentDecision: "Meri — 2 errors on Q5 (3+3). Visual scaffold re-enabled. Tok Pisin first throughout. sum=6 gap flagged for next session.",
   mastery: [
@@ -307,35 +356,69 @@ export const MERI_LOG_DATA: AILogPageProps = {
     { name: "Tok Pisin read",  pct: 55 },
   ],
   log: [
-    { type: "info",     label: "Session Started — Support Path",    text: "Meri · Grade 2 · Maths Ch.2. Profile analysis: lessonProgress 45%, streak 2 days. Support path assigned. Visual aids + Tok Pisin first enabled. 6 activities queued.", time: "14:28:01" },
-    { type: "decision", label: "AI: Content Loaded",                text: "Slower response pattern in prior sessions detected. Visual emoji aids ON. Tok Pisin first. Smaller numbers selected: 2+3 story check, 2+1, 3+2, 4+1, 3+3, 4+2 basket.", time: "14:28:01" },
-    { type: "info",     label: "Language Setting",                  text: "Language: Tok Pisin first. English translation shown below each question. No timer pressure on student-facing UI.", time: "14:28:02" },
-    { type: "info",     label: "Story — Beni long Maket",           text: "Story loaded. Meri reading slide 1 of 6. Word-by-word narration active. AI observing reading pace and hesitation patterns.", time: "14:28:10" },
-    { type: "info",     label: "Story — Slide 3",                   text: "Meri paused on slide 3 — Mama buys 2 mangoes. 8s dwell time. AI flagging this as a potential comprehension check point for Q1.", time: "14:28:42" },
-    { type: "info",     label: "Story Complete",                    text: "All 6 story slides read. Total story time: 74s. Normal pace for support profile. Moving to activities.", time: "14:29:24" },
-    { type: "info",     label: "Q1 — Story Check: 2+3",            text: "Question: 🥭🥭 + 🥥🥥🥥 = ? Visual emoji displayed. Tok Pisin: Mama i baim 2 mango na 3 kokonas. Hamas olgeta? Difficulty: 1.", time: "14:29:27" },
-    { type: "success",  label: "Correct — Q1 (1st attempt)",        text: "Meri answered 5 in 18s. Correct. Story context aided recall. mastery[addition_visual]: 28% → 38%. hint_count: 0. Good start.", time: "14:29:45" },
-    { type: "info",     label: "⚡ AI: Baseline Signal",             text: "Q1 correct — story-anchored question as expected. 18s response acceptable for support profile. Retaining full visual scaffold for Q2.", time: "14:29:46" },
-    { type: "info",     label: "Q2 — Kauntim Banana: 2+1",         text: "Question: 🍌🍌 + 🍌 = ? Tok Pisin: Beni i gat 2 banana. Em i kisim 1 moa. Hamas nau? Difficulty: 1. AI watching for response time.", time: "14:29:50" },
-    { type: "warning",  label: "Incorrect — Q2 attempt 1",         text: "Meri selected 4. Correct answer: 3. Error #1. Gentle redirect shown: Mmm kauntim gen wantaim mi. No penalty. hint_count: 1.", time: "14:30:04" },
-    { type: "decision", label: "AI: Stay at Same Level",           text: "1 error on Q2 — insufficient signal to escalate. Keeping visual scaffold. Will not remove aids until 2 consecutive correct.", time: "14:30:05" },
-    { type: "success",  label: "Correct — Q2 attempt 2",           text: "Meri answered 3 in 26s total. Self-corrected with emoji count. mastery[addition_visual]: 38% → 43%. Gentle praise rendered.", time: "14:30:16" },
-    { type: "info",     label: "⚡ AI: Pace Noted",                 text: "Q2 took 26s across 2 attempts. Tok Pisin label retained. Visual emoji aids maintained. 1 error this session so far.", time: "14:30:17" },
-    { type: "info",     label: "Q3 — Kokonas Basket: 3+2",         text: "Question: 🥥🥥🥥 + 🥥🥥 = ? Tok Pisin: Em i putim 3 kokonas long basket, bai em i kisim 2 moa. Hamas olgeta? Difficulty: 1.", time: "14:30:20" },
-    { type: "success",  label: "Correct — Q3 (1st attempt)",        text: "Meri answered 5 in 14s. Correct. Faster than Q2. mastery[addition_visual]: 43% → 50%. consecutive_correct: 1. Improvement detected.", time: "14:30:34" },
-    { type: "info",     label: "⚡ AI: Slight Improvement",         text: "Q3: 14s vs Q2: 26s. 1st attempt correct. Confidence score rising. Still retaining visual aids — need 2 consecutive to remove scaffold.", time: "14:30:35" },
-    { type: "info",     label: "Q4 — Maket Maths: 4+1",           text: "Question: 🍌🍌🍌🍌 + 🍍 = ? Tok Pisin: Beni i holim 4 banana, em i kisim 1 pineapple. Hamas frut olgeta? Difficulty: 1.", time: "14:30:38" },
-    { type: "success",  label: "Correct — Q4 (1st attempt)",        text: "Meri answered 5 in 11s. Fastest response so far. consecutive_correct: 2. mastery[addition_visual]: 50% → 56%. Confidence: 28% → 38%.", time: "14:30:49" },
-    { type: "decision", label: "⚡ AI: Streak — Advancing",         text: "2 consecutive correct. Confidence rising. Advancing to next difficulty. Q5: 3+3 — both object groups new (papaya + papaya). Emoji scaffold retained.", time: "14:30:50" },
-    { type: "info",     label: "Q5 — Papaya: 3+3",                 text: "Question: 🍈🍈🍈 + 🍈🍈🍈 = ? Tok Pisin: 3 kapaia long dispela han, 3 kapaia long narapela han. Hamas olgeta? Difficulty: 2. sum=6 is a common gap.", time: "14:30:53" },
-    { type: "warning",  label: "Incorrect — Q5 attempt 1",         text: "Meri selected 5. Correct: 6. Error #1 on Q5. sum=6 gap confirmed. Gentle retry prompt shown. No penalty. total_errors: 2.", time: "14:31:09" },
-    { type: "warning",  label: "Pattern — Q5 attempt 2",           text: "Meri selected 7. Correct: 6. Error #2 on same question. Consistent mis-estimation around sum=6. Flag: sum_to_6_gap=true.", time: "14:31:21" },
-    { type: "decision", label: "AI: Full Support Mode",            text: "Emoji scaffold restored. Question re-phrased: count left group first, then right group, then add. No shame message. Full support mode active.", time: "14:31:22" },
-    { type: "success",  label: "Correct — Q5 attempt 3",          text: "Meri answered 6 in 41s total with guided scaffold. Correct. mastery[number_bonds]: 22% → 31%. Flag persists for next session revision.", time: "14:31:38" },
-    { type: "info",     label: "Q6 — Basket Story: 4+2",          text: "Question: 🧺 Meri i putim 4 mango na 2 kokonas long basket. Hamas frut i stap long basket? Difficulty: 2. First word-problem format.", time: "14:31:41" },
-    { type: "success",  label: "Correct — Q6 (1st attempt)",       text: "Meri answered 6 in 16s. Correct. Read narrative, extracted numbers, added correctly. mastery[word_problems]: 15% → 22%. Confidence: 38% → 44%.", time: "14:31:57" },
-    { type: "success",  label: "✅ Lesson Complete",               text: "Meri finished all 6 Adding Up activities. Grade 2 Maths Ch.2 complete. overall_mastery: 28% → 48%. streak: 2 → 3 days. total_errors: 3.", time: "14:31:58" },
-    { type: "decision", label: "AI: Next Session Plan",            text: "Flag: sum_to_6_gap=true. Next session opens with visual 3+3 revision before advancing. Word-problem format showed promise — include 1 per session. Writing to student profile.", time: "14:31:59" },
+    // ── SESSION INIT ─────────────────────────────────────────────────────────
+    { phase: "Session Init", type: "info",     label: "Session Started — Support Path",   text: "Meri · Grade 2 · Maths Ch.2 — Putim Wantaim. Profile loaded: lessonProgress 45%, streak 2 days, avg_response 18s. Support path assigned.", time: "14:28:01" },
+    { phase: "Session Init", type: "decision", label: "AI: Path Selection",               text: "lessonProgress=45% below threshold (55%) AND streak=2 below threshold (3). → Support path. Visual emoji aids ON. Tok Pisin first. Numbers: 1+1, 2+1, 3+2, 4+1, 2+4, 3+3, 4+2 (scaffolded).", time: "14:28:01" },
+    { phase: "Session Init", type: "info",     label: "AI: Language Config",              text: "Language mode: Tok Pisin primary. English below as translation. No countdown timer on student UI. hint_budget: 3.", time: "14:28:02" },
+
+    // ── STORY ────────────────────────────────────────────────────────────────
+    { phase: "Story — 10 Slides", type: "info",     label: "Story Loaded — Slide 1/10",        text: "Scene: 🌅 Dawn at Beni's house. Word-by-word narration active. AI observing dwell time and hesitation between word highlights.", time: "14:28:10" },
+    { phase: "Story — 10 Slides", type: "info",     label: "Story — Slide 2/10",               text: "Scene: Mama calls Beni to market. Tap-next pace: 7s. Normal for support profile.", time: "14:28:18" },
+    { phase: "Story — 10 Slides", type: "info",     label: "Story — Slide 3/10",               text: "Scene: Walking to market. Pace 8s. AI noting no hesitation — comprehension intact.", time: "14:28:27" },
+    { phase: "Story — 10 Slides", type: "info",     label: "Story — Slide 4/10 ✋ TAP",        text: "Interactive: tap each 🥭 to count to 2. Meri completed in 9s — tapped twice, deliberate. Interaction recorded.", time: "14:28:36" },
+    { phase: "Story — 10 Slides", type: "info",     label: "Story — Slide 5/10",               text: "Scene: 2 mangoes in basket confirmed. 6s dwell — Meri looking at the number badge.", time: "14:28:43" },
+    { phase: "Story — 10 Slides", type: "info",     label: "Story — Slide 6/10 ✋ TAP",        text: "Interactive: tap each 🥥 to count to 3. Meri tapped slowly — 14s. Counted aloud likely. interaction_time: 14s.", time: "14:28:52" },
+    { phase: "Story — 10 Slides", type: "warning",  label: "AI: Slow Tap Noted — Slide 6",     text: "14s on tap-count for 3 coconuts suggests manual counting needed. Flag: counting_by_one=likely. Will use emoji visual aids throughout activities.", time: "14:28:53" },
+    { phase: "Story — 10 Slides", type: "info",     label: "Story — Slide 7/10",               text: "Scene: 3 coconuts in basket. Meri nodded at screen (observed by supervisor). Comprehension signal: strong.", time: "14:29:01" },
+    { phase: "Story — 10 Slides", type: "info",     label: "Story — Slide 8/10 ✋ TAP-ADD",    text: "Interactive: tap ➕ to merge 2 mangoes + 3 coconuts. Meri hesitated 5s before tapping. Then watched animation fully. Engaged.", time: "14:29:10" },
+    { phase: "Story — 10 Slides", type: "decision", label: "AI: Story Comprehension Check",    text: "Slide 8 hesitation (5s before ➕) suggests Meri is processing the concept, not confused. Positive signal. Q1 will anchor to this exact scene.", time: "14:29:11" },
+    { phase: "Story — 10 Slides", type: "info",     label: "Story — Slide 9/10",               text: "Scene: 5 olgeta celebration. Meri smiled (supervisor note). Total = revealed. 4s dwell.", time: "14:29:16" },
+    { phase: "Story — 10 Slides", type: "info",     label: "Story — Slide 10/10 — Complete",   text: "YOUR TURN slide. Story total time: 82s (10 slides). Above average — consistent with support profile. Launching activities.", time: "14:29:24" },
+
+    // ── ACTIVITY 1 ────────────────────────────────────────────────────────────
+    { phase: "Activity 1 — Story Check 2+3", type: "info",     label: "Q1 Loaded — Story Check 2+3",      text: "🥭🥭 + 🥥🥥🥥 = ? Visual emoji displayed. Tok Pisin: Mama i baim 2 mango na 3 kokonas. Hamas olgeta? difficulty=1. This mirrors slide 8 exactly.", time: "14:29:27" },
+    { phase: "Activity 1 — Story Check 2+3", type: "success",  label: "✓ Correct — Q1 (1st attempt)",     text: "Meri answered 5 in 18s. Correct. Story anchor worked — same scene recalled. mastery[addition_visual]: 28% → 38%. hint_count: 0.", time: "14:29:45" },
+    { phase: "Activity 1 — Story Check 2+3", type: "decision", label: "AI: Baseline Set",                 text: "18s response is within support-profile expected range (<25s). No hints needed. Story-anchored recall confirmed. Scaffold maintained for Q2.", time: "14:29:46" },
+
+    // ── ACTIVITY 2 ────────────────────────────────────────────────────────────
+    { phase: "Activity 2 — 1+1 Banana",      type: "info",     label: "Q2 Loaded — Isi Isi 1+1",          text: "🍌 + 🍌 = ? Smallest possible sum. Warm-up question. Tok Pisin: Beni i painim 1 banana, em i painim 1 moa. difficulty=1.", time: "14:29:50" },
+    { phase: "Activity 2 — 1+1 Banana",      type: "success",  label: "✓ Correct — Q2 (1st attempt)",     text: "Meri answered 2 in 9s. Correct. Fast for support profile. consecutive_correct: 1. mastery[addition_visual]: 38% → 41%.", time: "14:29:59" },
+    { phase: "Activity 2 — 1+1 Banana",      type: "info",     label: "AI: Warm-up Passed",               text: "9s on 1+1 — good. Not a meaningful signal yet. Moving to 2+1 with same emoji scaffold retained.", time: "14:30:00" },
+
+    // ── ACTIVITY 3 ────────────────────────────────────────────────────────────
+    { phase: "Activity 3 — 2+1 Banana",      type: "info",     label: "Q3 Loaded — Kauntim Banana 2+1",   text: "🍌🍌 + 🍌 = ? Tok Pisin: Beni i gat 2 banana. Em i kisim 1 moa. Hamas nau? difficulty=1. AI watching response time.", time: "14:30:04" },
+    { phase: "Activity 3 — 2+1 Banana",      type: "warning",  label: "✗ Incorrect — Q3 attempt 1",       text: "Meri selected 4. Correct: 3. Error #1 this session. Likely counted starting from 2 and added 2 instead of 1. hint_count: 1.", time: "14:30:18" },
+    { phase: "Activity 3 — 2+1 Banana",      type: "decision", label: "AI: TeachMoment Triggered",        text: "Wrong answer → Count Together technique shown. Emoji group A (🍌🍌) revealed one-by-one, then group B (🍌). Student must watch full animation before retry.", time: "14:30:19" },
+    { phase: "Activity 3 — 2+1 Banana",      type: "success",  label: "✓ Correct — Q3 attempt 2",         text: "Meri answered 3 in 26s total. Self-corrected after TeachMoment counting sequence. mastery[addition_visual]: 41% → 46%. No penalty recorded.", time: "14:30:30" },
+    { phase: "Activity 3 — 2+1 Banana",      type: "info",     label: "AI: Pace Noted",                   text: "26s total across 2 attempts. TeachMoment helped. Visual scaffold retained. consecutive_correct reset to 0. error_total: 1.", time: "14:30:31" },
+
+    // ── ACTIVITY 4 ────────────────────────────────────────────────────────────
+    { phase: "Activity 4 — 3+2 Coconuts",    type: "info",     label: "Q4 Loaded — Kokonas Basket 3+2",   text: "🥥🥥🥥 + 🥥🥥 = ? Tok Pisin: Em i putim 3 kokonas, bai em i kisim 2 moa. Hamas? difficulty=1.", time: "14:30:35" },
+    { phase: "Activity 4 — 3+2 Coconuts",    type: "success",  label: "✓ Correct — Q4 (1st attempt)",     text: "Meri answered 5 in 14s. Correct. Faster than Q3 (26s). consecutive_correct: 1. mastery[addition_visual]: 46% → 52%.", time: "14:30:49" },
+    { phase: "Activity 4 — 3+2 Coconuts",    type: "info",     label: "AI: Improvement Detected",         text: "14s vs 26s previous — significant speed gain. 1st attempt correct. Confidence score nudged. Still need 2 consecutive before scaffold removal.", time: "14:30:50" },
+
+    // ── ACTIVITY 5 ────────────────────────────────────────────────────────────
+    { phase: "Activity 5 — 4+1 Banana+Pine", type: "info",     label: "Q5 Loaded — Kauntim Frut 4+1",     text: "🍌🍌🍌🍌 + 🍍 = ? Tok Pisin: Stol i gat 4 banana, Mama i baim 1 painap. Hamas frut? difficulty=1. Two different fruit types.", time: "14:30:53" },
+    { phase: "Activity 5 — 4+1 Banana+Pine", type: "success",  label: "✓ Correct — Q5 (1st attempt)",     text: "Meri answered 5 in 11s. Fastest response this session. consecutive_correct: 2. mastery[addition_visual]: 52% → 58%. Confidence: 28% → 38%.", time: "14:31:04" },
+    { phase: "Activity 5 — 4+1 Banana+Pine", type: "decision", label: "⚡ AI: 2-Streak — Advancing",       text: "consecutive_correct=2. Threshold reached. Advancing difficulty to sum=6 (3+3). New object type (papaya). Emoji scaffold retained — not enough signal to remove.", time: "14:31:05" },
+
+    // ── ACTIVITY 6 ────────────────────────────────────────────────────────────
+    { phase: "Activity 6 — 3+3 Papaya",      type: "info",     label: "Q6 Loaded — Strong Askim 3+3",     text: "🍈🍈🍈 + 🍈🍈🍈 = ? Tok Pisin: 3 kapaia long dispela han, 3 long narapela. Hamas? difficulty=2. sum=6 is a statistically common error point.", time: "14:31:09" },
+    { phase: "Activity 6 — 3+3 Papaya",      type: "warning",  label: "✗ Incorrect — Q6 attempt 1",       text: "Meri selected 5. Correct: 6. Error #2 this session. sum=6 gap triggered. Gentle redirect shown. hint_count: 2.", time: "14:31:23" },
+    { phase: "Activity 6 — 3+3 Papaya",      type: "warning",  label: "✗ Pattern — Q6 attempt 2",         text: "Meri selected 7. Correct: 6. Error #3 same question. Consistent mis-estimation around sum=6. Flag: sum_to_6_gap=true.", time: "14:31:35" },
+    { phase: "Activity 6 — 3+3 Papaya",      type: "decision", label: "AI: Full Support Mode + Number Line", text: "2nd wrong on same Q → TeachMoment technique 2: Number Line. 🐸 hops from 3, then 3 more hops to land on 6. Full support mode active. No shame message.", time: "14:31:36" },
+    { phase: "Activity 6 — 3+3 Papaya",      type: "success",  label: "✓ Correct — Q6 attempt 3",         text: "Meri answered 6 in 41s total. Correct with Number Line scaffold. mastery[number_bonds]: 22% → 31%. Flag persists — needs next-session revision.", time: "14:31:52" },
+
+    // ── ACTIVITY 7 ────────────────────────────────────────────────────────────
+    { phase: "Activity 7 — 2+4 Papaya+Mango",type: "info",     label: "Q7 Loaded — Popo na Mango 2+4",    text: "🍈🍈 + 🥭🥭🥭🥭 = ? Tok Pisin: Beni i kisim 2 popo na putim wantaim 4 mango. difficulty=2. Flipped order — testing commutativity.", time: "14:31:56" },
+    { phase: "Activity 7 — 2+4 Papaya+Mango",type: "success",  label: "✓ Correct — Q7 (1st attempt)",     text: "Meri answered 6 in 18s. Correct. Commutativity handled — sum=6 worked this time with visual. consecutive_correct: 1. mastery[addition_visual]: 58% → 63%.", time: "14:32:14" },
+    { phase: "Activity 7 — 2+4 Papaya+Mango",type: "info",     label: "AI: sum=6 Progress",               text: "Meri got 2+4=6 correct (18s) after failing 3+3. Visual layout (2 left, 4 right) easier than equal groups (3+3). Interesting error pattern. Logged.", time: "14:32:15" },
+
+    // ── ACTIVITY 8 ────────────────────────────────────────────────────────────
+    { phase: "Activity 8 — 4+2 Basket Story",type: "info",     label: "Q8 Loaded — Stori Maths 4+2",      text: "🧺 Beni i putim 4 mango na 2 kokonas long basket. Hamas samting? difficulty=2. First word-problem format. No equation shown — full narrative.", time: "14:32:18" },
+    { phase: "Activity 8 — 4+2 Basket Story",type: "success",  label: "✓ Correct — Q8 (1st attempt)",     text: "Meri answered 6 in 16s. Correct. Read narrative, extracted numbers, added. mastery[word_problems]: 15% → 22%. Confidence: 38% → 44%.", time: "14:32:34" },
+    { phase: "Activity 8 — 4+2 Basket Story",type: "success",  label: "✅ Lesson Complete",               text: "Meri finished all 8 activities. overall_mastery: 28% → 48%. streak: 2 → 3 days. total_errors: 3. hint_total: 3. avg_response: 16s.", time: "14:32:35" },
+    { phase: "Activity 8 — 4+2 Basket Story",type: "decision", label: "AI: Next Session Written",         text: "sum_to_6_gap=true. Next session: open with 3+3 visual revision before new content. Word problem format showed promise — include 1 per session going forward.", time: "14:32:36" },
   ],
 };
 
@@ -346,11 +429,11 @@ export const TURA_LOG_DATA: AILogPageProps = {
   chapter: "Ch.2 — Putim Wantaim (Adding Up)",
   path: "Challenge Path",
   pathColor: "#69ff47",
-  confidence: 82,
-  responseTime: "5s avg",
+  confidence: 95,
+  responseTime: "4.5s avg",
   hints: 0,
   accuracy: "100%",
-  currentDecision: "Tura — 6/6 correct, 0 hints, avg 5s. Expert Q6 (8+5=13) solved in 6s. Full mastery. Recommend Ch.3 Kisim Ausait next session.",
+  currentDecision: "Tura — 8/8 correct, 0 hints, avg 4.5s. Expert Q8 (8+5=13) solved in 6s. Full mastery confirmed. Recommend Ch.3 Kisim Ausait next session.",
   mastery: [
     { name: "Addition visual", pct: 95 },
     { name: "Number bonds",    pct: 88 },
@@ -358,30 +441,59 @@ export const TURA_LOG_DATA: AILogPageProps = {
     { name: "Tok Pisin read",  pct: 72 },
   ],
   log: [
-    { type: "info",     label: "Session Started — Challenge Path",  text: "Tura · Grade 2 · Maths Ch.2. Profile analysis: lessonProgress 72%, streak 5 days. Challenge path assigned. Visual scaffolding OFF. English primary. 6 activities queued.", time: "14:31:10" },
-    { type: "decision", label: "AI: Content Loaded",               text: "High prior performance detected. Skipping visual scaffolding. Harder sequence loaded: story check 2+3 fast, 4+3, 5+4 word problem, 6+2 market, K7+K3 kina, 8+5 expert.", time: "14:31:10" },
-    { type: "info",     label: "Language Setting",                 text: "Language: English primary. Tok Pisin shown as secondary label only. No emoji scaffold. No retry hints pre-loaded.", time: "14:31:11" },
-    { type: "info",     label: "Story — Beni long Maket",          text: "Story loaded. Tura reading slide 1 of 6. AI observing navigation pace. Fast story traversal expected based on profile history.", time: "14:31:18" },
-    { type: "info",     label: "Story — Fast Pace Detected",       text: "Tura tapped through slides 1–3 in under 20s. Comprehension signal strong from prior sessions. AI reducing observation weight on story slides.", time: "14:31:38" },
-    { type: "info",     label: "Story Complete",                   text: "All 6 story slides tapped in 42s — above-average pace. Comprehension confirmed from profile. Moving to activities.", time: "14:32:00" },
-    { type: "info",     label: "Q1 — Story Check: 2+3",           text: "Question: 2+3=? Text only — no emoji visual. Tok Pisin label only as secondary. difficulty: 1. Baseline signal for session calibration.", time: "14:32:02" },
-    { type: "success",  label: "Strong Signal — Q1",              text: "Tura answered 5 in 2s. Correct on 1st attempt. Instant recall — story context not needed. mastery[addition_visual]: 82% → 87%. hint_count: 0.", time: "14:32:04" },
-    { type: "decision", label: "⚡ AI: Scaffolding Confirmed Off",  text: "Q1 answered in 2s — well above threshold. Visual aids remain hidden for entire session. Advancing immediately to higher difficulty.", time: "14:32:05" },
-    { type: "info",     label: "Q2 — Think Fast: 4+3",            text: "Question: 4+3=? No visual. Text only. difficulty: 2. Slightly harder number pair. AI monitoring response speed continuity.", time: "14:32:07" },
-    { type: "success",  label: "Strong Signal — Q2",              text: "Tura answered 7 in 4s. Correct. No hints. consecutive_correct: 2. mastery[number_bonds]: 75% → 82%. confidence: 68% → 76%.", time: "14:32:11" },
-    { type: "decision", label: "⚡ AI: Pattern Confirmed",         text: "2 correct in avg 3s. Consistent high performance. No-scaffold mode maintained. Q3 escalates to full word problem format.", time: "14:32:12" },
-    { type: "info",     label: "Q3 — Word Problem: 5+4",          text: "Question: Beni has 5 mangoes in his bag. He buys 4 more at the market. How many does he have now? difficulty: 2. No visual. Narrative extraction required.", time: "14:32:14" },
-    { type: "success",  label: "Strong Signal — Q3",              text: "Tura answered 9 in 5s. Extracted numbers from narrative, computed correctly. consecutive_correct: 3. mastery[word_problems]: 58% → 71%.", time: "14:32:19" },
-    { type: "decision", label: "⚡ AI: Streak — Escalating",       text: "3-answer streak confirmed. Advancing to compact multi-object problem. Q4: 6 coconuts + 2 papayas. Grouping complexity increased.", time: "14:32:20" },
-    { type: "info",     label: "Q4 — Market Stall: 6+2",          text: "Question: 🥥×6 ➕ 🍈×2 = ? Compact emoji notation — compact grouping challenge. difficulty: 3. Two different object types.", time: "14:32:22" },
-    { type: "success",  label: "Correct — Q4",                   text: "Tura answered 8 in 5s. Correct. Handled grouped emoji notation without slowing. consecutive_correct: 4. mastery[addition_visual]: 87% → 92%.", time: "14:32:27" },
-    { type: "decision", label: "⚡ AI: Escalating to Currency",    text: "4-answer streak. Advancing to real-world financial context — Kina (PNG currency). Grade 2 ceiling content unlocked.", time: "14:32:28" },
-    { type: "info",     label: "Q5 — Real World: K7+K3",          text: "Question: Mama spent K7 on fruit and K3 on fish at the market. How many kina did she spend? difficulty: 3. PNG financial context.", time: "14:32:30" },
-    { type: "success",  label: "Strong Signal — Q5",              text: "Tura answered K10 in 5s. Correct. Extracted addition from financial narrative. No hesitation. mastery[word_problems]: 71% → 81%. confidence: 76% → 87%.", time: "14:32:35" },
-    { type: "decision", label: "⚡ AI: Expert Level Unlocked",     text: "5-answer streak. confidence: 87%. Unlocking expert Q6 — double-digit addition (8+5). Outside standard Grade 2 scope. Flagging as ceiling probe.", time: "14:32:36" },
-    { type: "info",     label: "Q6 — Expert: 8+5",               text: "Question: Uncle has 8 baskets of corn. He brings 5 more from the garden. How many baskets now? difficulty: 4. Double-digit result. Expert ceiling probe.", time: "14:32:38" },
-    { type: "success",  label: "✅ Expert Mastery — Q6",          text: "Tura answered 13 in 6s. Correct. Double-digit addition solved without visual aid. 6/6 correct. hints: 0. avg_response: 4.5s. session_mastery: 95%.", time: "14:32:44" },
-    { type: "success",  label: "✅ Lesson Complete — Full Mastery", text: "Tura finished all 6 activities. accuracy: 100%. hints: 0. avg_response: 4.5s. Grade 2 Maths Ch.2 complete at expert level. streak: 5 → 6 days.", time: "14:32:45" },
-    { type: "decision", label: "AI: Next Session Plan",           text: "Tura exceeded Grade 2 Ch.2 ceiling. Expert Q6 (8+5) solved in 6s confirms high readiness. Recommend: Ch.3 Kisim Ausait (Taking Away). Writing to student profile.", time: "14:32:46" },
+    // ── SESSION INIT ─────────────────────────────────────────────────────────
+    { phase: "Session Init", type: "info",     label: "Session Started — Challenge Path",  text: "Tura · Grade 2 · Maths Ch.2 — Putim Wantaim. Profile loaded: lessonProgress 72%, streak 5 days, avg_response 5s. Challenge path assigned.", time: "14:31:10" },
+    { phase: "Session Init", type: "decision", label: "AI: Path Selection",               text: "lessonProgress=72% above threshold (55%) AND streak=5 above threshold (3). → Challenge path. Visual scaffolding OFF. English primary. Numbers: 2+3, 4+3, 5+4, 3+5, 6+2, K7+K3, 8+4, 8+5 expert.", time: "14:31:10" },
+    { phase: "Session Init", type: "info",     label: "AI: No Scaffold Config",           text: "hint_budget: 0 pre-loaded. Visual aids disabled. No emoji groups. English primary, Tok Pisin secondary only. Harder number pairs queued.", time: "14:31:11" },
+
+    // ── STORY ────────────────────────────────────────────────────────────────
+    { phase: "Story — 10 Slides", type: "info",     label: "Story Loaded — Slide 1/10",        text: "Scene: 🌅 Dawn. Tura tapped next in 4s. Fast traversal expected — story is context-setting, not the challenge.", time: "14:31:16" },
+    { phase: "Story — 10 Slides", type: "info",     label: "Story — Slides 2–3 Fast",           text: "Slides 2 and 3 tapped in 3s each. Pace consistent with high-performance profile. AI reducing observation weight.", time: "14:31:23" },
+    { phase: "Story — 10 Slides", type: "info",     label: "Story — Slide 4/10 ✋ TAP",        text: "Interactive: tap 🥭 ×2. Tura completed in 3s — tapped twice rapidly. No hesitation. counted_by_group=likely.", time: "14:31:27" },
+    { phase: "Story — 10 Slides", type: "info",     label: "Story — Slides 5–6 Fast",           text: "Slides 5 and 6 tapped in 3s each. Slide 6 tap-count (🥥×3) done in 4s.", time: "14:31:35" },
+    { phase: "Story — 10 Slides", type: "decision", label: "AI: Story Pace Signal",             text: "Tura avg 3.6s per slide (benchmark: 7s). Fast = confident. No comprehension flags. Skipping extra story observation. Activities will confirm.", time: "14:31:36" },
+    { phase: "Story — 10 Slides", type: "info",     label: "Story — Slides 7–8 + TAP-ADD",     text: "Slide 8 tap-add (2+3): Tura tapped ➕ immediately (1s hesitation). Watched merge animation 2s then tapped next. Engaged but fast.", time: "14:31:43" },
+    { phase: "Story — 10 Slides", type: "info",     label: "Story — Slides 9–10 Complete",      text: "Story total time: 34s (10 slides). Fastest story completion on record for this class. Activities launching.", time: "14:31:50" },
+
+    // ── ACTIVITY 1 ────────────────────────────────────────────────────────────
+    { phase: "Activity 1 — Story Check 2+3", type: "info",     label: "Q1 Loaded — Story Check 2+3",      text: "2+3=? Text only, no emoji. English only. difficulty=1. Baseline calibration question.", time: "14:31:52" },
+    { phase: "Activity 1 — Story Check 2+3", type: "success",  label: "⚡ Strong Signal — Q1",             text: "Tura answered 5 in 2s. Instant recall. mastery[addition_visual]: 82% → 87%. hint_count: 0. No story context needed.", time: "14:31:54" },
+    { phase: "Activity 1 — Story Check 2+3", type: "decision", label: "AI: Scaffolding Confirmed Off",    text: "2s response on baseline — well above threshold. Visual aids remain hidden for entire session. Advancing to difficulty=2 immediately.", time: "14:31:55" },
+
+    // ── ACTIVITY 2 ────────────────────────────────────────────────────────────
+    { phase: "Activity 2 — Think Fast 4+3",  type: "info",     label: "Q2 Loaded — Round 1: 4+3",         text: "4+3=? No visual. Text only. difficulty=2. AI monitoring whether response time holds under harder numbers.", time: "14:31:57" },
+    { phase: "Activity 2 — Think Fast 4+3",  type: "success",  label: "⚡ Strong Signal — Q2",             text: "Tura answered 7 in 4s. No hints. consecutive_correct: 2. mastery[number_bonds]: 75% → 82%. confidence: 68% → 76%.", time: "14:32:01" },
+    { phase: "Activity 2 — Think Fast 4+3",  type: "decision", label: "AI: Pattern Confirmed",            text: "2 correct in avg 3s. High performance consistent. No-scaffold mode confirmed. Q3 escalates to word-problem narrative format.", time: "14:32:02" },
+
+    // ── ACTIVITY 3 ────────────────────────────────────────────────────────────
+    { phase: "Activity 3 — Word Problem 5+4",type: "info",     label: "Q3 Loaded — Market Word Prob 5+4", text: "Beni has 5 mangoes, buys 4 more. Total? No visual. English. difficulty=2. Tests: can Tura extract numbers from narrative?", time: "14:32:04" },
+    { phase: "Activity 3 — Word Problem 5+4",type: "success",  label: "⚡ Strong Signal — Q3",             text: "Tura answered 9 in 5s. Extracted numbers from narrative, computed correctly. consecutive_correct: 3. mastery[word_problems]: 58% → 71%.", time: "14:32:09" },
+    { phase: "Activity 3 — Word Problem 5+4",type: "decision", label: "⚡ AI: 3-Streak — Escalating",      text: "3-answer streak confirmed. Word-problem comprehension strong. Advancing to multi-object grouping: 3+5 (flipped order).", time: "14:32:10" },
+
+    // ── ACTIVITY 4 ────────────────────────────────────────────────────────────
+    { phase: "Activity 4 — Flip Order 3+5",  type: "info",     label: "Q4 Loaded — Flip It 3+5",          text: "Mama has 3 fish + 5 sweet potatoes. Total? difficulty=2. Tests commutativity awareness. Small visual hint: 🐟🐟🐟 ➕ 🍠🍠🍠🍠🍠.", time: "14:32:12" },
+    { phase: "Activity 4 — Flip Order 3+5",  type: "success",  label: "⚡ Strong Signal — Q4",             text: "Tura answered 8 in 4s. Correct. Handled flipped order without hesitation. consecutive_correct: 4. mastery[addition_visual]: 87% → 92%.", time: "14:32:16" },
+    { phase: "Activity 4 — Flip Order 3+5",  type: "decision", label: "⚡ AI: Escalating — Market Stall",  text: "4-answer streak. Commutativity implicit — no sign of confusion. Advancing to 6+2 grouped emoji notation.", time: "14:32:17" },
+
+    // ── ACTIVITY 5 ────────────────────────────────────────────────────────────
+    { phase: "Activity 5 — Market 6+2",      type: "info",     label: "Q5 Loaded — Market Stall 6+2",     text: "🥥×6 ➕ 🍈×2 = ? Compact emoji. difficulty=3. Two object types. Tests grouped counting vs individual counting.", time: "14:32:19" },
+    { phase: "Activity 5 — Market 6+2",      type: "success",  label: "⚡ Strong Signal — Q5",             text: "Tura answered 8 in 5s. Handled compact grouping without slowing. consecutive_correct: 5. mastery[addition_visual]: 92% → 95%.", time: "14:32:24" },
+    { phase: "Activity 5 — Market 6+2",      type: "decision", label: "⚡ AI: Escalating — Kina Currency", text: "5-answer streak. confidence: 87%. Unlocking real-world financial context. Kina (PNG currency) format — Grade 2 ceiling content.", time: "14:32:25" },
+
+    // ── ACTIVITY 6 ────────────────────────────────────────────────────────────
+    { phase: "Activity 6 — Kina K7+K3",      type: "info",     label: "Q6 Loaded — Kina Maths K7+K3",     text: "Mama spent K7 on fruit and K3 on fish. Total? difficulty=3. PNG financial context. Tests: abstract addition without visual anchor.", time: "14:32:27" },
+    { phase: "Activity 6 — Kina K7+K3",      type: "success",  label: "⚡ Strong Signal — Q6",             text: "Tura answered K10 in 5s. Extracted addition from financial narrative, no hesitation. mastery[word_problems]: 71% → 81%. confidence: 87% → 92%.", time: "14:32:32" },
+    { phase: "Activity 6 — Kina K7+K3",      type: "decision", label: "⚡ AI: Expert Level Unlocked",      text: "6-answer streak. confidence: 92%. Unlocking Q7 (8+4) as pre-expert, then Q8 (8+5) full expert ceiling probe. Double-digit results.", time: "14:32:33" },
+
+    // ── ACTIVITY 7 ────────────────────────────────────────────────────────────
+    { phase: "Activity 7 — Level Up 8+4",    type: "info",     label: "Q7 Loaded — Level Up 8+4",          text: "Beni's family harvested 8 coconuts morning + 4 afternoon. Total? difficulty=3. Pre-expert: double digits but sum=12.", time: "14:32:35" },
+    { phase: "Activity 7 — Level Up 8+4",    type: "success",  label: "⚡ Strong Signal — Q7",              text: "Tura answered 12 in 5s. Correct. Double-digit addition no hesitation. consecutive_correct: 7. session_mastery approaching ceiling.", time: "14:32:40" },
+    { phase: "Activity 7 — Level Up 8+4",    type: "decision", label: "⚡ AI: Expert Q8 Confirmed",         text: "7-answer streak. All correct, avg 4.2s, 0 hints. Proceeding to Q8 (8+5=13) — hardest question in Grade 2 scope.", time: "14:32:41" },
+
+    // ── ACTIVITY 8 ────────────────────────────────────────────────────────────
+    { phase: "Activity 8 — Expert 8+5",      type: "info",     label: "Q8 Loaded — Expert Round 8+5",     text: "Uncle sold 8 corn baskets morning + 5 afternoon. Total? difficulty=4. Double-digit result=13. Outside standard Grade 2 scope. Ceiling probe.", time: "14:32:43" },
+    { phase: "Activity 8 — Expert 8+5",      type: "success",  label: "✅ Expert Mastery — Q8",            text: "Tura answered 13 in 6s. Correct. 8+5 solved without visual. 8/8 correct. hints: 0. avg_response: 4.5s. session_mastery: 95%.", time: "14:32:49" },
+    { phase: "Activity 8 — Expert 8+5",      type: "success",  label: "✅ Lesson Complete — Full Mastery", text: "Tura finished all 8 activities. accuracy: 100%. hints: 0. avg: 4.5s. Ch.2 complete at expert ceiling. streak: 5 → 6 days.", time: "14:32:50" },
+    { phase: "Activity 8 — Expert 8+5",      type: "decision", label: "AI: Next Session Written",         text: "Tura exceeded Grade 2 Ch.2 ceiling. Expert 8+5 in 6s confirms readiness. Recommend Ch.3 Kisim Ausait (Subtraction). Writing to student profile.", time: "14:32:51" },
   ],
 };
