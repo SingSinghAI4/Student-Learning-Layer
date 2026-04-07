@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { Star } from "lucide-react";
 import { StudentProfile } from "../LoginScreen";
 import { SUBJECTS, CHAPTERS, SubjectId } from "../data";
 
@@ -275,7 +276,7 @@ export default function ChapterScreen({ profile, subjectId, onSelect, onBack }: 
                       animate={{ scale: ch.stars >= n ? [1.3, 1] : 1 }}
                       transition={{ delay: 0.4 + i * 0.07 + n * 0.07, type: "spring" }}
                     >
-                      {ch.stars >= n ? "⭐" : "☆"}
+                      <Star size={13} fill={ch.stars >= n ? "#FFD93D" : "none"} stroke={ch.stars >= n ? "#FFD93D" : "#666"} />
                     </motion.span>
                   ))}
                 </div>

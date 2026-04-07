@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Bot, Target, Rocket } from "lucide-react";
 import { AIEntry } from "../types";
 import { DIAG_QUESTIONS } from "../data";
 import { StudentProfile } from "../LoginScreen";
@@ -48,7 +49,7 @@ export default function DiagnosticScreen({
       {/* ── Left: Questions ── */}
       <div className="diag-left">
         <div style={{ textAlign: "center" }}>
-          <div className="diag-badge">🤖 AI Diagnostic — Finding Your Level</div>
+          <div className="diag-badge"><Bot size={13} style={{verticalAlign:"middle",marginRight:4}} />AI Diagnostic — Finding Your Level</div>
           <div className="diag-title">
             Let's see what you know, {profile.name}!
           </div>
@@ -131,7 +132,7 @@ export default function DiagnosticScreen({
                 animate={{ rotate: [0, -10, 10, -6, 6, 0] }}
                 transition={{ delay: 0.3, duration: 0.6 }}
               >
-                🎯
+                <Target size={48} strokeWidth={1.5} />
               </motion.div>
               <div className="diag-placed-title">
                 {lang === "tok" ? "AI i save pinis long yu!" : "AI Assessment Complete!"}
@@ -151,7 +152,7 @@ export default function DiagnosticScreen({
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.97 }}
               >
-                {lang === "tok" ? "Stat Laninim! 🚀" : "Start Learning! 🚀"}
+                {lang === "tok" ? "Stat Laninim!" : "Start Learning!"} <Rocket size={15} style={{verticalAlign:"middle",marginLeft:4}} />
               </motion.button>
             </motion.div>
           )}
@@ -160,7 +161,7 @@ export default function DiagnosticScreen({
 
       {/* ── Right: AI Log ── */}
       <div className="diag-right">
-        <div className="aip-head-title">🤖 AI — Reading {profile.name}</div>
+        <div className="aip-head-title"><Bot size={13} style={{verticalAlign:"middle",marginRight:4}} />AI — Reading {profile.name}</div>
         <div className="aip-log-scroll" ref={logRef}>
           <AnimatePresence>
             {diagAILog.map((e, i) => (

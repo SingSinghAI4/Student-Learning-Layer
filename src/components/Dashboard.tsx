@@ -142,7 +142,7 @@ export default function Dashboard({ lang, dashFilter, setDashFilter, onSessionEn
                   className={`f-btn${dashFilter === f ? " active" : ""}`}
                   onClick={() => setDashFilter(f)}
                 >
-                  {f === "all" ? "All" : f === "flying" ? "🔵 Flying" : f === "attention" ? "🟡 Attention" : "🔴 Inactive"}
+                  {f === "all" ? "All" : f === "flying" ? <><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:"#60a5fa",marginRight:4,verticalAlign:"middle"}} />Flying</> : f === "attention" ? <><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:"#fbbf24",marginRight:4,verticalAlign:"middle"}} />Attention</> : <><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:"#f87171",marginRight:4,verticalAlign:"middle"}} />Inactive</>}
                 </button>
               ))}
             </div>
@@ -174,10 +174,13 @@ export default function Dashboard({ lang, dashFilter, setDashFilter, onSessionEn
                   />
                 </div>
                 <div className="sc-status">
-                  {s.status === "flying" ? "🔵 Flying"
-                    : s.status === "attention" ? "🟡 Needs Attention"
-                    : s.status === "inactive" ? "🔴 Inactive"
-                    : "🟢 On Track"}
+                  {s.status === "flying"
+                    ? <><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:"#60a5fa",marginRight:4,verticalAlign:"middle"}} />Flying</>
+                    : s.status === "attention"
+                    ? <><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:"#fbbf24",marginRight:4,verticalAlign:"middle"}} />Needs Attention</>
+                    : s.status === "inactive"
+                    ? <><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:"#f87171",marginRight:4,verticalAlign:"middle"}} />Inactive</>
+                    : <><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:"#4ade80",marginRight:4,verticalAlign:"middle"}} />On Track</>}
                 </div>
               </motion.div>
             ))}

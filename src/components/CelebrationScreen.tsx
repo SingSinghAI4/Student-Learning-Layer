@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
+import { PartyPopper, Star } from "lucide-react";
 import confetti from "canvas-confetti";
 import { StudentProfile } from "../LoginScreen";
 
@@ -48,7 +49,7 @@ export default function CelebrationScreen({ profile, lang, onDashboard, onSessio
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: "spring", bounce: 0.6, duration: 0.7 }}
         >
-          🎉
+          <PartyPopper size={64} strokeWidth={1.5} />
         </motion.div>
 
         <motion.div
@@ -57,7 +58,7 @@ export default function CelebrationScreen({ profile, lang, onDashboard, onSessio
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, duration: 0.4 }}
         >
-          Gutpela Wok, {profile.name}! 🌟
+          Gutpela Wok, {profile.name}! <Star size={20} fill="#FFD93D" stroke="#FFD93D" style={{verticalAlign:"middle",marginLeft:4}} />
         </motion.div>
 
         <motion.div

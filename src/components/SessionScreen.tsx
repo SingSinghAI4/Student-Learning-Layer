@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Flame, Star, Bot, Target, Plus } from "lucide-react";
 import { ActivityMode } from "../types";
 import { AVATARS, STORY_PAGES, STORY_PAGES_2, ACTIVITIES, ACTIVITIES_2,
          MATHS_STORY_PAGES, MATHS_ACTIVITIES_MERI, MATHS_ACTIVITIES_SIONE,
@@ -244,7 +245,7 @@ export default function SessionScreen({
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 1.4, y: -40 }}
               transition={{ type: "spring", bounce: 0.65, duration: 0.5 }}>
-              🔥 {consecutiveCorrect} in a row!
+              <Flame size={16} style={{verticalAlign:"middle",marginRight:4}} />{consecutiveCorrect} in a row!
             </motion.div>
           )}
         </AnimatePresence>
@@ -256,7 +257,7 @@ export default function SessionScreen({
               initial={{ opacity: 1, y: 0, scale: 1 }}
               animate={{ opacity: 0, y: -100, scale: 1.8 }}
               transition={{ duration: 1.0, ease: "easeOut" }}>
-              +⭐
+              +<Star size={16} fill="#FFD93D" stroke="#FFD93D" style={{verticalAlign:"middle"}} />
             </motion.div>
           )}
         </AnimatePresence>
@@ -273,7 +274,7 @@ export default function SessionScreen({
             </motion.div>
             <div>
               <div className="s-name">{profile.name}</div>
-              <div className="s-level">⭐ {diagPlacement || "Grade 2 — AI Guided"}</div>
+              <div className="s-level"><Star size={12} fill="#FFD93D" stroke="#FFD93D" style={{verticalAlign:"middle",marginRight:3}} />{diagPlacement || "Grade 2 — AI Guided"}</div>
             </div>
             <div className={`chapter-badge ch${chapter}`}>Ch {chapter}</div>
           </div>
@@ -298,7 +299,7 @@ export default function SessionScreen({
         {/* ── Role Banner ── */}
         <div className="role-banner">
           <div className="role-pill role-ai">
-            <span className="role-icon">🤖</span>
+            <span className="role-icon"><Bot size={16} /></span>
             <div className="role-text">
               <span className="role-label">AI Tutor</span>
               <span className="role-desc">Curriculum · Pacing · Assessment</span>
@@ -419,7 +420,7 @@ export default function SessionScreen({
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ type: "spring", bounce: 0.5 }}
                       >
-                        {storyPage < storyPages.length - 1 ? "Next ▶" : "Start Activity! 🎯"}
+                        {storyPage < storyPages.length - 1 ? "Next ▶" : <span>Start Activity! <Target size={14} style={{verticalAlign:"middle",marginLeft:3}} /></span>}
                       </motion.button>
                     ) : (
                       <motion.div
@@ -427,7 +428,7 @@ export default function SessionScreen({
                         transition={{ duration: 1, repeat: Infinity }}
                         style={{ color: "#52B788", fontSize: 13, padding: "10px 0" }}
                       >
-                        {isTapCount ? `👆 Tap to count all ${mp!.tapCount} items first` : "👆 Tap ➕ to add the groups together"}
+                        {isTapCount ? `Tap to count all ${mp!.tapCount} items first` : <span>Tap <Plus size={12} style={{verticalAlign:"middle"}} /> to add the groups together</span>}
                       </motion.div>
                     )}
                   </div>
@@ -451,7 +452,7 @@ export default function SessionScreen({
                   className="cb-star"
                   animate={{ rotate: [0, 15, -15, 10, -10, 0], scale: [1, 1.3, 1] }}
                   transition={{ duration: 0.7, delay: 0.2 }}
-                >⭐</motion.div>
+                ><Star size={16} fill="#FFD93D" stroke="#FFD93D" /></motion.div>
                 <div className="cb-title">Chapter 1 Complete!</div>
                 <div className="cb-sub">Counting · Reading · Maths</div>
                 <div className="cb-unlock">🔓 Chapter 2 Unlocking — Phonics &amp; Comprehension</div>

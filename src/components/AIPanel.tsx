@@ -1,5 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Bot } from "lucide-react";
 import { AIEntry, MasteryItem } from "../types";
 import { StudentProfile } from "../LoginScreen";
 
@@ -35,7 +36,7 @@ export default function AIPanel({
   return (
     <div className="ai-thinking-panel">
       <div className="aip-head">
-        <div className="aip-head-title">🤖 AI Tutor — Live View</div>
+        <div className="aip-head-title"><Bot size={14} style={{verticalAlign:"middle",marginRight:5}} />AI Tutor — Live View</div>
         <div className="aip-student">
           <div className="aip-sname">{profile.name} · Grade {selectedGrade}</div>
           <div className="aip-metrics">

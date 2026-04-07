@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Rocket } from "lucide-react";
 import { StudentProfile } from "../LoginScreen";
 import { SUBJECTS, SubjectId } from "../data";
 
@@ -923,7 +924,7 @@ function SpotlightPanel({ subject, meta, bottomRow }: {
           letterSpacing: 0.4,
         }}
       >
-        Let's Go! 🚀
+        Let's Go! <Rocket size={15} style={{verticalAlign:"middle",marginLeft:4}} />
       </motion.div>
     </motion.div>
   );

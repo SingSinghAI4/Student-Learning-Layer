@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Star, Target, Sparkles } from "lucide-react";
 
 interface Props {
   addends: [number, number];
@@ -101,7 +102,7 @@ export default function TeachMoment({ addends, emojiA, emojiB, attemptNumber, on
                 transition={{ duration: 0.45 }}
                 style={{ color: "#52B788", fontSize: 22, fontWeight: 700, marginBottom: 4 }}
               >
-                {total} olgeta! ⭐
+                {total} olgeta! <Star size={18} fill="#FFD93D" stroke="#FFD93D" style={{verticalAlign:"middle",marginLeft:3}} />
               </motion.div>
               <div style={{ color: "#aaa", fontSize: 12, marginBottom: 16 }}>
                 {total} altogether! You can do it — yu inap!
@@ -117,7 +118,7 @@ export default function TeachMoment({ addends, emojiA, emojiB, attemptNumber, on
                   cursor: "pointer",
                 }}
               >
-                Traim Gen!  Try Again 🎯
+                Traim Gen! Try Again <Target size={15} style={{verticalAlign:"middle",marginLeft:4}} />
               </motion.button>
             </motion.div>
           )}
@@ -225,7 +226,7 @@ function CountTechnique({ addends, emojiA, emojiB, total, onComplete }:
       {phase >= 3 && (
         <div style={{ marginTop: 12 }}>
           <div style={{ color: "#fff", fontSize: 13, marginBottom: 8 }}>
-            ✨ Putim wantaim — {addends[0]} + {addends[1]}
+            <Sparkles size={14} style={{verticalAlign:"middle",marginRight:4}} />Putim wantaim — {addends[0]} + {addends[1]}
           </div>
           <div style={{ display: "flex", justifyContent: "center", gap: 5, flexWrap: "wrap" }}>
             {allItems.map((emoji, i) => (
@@ -357,9 +358,9 @@ function NumberLineTechnique({ addends, total, onComplete }:
 
       {/* Legend */}
       <div style={{ display: "flex", gap: 14, justifyContent: "center", marginTop: 10, fontSize: 11, color: "#aaa" }}>
-        <span>🟢 Start: {addends[0]}</span>
+        <span><span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:"#4ade80",marginRight:4,verticalAlign:"middle"}} />Start: {addends[0]}</span>
         <span>⬆️ Hops: {addends[1]}</span>
-        {phase === "done" && <span style={{ color: "#FFD93D" }}>⭐ Answer: {total}</span>}
+        {phase === "done" && <span style={{ color: "#FFD93D" }}><Star size={13} fill="#FFD93D" stroke="#FFD93D" style={{verticalAlign:"middle",marginRight:3}} />Answer: {total}</span>}
       </div>
 
       {/* Equation building */}
@@ -440,12 +441,12 @@ function TenFrameTechnique({ addends, total, onComplete }:
       {/* Progress labels */}
       <div style={{ display: "flex", gap: 18, justifyContent: "center", marginTop: 10, fontSize: 12 }}>
         <span style={{ color: "#52B788" }}>
-          🟢 {Math.min(filled, addends[0])} / {addends[0]}
+          <span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:"#4ade80",marginRight:4,verticalAlign:"middle"}} />{Math.min(filled, addends[0])} / {addends[0]}
         </span>
         {filled > addends[0] && (
           <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }}
             style={{ color: "#FFD93D" }}>
-            🟡 {Math.min(filled - addends[0], addends[1])} / {addends[1]}
+            <span style={{display:"inline-block",width:8,height:8,borderRadius:"50%",background:"#fbbf24",marginRight:4,verticalAlign:"middle"}} />{Math.min(filled - addends[0], addends[1])} / {addends[1]}
           </motion.span>
         )}
       </div>

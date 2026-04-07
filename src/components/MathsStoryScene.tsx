@@ -5,6 +5,7 @@
  */
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Star, Trophy, Sparkles as SparklesIcon, Target, PartyPopper, Plus } from "lucide-react";
 import { MathsStoryPage } from "../data";
 
 interface Props {
@@ -83,7 +84,7 @@ function SparkBurst({ active }: { active: boolean }) {
 function Char({
   emoji, x, y, size, anim, delay = 0,
 }: {
-  emoji: string; x: string; y: string; size: number;
+  emoji: string | React.ReactNode; x: string; y: string; size: number;
   anim: "float"|"sway"|"bounce"|"pulse"|"spin"|"static";
   delay?: number;
 }) {
@@ -113,8 +114,8 @@ function PassiveScene({ idx }: { idx: number }) {
     <>
       {/* Dawn sky */}
       <Char emoji="🌅" x="8%"  y="8%"  size={70} anim="pulse" delay={0} />
-      <Char emoji="⭐" x="62%" y="6%"  size={26} anim="float" delay={0.3} />
-      <Char emoji="⭐" x="78%" y="12%" size={20} anim="float" delay={0.7} />
+      <Char emoji={<Star size={26} fill="#FFD93D" stroke="#FFD93D" />} x="62%" y="6%"  size={26} anim="float" delay={0.3} />
+      <Char emoji={<Star size={20} fill="#FFD93D" stroke="#FFD93D" />} x="78%" y="12%" size={20} anim="float" delay={0.7} />
       <Char emoji="🏡" x="36%" y="30%" size={72} anim="static" delay={0.2} />
       <Char emoji="🌿" x="68%" y="42%" size={52} anim="sway"   delay={0} />
       <Char emoji="🦜" x="55%" y="10%" size={54} anim="float" delay={0.5} />
@@ -226,17 +227,17 @@ function PassiveScene({ idx }: { idx: number }) {
           padding: "6px 22px", fontSize: 26, fontWeight: 900,
           boxShadow: "0 4px 20px rgba(255,217,61,0.7)",
         }}
-      >5 ⭐</motion.div>
+      >5 <Star size={22} fill="#FFD93D" stroke="#FFD93D" style={{verticalAlign:"middle"}} /></motion.div>
       <Sparkles count={8} colors={["#FFD93D","#fff","#52B788","#ff7043","#A8DADC"]} />
     </>
   );
   if (idx === 9) return ( // your turn
     <>
-      <Char emoji="🏆" x="35%" y="8%"  size={90} anim="bounce" delay={0} />
-      <Char emoji="✨" x="8%"  y="10%" size={44} anim="spin"   delay={0.2} />
-      <Char emoji="✨" x="76%" y="8%"  size={44} anim="spin"   delay={0.5} />
-      <Char emoji="⭐" x="18%" y="50%" size={36} anim="float"  delay={0.3} />
-      <Char emoji="⭐" x="65%" y="52%" size={36} anim="float"  delay={0.6} />
+      <Char emoji={<Trophy size={90} strokeWidth={1.2} />} x="35%" y="8%"  size={90} anim="bounce" delay={0} />
+      <Char emoji={<SparklesIcon size={44} />} x="8%"  y="10%" size={44} anim="spin"   delay={0.2} />
+      <Char emoji={<SparklesIcon size={44} />} x="76%" y="8%"  size={44} anim="spin"   delay={0.5} />
+      <Char emoji={<Star size={36} fill="#FFD93D" stroke="#FFD93D" />} x="18%" y="50%" size={36} anim="float"  delay={0.3} />
+      <Char emoji={<Star size={36} fill="#FFD93D" stroke="#FFD93D" />} x="65%" y="52%" size={36} anim="float"  delay={0.6} />
       <motion.div
         initial={{ scale: 0, y: 20 }}
         animate={{ scale: 1, y: 0 }}
@@ -247,7 +248,7 @@ function PassiveScene({ idx }: { idx: number }) {
           textShadow: "0 2px 12px rgba(0,0,0,0.6)", whiteSpace: "nowrap",
           letterSpacing: 1,
         }}
-      >YU TEM! — YOUR TURN! 🎯</motion.div>
+      >YU TEM! — YOUR TURN! <Target size={18} style={{verticalAlign:"middle",marginLeft:4}} /></motion.div>
       <Sparkles count={7} colors={["#FFD93D","#fff","#ce93d8","#80deea"]} />
     </>
   );
@@ -364,7 +365,7 @@ function TapCountScene({
           transition={{ duration: 0.5, times: [0, 0.7, 1] }}
           style={{ fontSize: 28, fontWeight: 900, color }}
         >
-          {count} ✓ Gutpela! 🎉
+          {count} ✓ Gutpela! <PartyPopper size={22} style={{verticalAlign:"middle",marginLeft:4}} />
         </motion.div>
       )}
 
@@ -434,7 +435,7 @@ function TapAddScene({
                 boxShadow: "0 4px 20px rgba(82,183,136,0.55)",
               }}
             >
-              ➕
+              <Plus size={28} strokeWidth={3} />
             </motion.button>
           </div>
 
@@ -481,7 +482,7 @@ function TapAddScene({
             transition={{ delay: total * 0.22 + 0.3, duration: 0.5, times: [0, 0.7, 1] }}
             style={{ color: "#FFD93D", fontSize: 26, fontWeight: 900, textAlign: "center" }}
           >
-            {total} olgeta! ⭐
+            {total} olgeta! <Star size={22} fill="#FFD93D" stroke="#FFD93D" style={{verticalAlign:"middle",marginLeft:3}} />
           </motion.div>
         </div>
       )}
