@@ -847,15 +847,83 @@ export const CLASS_STUDENTS = [
   { name: "Grace", emoji: "🦋", grade: 2, status: "on-track"  as const, mastery: 64, skill: "Sentences",    time: "15m" },
 ];
 
-export const PROVINCES = [
-  { name: "NCD",          status: "active" as const },
-  { name: "Morobe",       status: "active" as const },
-  { name: "E. Highlands", status: "active" as const },
-  { name: "W. Highlands", status: "active" as const },
-  { name: "Madang",       status: "active" as const },
-  { name: "Milne Bay",    status: "warn"   as const },
-  { name: "Gulf",         status: "warn"   as const },
-  { name: "Chimbu",       status: "active" as const },
-  { name: "Oro",          status: "off"    as const },
-  { name: "Manus",        status: "active" as const },
+// Cultural regions — each maps to a guardian dress style
+export type CulturalRegion = "highlands" | "momase" | "papuan" | "islands";
+
+export const PROVINCE_DATA: {
+  name: string;
+  status: "active" | "warn" | "off";
+  region: CulturalRegion;
+  // Position on the PNG map SVG (viewBox 0 0 520 380)
+  mapX: number;
+  mapY: number;
+  // Bilum food item from this province
+  food: string;
+}[] = [
+  { name: "NCD",          status: "active", region: "papuan",     mapX: 305, mapY: 230, food: "🥭" },
+  { name: "Morobe",       status: "active", region: "momase",     mapX: 288, mapY: 148, food: "🍌" },
+  { name: "E. Highlands", status: "active", region: "highlands",  mapX: 242, mapY: 162, food: "🥕" },
+  { name: "W. Highlands", status: "active", region: "highlands",  mapX: 210, mapY: 168, food: "🍠" },
+  { name: "Madang",       status: "active", region: "momase",     mapX: 228, mapY: 108, food: "🥥" },
+  { name: "Milne Bay",    status: "warn",   region: "papuan",     mapX: 368, mapY: 222, food: "🐟" },
+  { name: "Gulf",         status: "warn",   region: "papuan",     mapX: 245, mapY: 238, food: "🦀" },
+  { name: "Chimbu",       status: "active", region: "highlands",  mapX: 232, mapY: 172, food: "🌽" },
+  { name: "Oro",          status: "off",    region: "papuan",     mapX: 292, mapY: 196, food: "🍍" },
+  { name: "Manus",        status: "active", region: "islands",    mapX: 295, mapY: 14,  food: "🐚" },
 ];
+
+// Keep backward-compat alias
+export const PROVINCES = PROVINCE_DATA.map(p => ({ name: p.name, status: p.status }));
+
+// Guardian dress styles per cultural region
+export const CULTURAL_REGIONS: Record<CulturalRegion, {
+  label: string;
+  headdressColor: string;
+  featherColor: string;
+  skirtColor: string;
+  shellColor: string;
+  faceMarkColor: string;
+  glow: string;
+  tok: string;   // region name in Tok Pisin
+}> = {
+  highlands: {
+    label: "Highlands",
+    headdressColor: "#8B1A1A",
+    featherColor:   "#FFD700",
+    skirtColor:     "#8B5E3C",
+    shellColor:     "#FFF8DC",
+    faceMarkColor:  "#CC0000",
+    glow:           "rgba(255,215,0,0.55)",
+    tok:            "Hailens",
+  },
+  momase: {
+    label: "Momase",
+    headdressColor: "#2E4A1E",
+    featherColor:   "#FF6B00",
+    skirtColor:     "#5C3D2E",
+    shellColor:     "#E8D5A3",
+    faceMarkColor:  "#1A3A2A",
+    glow:           "rgba(255,107,0,0.5)",
+    tok:            "Momase",
+  },
+  papuan: {
+    label: "Papuan",
+    headdressColor: "#1A3A5C",
+    featherColor:   "#00BFFF",
+    skirtColor:     "#2C5F2E",
+    shellColor:     "#F0E6D3",
+    faceMarkColor:  "#003366",
+    glow:           "rgba(0,191,255,0.5)",
+    tok:            "Papua",
+  },
+  islands: {
+    label: "Islands",
+    headdressColor: "#2D5A27",
+    featherColor:   "#FF1493",
+    skirtColor:     "#8B6914",
+    shellColor:     "#FFE4B5",
+    faceMarkColor:  "#006400",
+    glow:           "rgba(255,20,147,0.5)",
+    tok:            "Aisland",
+  },
+};

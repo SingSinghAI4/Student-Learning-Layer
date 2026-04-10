@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { PROVINCE_DATA, CULTURAL_REGIONS } from "./data";
+import ProvinceGuardian from "./components/ProvinceGuardian";
 
 // ── TYPES ──────────────────────────────────────────────
 export interface StudentProfile {
@@ -11,6 +14,7 @@ export interface StudentProfile {
   bilumItems: string[];
   lastSeen: string;
   placement: string;
+  province?: string;
   // Grade 3-5 only
   studentId?: string;
   pin?: string;
@@ -61,6 +65,7 @@ const MOCK_PROFILES: StudentProfile[] = [
     bilumItems: ["🥭", "🐚", "🌺", "⭐", "🪸"],
     lastSeen: "Today",
     placement: "Grade 2 — On Track",
+    province: "NCD",
   },
   {
     id: "kila-002",
@@ -74,6 +79,7 @@ const MOCK_PROFILES: StudentProfile[] = [
     placement: "Grade 3 — Flying Ahead",
     studentId: "STU-002",
     pin: "4721",
+    province: "Morobe",
   },
   {
     id: "meri-003",
@@ -85,6 +91,7 @@ const MOCK_PROFILES: StudentProfile[] = [
     bilumItems: ["🥭", "🌺"],
     lastSeen: "Yesterday",
     placement: "Grade 2 — Building",
+    province: "E. Highlands",
   },
   {
     id: "peni-004",
@@ -96,6 +103,7 @@ const MOCK_PROFILES: StudentProfile[] = [
     bilumItems: ["🥭"],
     lastSeen: "3 days ago",
     placement: "Grade 1 — Foundational",
+    province: "Gulf",
   },
   {
     id: "hana-005",
@@ -109,6 +117,7 @@ const MOCK_PROFILES: StudentProfile[] = [
     placement: "Grade 4 — On Track",
     studentId: "STU-005",
     pin: "1834",
+    province: "Madang",
   },
   {
     id: "sione-006",
@@ -120,6 +129,7 @@ const MOCK_PROFILES: StudentProfile[] = [
     bilumItems: ["🥭", "🐚", "🌺"],
     lastSeen: "Today",
     placement: "Grade 2 — On Track",
+    province: "W. Highlands",
   },
   {
     id: "raka-007",
@@ -131,6 +141,7 @@ const MOCK_PROFILES: StudentProfile[] = [
     bilumItems: ["🥭"],
     lastSeen: "Today",
     placement: "Grade 2 — Building",
+    province: "Manus",
   },
   {
     id: "tura-008",
@@ -142,6 +153,7 @@ const MOCK_PROFILES: StudentProfile[] = [
     bilumItems: ["🥭", "🐚", "🌺", "⭐", "🪸", "🌿", "🦋", "🌟", "🪴"],
     lastSeen: "Today",
     placement: "Grade 3 — Flying Ahead",
+    province: "Milne Bay",
   },
   {
     id: "garo-009",
@@ -153,6 +165,7 @@ const MOCK_PROFILES: StudentProfile[] = [
     bilumItems: ["🥭", "🌺"],
     lastSeen: "2 days ago",
     placement: "Grade 2 — Building",
+    province: "Chimbu",
   },
 ];
 
@@ -751,8 +764,218 @@ function GradeCard({
   );
 }
 
+// ── PROVINCE PICKER ───────────────────────────────────
+function ProvincePicker({
+  lang, newProvince, setNewProvince, handleCreateProfile, onBack,
+}: {
+  lang: "tok" | "en";
+  newProvince: string | null;
+  setNewProvince: (p: string) => void;
+  handleCreateProfile: (p: string) => void;
+  onBack: () => void;
+}) {
+  const [hoveredProv, setHoveredProv] = React.useState<string | null>(null);
+  const previewProv = hoveredProv || newProvince;
+  const previewData = PROVINCE_DATA.find(p => p.name === previewProv);
+  const previewRegion = previewData?.region ?? null;
+
+  return (
+    <div className="ls-page">
+      <button className="ls-back" onClick={onBack}>
+        ← {lang === "tok" ? "Go Bek" : "Back"}
+      </button>
+      <motion.div
+        className="province-pick-wrap"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        style={{ maxWidth: 760, display: "flex", flexDirection: "column", alignItems: "center" }}
+      >
+        <motion.div
+          className="screen-title"
+          style={{ marginBottom: 4 }}
+          initial={{ opacity: 0, y: -18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, type: "spring", bounce: 0.45 }}
+        >
+          {lang === "tok" ? "Wanem provins bilong yu?" : "Which province are you from?"}
+        </motion.div>
+        <motion.div
+          className="screen-sub"
+          style={{ marginBottom: 20 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.22, duration: 0.4 }}
+        >
+          {lang === "tok"
+            ? "Makim provins bilong yu long PNG"
+            : "Select your province in Papua New Guinea"}
+        </motion.div>
+
+        {/* Guardian preview + province grid side by side */}
+        <div style={{ display: "flex", gap: 20, width: "100%", alignItems: "flex-start" }}>
+
+          {/* Guardian preview panel */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3, duration: 0.4 }}
+            style={{
+              width: 140, flexShrink: 0,
+              background: "rgba(0,0,0,0.3)",
+              border: previewRegion
+                ? `1.5px solid ${CULTURAL_REGIONS[previewRegion].glow.replace("0.5)", "0.4)").replace("0.55)", "0.4)")}`
+                : "1.5px solid rgba(255,255,255,0.08)",
+              borderRadius: 20, padding: "16px 12px",
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
+              minHeight: 200,
+              transition: "border-color 0.3s",
+            }}
+          >
+            <AnimatePresence mode="wait">
+              {previewRegion ? (
+                <motion.div
+                  key={previewRegion}
+                  initial={{ scale: 0.7, opacity: 0, y: 10 }}
+                  animate={{ scale: 1, opacity: 1, y: 0 }}
+                  exit={{ scale: 0.7, opacity: 0 }}
+                  transition={{ type: "spring", bounce: 0.5, duration: 0.4 }}
+                >
+                  <ProvinceGuardian region={previewRegion} state="excited" size={96} />
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="placeholder"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  style={{
+                    width: 96, height: 135,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 36, opacity: 0.15,
+                  }}
+                >
+                  🗺
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <AnimatePresence mode="wait">
+              {previewRegion ? (
+                <motion.div
+                  key={`label-${previewRegion}`}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  style={{ textAlign: "center" }}
+                >
+                  <div style={{
+                    fontSize: 13, fontWeight: 900, color: "#fff", marginBottom: 2,
+                    fontFamily: "'Baloo 2', cursive",
+                  }}>
+                    {previewData?.name}
+                  </div>
+                  <div style={{
+                    fontSize: 10, fontWeight: 700,
+                    color: CULTURAL_REGIONS[previewRegion].glow.replace("0.5)", "1)").replace("0.55)", "1)"),
+                    letterSpacing: 1, textTransform: "uppercase",
+                  }}>
+                    {CULTURAL_REGIONS[previewRegion].label}
+                  </div>
+                  <div style={{ fontSize: 18, marginTop: 4 }}>{previewData?.food}</div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="hint"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", textAlign: "center", fontWeight: 600 }}
+                >
+                  {lang === "tok" ? "Makim provins" : "Hover a province"}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+
+          {/* Province grid */}
+          <motion.div
+            className="province-pick-grid"
+            style={{ flex: 1 }}
+            initial="hidden"
+            animate="show"
+            variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
+          >
+            {PROVINCE_DATA.map((p, i) => {
+              const regionColor = CULTURAL_REGIONS[p.region].glow
+                .replace("0.5)", "0.85)").replace("0.55)", "0.85)");
+              return (
+                <motion.button
+                  key={i}
+                  variants={{
+                    hidden: { opacity: 0, y: 22, scale: 0.84, rotateX: -18 },
+                    show: { opacity: 1, y: 0, scale: 1, rotateX: 0,
+                      transition: { type: "spring", bounce: 0.52, duration: 0.55 } },
+                  }}
+                  whileHover={{ y: -5, scale: 1.07, transition: { duration: 0.14 } }}
+                  whileTap={{ scale: 0.91 }}
+                  className={`prov-pick-btn${newProvince === p.name ? " sel" : ""}`}
+                  onMouseEnter={() => setHoveredProv(p.name)}
+                  onMouseLeave={() => setHoveredProv(null)}
+                  onClick={() => {
+                    setNewProvince(p.name);
+                    handleCreateProfile(p.name);
+                  }}
+                  style={{ position: "relative", overflow: "hidden" }}
+                >
+                  <motion.span
+                    className={`prov-pick-dot${p.status === "warn" ? " warn" : ""}`}
+                    animate={{
+                      scale: [1, 1.7, 1], opacity: [1, 0.35, 1],
+                      boxShadow: p.status === "warn"
+                        ? ["0 0 4px rgba(255,217,61,0.5)", "0 0 14px rgba(255,217,61,0.9)", "0 0 4px rgba(255,217,61,0.5)"]
+                        : [`0 0 4px ${CULTURAL_REGIONS[p.region].glow.replace("0.5)","0.5)").replace("0.55)","0.55)")}`,
+                           `0 0 14px ${CULTURAL_REGIONS[p.region].glow.replace("0.5)","0.9)").replace("0.55)","0.9)")}`,
+                           `0 0 4px ${CULTURAL_REGIONS[p.region].glow.replace("0.5)","0.5)").replace("0.55)","0.55)")}`],
+                    }}
+                    style={{ background: p.status === "warn" ? "#FFD93D" : regionColor }}
+                    transition={{ duration: 2.2, repeat: Infinity, delay: i * 0.17, ease: "easeInOut" }}
+                  />
+                  <span className="prov-pick-name">{p.name}</span>
+                  {newProvince === p.name && (
+                    <motion.div
+                      initial={{ scale: 0.5, opacity: 0.8 }}
+                      animate={{ scale: 2, opacity: 0 }}
+                      transition={{ duration: 0.55, ease: "easeOut" }}
+                      style={{
+                        position: "absolute", inset: 0, borderRadius: 14,
+                        background: "radial-gradient(circle, rgba(255,217,61,0.5) 0%, transparent 70%)",
+                        pointerEvents: "none",
+                      }}
+                    />
+                  )}
+                </motion.button>
+              );
+            })}
+          </motion.div>
+        </div>
+
+        <motion.button
+          className="start-btn"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 0.3, y: 0 }}
+          transition={{ delay: 0.85, duration: 0.4 }}
+          whileHover={{ opacity: 0.6 }}
+          style={{ fontSize: 13, padding: "12px", marginTop: 16 }}
+          onClick={() => handleCreateProfile("PNG")}
+        >
+          {lang === "tok" ? "Skip — Provins Narapela" : "Skip — Other Province"}
+        </motion.button>
+      </motion.div>
+    </div>
+  );
+}
+
 // ── MAIN LOGIN SCREEN ──────────────────────────────────
-type View = "welcome" | "grade" | "classCode" | "profiles" | "verify" | "new";
+type View = "welcome" | "grade" | "classCode" | "profiles" | "verify" | "new" | "province";
 
 export default function LoginScreen({ onLogin }: LoginScreenProps) {
   const [lang, setLang] = useState<"tok" | "en">("tok");
@@ -762,6 +985,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
   const [newName, setNewName] = useState("");
   const [newAvatar, setNewAvatar] = useState<number | null>(null);
   const [newGrade, setNewGrade] = useState<number | null>(null);
+  const [newProvince, setNewProvince] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -785,6 +1009,11 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
   function handleNewStudent() {
     if (!newName.trim() || newAvatar === null || newGrade === null) return;
+    setView("province");
+  }
+
+  function handleCreateProfile(province: string) {
+    if (!newName.trim() || newAvatar === null || newGrade === null) return;
     const profile: StudentProfile = {
       id: `${newName.toLowerCase()}-${Date.now()}`,
       name: newName.trim(),
@@ -795,6 +1024,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
       bilumItems: [],
       lastSeen: "Today",
       placement: "",
+      province,
     };
     onLogin(profile, true);
   }
@@ -1101,6 +1331,42 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
           from { opacity: 0; transform: translateY(14px); }
           to   { opacity: 1; transform: translateY(0); }
         }
+
+        /* ══ PROVINCE PICKER ══ */
+        .province-pick-wrap {
+          flex: 1; display: flex; flex-direction: column;
+          align-items: center; padding: 100px 48px 48px;
+          width: 100%; max-width: 680px; margin: 0 auto;
+        }
+        .province-pick-grid {
+          display: grid; grid-template-columns: 1fr 1fr;
+          gap: 12px; width: 100%; margin-bottom: 28px;
+          perspective: 900px;
+        }
+        .prov-pick-btn {
+          background: rgba(255,255,255,0.05);
+          border: 1.5px solid rgba(255,255,255,0.09);
+          border-radius: 14px; padding: 14px 12px;
+          cursor: pointer;
+          font-family: 'Nunito', sans-serif;
+          display: flex; flex-direction: column; align-items: center; gap: 6px;
+          will-change: transform;
+          transform-style: preserve-3d;
+        }
+        .prov-pick-btn.sel {
+          border: 2px solid #FFD93D;
+          background: rgba(255,217,61,0.1);
+          box-shadow: 0 0 20px rgba(255,217,61,0.35), 0 0 40px rgba(255,217,61,0.1);
+        }
+        .prov-pick-name {
+          font-size: 14px; font-weight: 800; color: #fff; letter-spacing: 0.2px;
+        }
+        .prov-pick-dot {
+          width: 9px; height: 9px; border-radius: 50%;
+          background: #52B788;
+          display: inline-block;
+        }
+        .prov-pick-dot.warn { background: #FFD93D; }
 
         @media (max-width: 700px) {
           .grade-grid { grid-template-columns: repeat(3, 1fr); }
@@ -1454,11 +1720,22 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
                 disabled={!newName.trim() || newAvatar === null || newGrade === null}
                 onClick={handleNewStudent}
               >
-                {lang === "tok" ? "Stat Lainim!" : "Start Learning!"}
+                {lang === "tok" ? "Nekis →" : "Next →"}
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* ══ PROVINCE PICKER ══ */}
+      {view === "province" && (
+        <ProvincePicker
+          lang={lang}
+          newProvince={newProvince}
+          setNewProvince={setNewProvince}
+          handleCreateProfile={handleCreateProfile}
+          onBack={() => setView("new")}
+        />
       )}
     </>
   );

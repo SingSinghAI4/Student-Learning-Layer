@@ -10,6 +10,8 @@ import VoiceWaveform from "./VoiceWaveform";
 import { useSpeech } from "../hooks/useSpeech";
 import TeachMoment from "./TeachMoment";
 import MathsStoryScene from "./MathsStoryScene";
+import DavidCharacter from "./DavidCharacter";
+import MathsCartoonLesson from "./MathsCartoonLesson";
 
 interface Props {
   profile: StudentProfile;
@@ -55,6 +57,7 @@ export default function SessionScreen({
   onActivityAnswer,
 }: Props) {
   const isMathsDemo = mathsPath != null;
+
   const storyPages = isMathsDemo ? MATHS_STORY_PAGES
     : chapter === 1 ? STORY_PAGES : STORY_PAGES_2;
   const activities = isMathsDemo
@@ -206,6 +209,26 @@ export default function SessionScreen({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actIdx, sessionMode]);
 
+  // ── Full-screen cartoon takeover for maths ──
+  if (isMathsDemo) {
+    return (
+      <MathsCartoonLesson
+        profile={profile}
+        lang={lang}
+        mathsPath={mathsPath!}
+        storyPage={storyPage}
+        litWordIdx={litWordIdx}
+        sessionMode={sessionMode}
+        sessionProgress={sessionProgress}
+        actIdx={actIdx}
+        actSelected={actSelected}
+        actWrong={actWrong}
+        onNextStoryPage={onNextStoryPage}
+        onActivityAnswer={onActivityAnswer}
+      />
+    );
+  }
+
   return (
     <div className={`screen session-screen ch${chapter}`}>
 
@@ -330,11 +353,14 @@ export default function SessionScreen({
                 transition={{ duration: 0.3 }}
               >
                 <motion.div
-                  className="tutor-face"
-                  animate={{ rotate: [0, -12, 12, -6, 6, 0] }}
+                  className="tutor-face tutor-face-david"
+                  animate={{ rotate: [0, -8, 8, -4, 4, 0] }}
                   transition={{ delay: 0.2, duration: 0.6 }}
                 >
-                  🦜
+                  <DavidCharacter
+                    state={mascotState === "correct" ? "excited" : mascotState === "wrong" ? "thinking" : "idle"}
+                    size={46}
+                  />
                 </motion.div>
                 <div className="tutor-bubble">
                   <div className="tutor-tok">{tutorMsg.tok}</div>
