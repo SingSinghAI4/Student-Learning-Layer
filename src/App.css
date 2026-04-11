@@ -1373,29 +1373,16 @@ body {
 /* ── Speech bubble ── */
 .mcl-speech {
   position: absolute;
-  bottom: 150px; left: 50%;
+  top: 58px; left: 50%;
   transform: translateX(-50%);
-  width: 90%; max-width: 460px;
+  width: 88%; max-width: 460px;
   z-index: 15;
   background: rgba(8, 24, 10, 0.93);
   border: 2px solid rgba(82,183,136,0.38);
   border-radius: 22px;
-  padding: 14px 18px 12px;
+  padding: 18px 22px 16px;
   box-shadow: 0 0 36px rgba(82,183,136,0.18), 0 4px 24px rgba(0,0,0,0.5);
-}
-.mcl-speech::before {
-  content: "";
-  position: absolute;
-  bottom: -15px; left: 44px;
-  border: 15px solid transparent;
-  border-top-color: rgba(82,183,136,0.38);
-}
-.mcl-speech::after {
-  content: "";
-  position: absolute;
-  bottom: -12px; left: 46px;
-  border: 13px solid transparent;
-  border-top-color: rgba(8,24,10,0.93);
+  text-align: center;
 }
 .mcl-speech-tok {
   font-size: 16px; font-weight: 800;
@@ -1412,7 +1399,7 @@ body {
 
 /* ── Next / CTA button ── */
 .mcl-next-btn {
-  position: absolute; bottom: 80px; right: 18px; z-index: 20;
+  position: absolute; bottom: 74px; right: 18px; z-index: 20;
   background: linear-gradient(135deg, #FFD93D, #ff8f00);
   border: none; border-radius: 50px;
   padding: 13px 28px;
@@ -1433,37 +1420,37 @@ body {
   background: #1B3A2A;
   border-radius: 28px 28px 0 0;
   border-top: 3px solid rgba(82,183,136,0.28);
-  padding: 20px 18px 28px;
+  padding: 16px 18px 76px; /* 76px bottom = 60px nav bar + 16px breathing room */
   box-shadow: 0 -8px 48px rgba(0,0,0,0.65);
 }
 .chk-label {
   font-size: 10px; font-weight: 900; letter-spacing: 2px;
-  color: #52B788; text-transform: uppercase; margin-bottom: 7px;
+  color: #52B788; text-transform: uppercase; margin-bottom: 4px;
   font-family: 'Nunito', sans-serif;
 }
 .chk-q {
-  font-size: 17px; font-weight: 900; color: #fff;
-  margin-bottom: 2px; line-height: 1.4;
+  font-size: 16px; font-weight: 900; color: #fff;
+  margin-bottom: 2px; line-height: 1.35;
   font-family: 'Nunito', sans-serif;
 }
 .chk-tok {
-  font-size: 13px; font-weight: 700;
+  font-size: 12px; font-weight: 700;
   color: #A8DADC; font-style: italic;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   font-family: 'Nunito', sans-serif;
 }
 .chk-visual {
-  font-size: 32px; text-align: center;
-  letter-spacing: 5px; margin-bottom: 12px;
+  font-size: 28px; text-align: center;
+  letter-spacing: 4px; margin-bottom: 8px;
 }
 .chk-options {
   display: grid; grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 8px;
 }
 .chk-opt {
   background: rgba(255,255,255,0.07);
   border: 2px solid rgba(255,255,255,0.12);
-  border-radius: 18px; padding: 14px 8px 10px;
+  border-radius: 18px; padding: 10px 8px 8px;
   cursor: pointer;
   font-family: 'Baloo 2', cursive;
   display: flex; flex-direction: column;
@@ -1472,7 +1459,7 @@ body {
   position: relative;
 }
 .chk-opt-main {
-  font-size: 30px; font-weight: 900; color: #fff;
+  font-size: 26px; font-weight: 900; color: #fff;
   font-family: 'Baloo 2', cursive;
 }
 .chk-opt-tok {
@@ -1493,7 +1480,7 @@ body {
 
 /* Mobile adjustments */
 @media (max-width: 480px) {
-  .mcl-speech { bottom: 140px; padding: 10px 14px; }
+  .mcl-speech { top: 58px; transform: translateX(-50%); padding: 14px 16px; }
   .mcl-speech-tok { font-size: 14px; }
   .chk-q { font-size: 15px; }
   .chk-opt-main { font-size: 26px; }
