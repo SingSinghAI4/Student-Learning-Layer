@@ -392,8 +392,8 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
   // ── Render ──
   return (
     <div className="app">
-      {/* Student info bar — top left */}
-      <div className="student-bar">
+      {/* Student info bar — top left (hidden during lesson) */}
+      {screen !== "session" && <div className="student-bar">
         {/* Avatar */}
         <div className="sbar-avatar" style={{ background: "#1a3a2a", borderColor: "#52B788" }}>
           {profile.name.charAt(0).toUpperCase()}
@@ -420,7 +420,7 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
           </svg>
           <span>12</span>
         </div>
-      </div>
+      </div>}
 
       {/* Language toggle */}
       <div className="lang-toggle-wrap">

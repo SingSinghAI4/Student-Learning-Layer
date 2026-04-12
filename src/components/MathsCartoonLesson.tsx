@@ -14,6 +14,7 @@ import {
 import { StudentProfile } from "../LoginScreen";
 import { ActivityMode } from "../types";
 import BeniCharacter from "./BeniCharacter";
+import AssessmentScreen from "./AssessmentScreen";
 
 type BeniState = "idle" | "excited" | "correct" | "sad" | "thinking" | "walk";
 
@@ -274,7 +275,7 @@ function SceneBackground({ slideIndex }: { slideIndex: number }) {
           bottom: "26%",
           left: 0, right: 0,
           width: "100%",
-          height: "46%",
+          height: "74%",
           zIndex: 1,
           overflow: "visible",
           pointerEvents: "none",
@@ -283,72 +284,85 @@ function SceneBackground({ slideIndex }: { slideIndex: number }) {
         {/* ── Slide 0: Dawn — PNG village huts ── */}
         {slideIndex === 0 && (
           <>
-            <rect x={48}  y={170} width={112} height={70} rx={6} fill="#3d2410" stroke="#1a0800" strokeWidth={2.5} />
-            <path d="M 34,172 Q 104,128 178,172 Z" fill="#2a1508" stroke="#1a0800" strokeWidth={2.5} />
-            <rect x={96}  y={202} width={28}  height={38} rx={3} fill="#1a0800" />
-            <rect x={60}  y={180} width={24}  height={18} rx={2} fill="#FFD93D" opacity={0.5} stroke="#1a0800" strokeWidth={1.5} />
-            <rect x={132} y={180} width={24}  height={18} rx={2} fill="#FFD93D" opacity={0.5} stroke="#1a0800" strokeWidth={1.5} />
-            <rect x={214} y={182} width={82}  height={58} rx={5} fill="#2a1a0a" stroke="#1a0800" strokeWidth={2} />
-            <path d="M 200,184 Q 255,148 310,184 Z" fill="#1a0f06" stroke="#1a0800" strokeWidth={2} />
-            <rect x={244} y={208} width={20}  height={28} rx={2} fill="#1a0800" />
+            {/* Big hut left — narrower wall, steeper roof */}
+            <rect x={52}  y={158} width={94}  height={82}  rx={4} fill="#6b4228" stroke="#1a0800" strokeWidth={2.5} />
+            <path d="M 38,161 Q 99,116 160,161 Z" fill="#3d2010" stroke="#1a0800" strokeWidth={2.5} />
+            <rect x={90}  y={204} width={22}  height={36}  rx={3} fill="#1a0800" />
+            <rect x={60}  y={174} width={20}  height={14}  rx={2} fill="#FFD93D" opacity={0.6} stroke="#1a0800" strokeWidth={1.5} />
+            <rect x={118} y={174} width={20}  height={14}  rx={2} fill="#FFD93D" opacity={0.6} stroke="#1a0800" strokeWidth={1.5} />
+            {/* Smaller hut right */}
+            <rect x={242} y={172} width={78}  height={68}  rx={4} fill="#4a2e18" stroke="#1a0800" strokeWidth={2} />
+            <path d="M 230,175 Q 281,136 332,175 Z" fill="#2e1a08" stroke="#1a0800" strokeWidth={2} />
+            <rect x={272} y={208} width={18}  height={32}  rx={2} fill="#1a0800" />
+            <rect x={250} y={185} width={16}  height={12}  rx={2} fill="#FFD93D" opacity={0.5} stroke="#1a0800" strokeWidth={1.5} />
           </>
         )}
 
-        {/* ── Slide 1: Village — house + palms on right ── */}
+        {/* ── Slide 1: Village — house + palms right ── */}
         {slideIndex === 1 && (
           <>
-            <rect x={118} y={176} width={72} height={64} rx={4} fill="#3d2518" stroke="#1a0800" strokeWidth={2} />
-            <path d="M 106,178 Q 154,140 202,178 Z" fill="#2a1a10" stroke="#1a0800" strokeWidth={2} />
-            <rect x={146} y={202} width={20} height={30} rx={2} fill="#1a0800" />
-            <rect x={124} y={186} width={20} height={16} rx={2} fill="#FFD93D" opacity={0.45} stroke="#1a0800" strokeWidth={1.5} />
-            <rect x={280} y={136} width={10} height={104} rx={5} fill="#5c3317" stroke="#1a0800" strokeWidth={2} />
-            <ellipse cx={285} cy={130} rx={30} ry={22} fill="#2d6a1a" stroke="#1a4006" strokeWidth={2} />
-            <ellipse cx={285} cy={130} rx={20} ry={14} fill="#3d8a2a" />
-            <rect x={340} y={150} width={8}  height={90} rx={4} fill="#5c3317" stroke="#1a0800" strokeWidth={1.5} />
-            <ellipse cx={344} cy={144} rx={24} ry={17} fill="#2d6a1a" stroke="#1a4006" strokeWidth={1.5} />
-            <ellipse cx={344} cy={144} rx={16} ry={11} fill="#3d8a2a" />
+            {/* House — ~100 units tall (y=140→240) */}
+            <rect x={182} y={140} width={130} height={100} rx={4} fill="#3d2518" stroke="#1a0800" strokeWidth={2.5} />
+            <path d="M 166,143 Q 247,100 328,143 Z" fill="#2a1a10" stroke="#1a0800" strokeWidth={2.5} />
+            <rect x={232} y={198} width={28}  height={42}  rx={2} fill="#1a0800" />
+            <rect x={190} y={158} width={26}  height={18}  rx={2} fill="#FFD93D" opacity={0.45} stroke="#1a0800" strokeWidth={1.5} />
+            <rect x={270} y={158} width={26}  height={18}  rx={2} fill="#FFD93D" opacity={0.45} stroke="#1a0800" strokeWidth={1.5} />
+            {/* Palm 1 — ~130 units tall (y=108→240) */}
+            <rect x={346} y={108} width={11}  height={132} rx={5} fill="#5c3317" stroke="#1a0800" strokeWidth={2} />
+            <ellipse cx={352} cy={102} rx={34} ry={26} fill="#2d6a1a" stroke="#1a4006" strokeWidth={2} />
+            <ellipse cx={352} cy={102} rx={22} ry={16} fill="#3d8a2a" />
+            {/* Palm 2 — ~118 units tall (y=122→240) */}
+            <rect x={382} y={122} width={9}   height={118} rx={4} fill="#5c3317" stroke="#1a0800" strokeWidth={1.5} />
+            <ellipse cx={387} cy={116} rx={28} ry={20} fill="#2d6a1a" stroke="#1a4006" strokeWidth={1.5} />
+            <ellipse cx={387} cy={116} rx={18} ry={12} fill="#3d8a2a" />
           </>
         )}
 
         {/* ── Slide 2: Walking — dirt path + trees right ── */}
         {slideIndex === 2 && (
           <>
-            <polygon points="158,240 242,240 214,60 186,60" fill="#8B5A2B" opacity={0.55} />
-            <rect x={302} y={148} width={8}  height={92} rx={4} fill="#5c3317" stroke="#1a0800" strokeWidth={1.5} />
-            <ellipse cx={306} cy={142} rx={22} ry={16} fill="#2d6a1a" stroke="#1a4006" strokeWidth={2} />
-            <rect x={354} y={158} width={8}  height={82} rx={4} fill="#5c3317" stroke="#1a0800" strokeWidth={1.5} />
-            <ellipse cx={358} cy={152} rx={20} ry={15} fill="#2d6a1a" stroke="#1a4006" strokeWidth={1.5} />
-            <rect x={176} y={72} width={50}  height={22} rx={4} fill="#8B5A2B" stroke="#1a0800" strokeWidth={2} />
-            <text x={201} y={87} textAnchor="middle" fontSize={9} fontWeight={900} fill="#FFD93D" fontFamily="'Baloo 2', cursive">MAKET</text>
+            {/* Shorter path — vanishes at y=100 so sign stays visible */}
+            <polygon points="155,240 245,240 218,100 182,100" fill="#8B5A2B" opacity={0.55} />
+            {/* Market sign — just above path vanishing point */}
+            <rect x={168} y={78}  width={66} height={26} rx={5} fill="#8B5A2B" stroke="#1a0800" strokeWidth={2} />
+            <text x={201} y={96} textAnchor="middle" fontSize={12} fontWeight={900} fill="#FFD93D" fontFamily="'Baloo 2', cursive">MAKET</text>
+            {/* Tree 1 */}
+            <rect x={300} y={108} width={10} height={132} rx={4} fill="#5c3317" stroke="#1a0800" strokeWidth={1.5} />
+            <ellipse cx={305} cy={102} rx={30} ry={22} fill="#2d6a1a" stroke="#1a4006" strokeWidth={2} />
+            <ellipse cx={305} cy={102} rx={20} ry={14} fill="#3d8a2a" />
+            {/* Tree 2 */}
+            <rect x={356} y={120} width={9}  height={120} rx={4} fill="#5c3317" stroke="#1a0800" strokeWidth={1.5} />
+            <ellipse cx={361} cy={114} rx={26} ry={19} fill="#2d6a1a" stroke="#1a4006" strokeWidth={1.5} />
+            <ellipse cx={361} cy={114} rx={17} ry={12} fill="#3d8a2a" />
           </>
         )}
 
-        {/* ── Slides 3 & 4: Market stall frame ── */}
+        {/* ── Slides 3 & 4: Market stall ── */}
         {(slideIndex === 3 || slideIndex === 4) && (
           <>
-            <rect x={20}  y={128} width={14} height={112} rx={4} fill="#5c3317" stroke="#1a0800" strokeWidth={1.5} />
-            <rect x={120} y={128} width={14} height={112} rx={4} fill="#5c3317" stroke="#1a0800" strokeWidth={1.5} />
-            <rect x={14}  y={122} width={130} height={14} rx={4} fill="#e65100" stroke="#1a0800" strokeWidth={2} />
-            <rect x={14}  y={129} width={130} height={8}  rx={3} fill="#ff7043" opacity={0.55} />
+            <rect x={18}  y={140} width={14} height={100} rx={4} fill="#5c3317" stroke="#1a0800" strokeWidth={1.5} />
+            <rect x={136} y={140} width={14} height={100} rx={4} fill="#5c3317" stroke="#1a0800" strokeWidth={1.5} />
+            <rect x={12}  y={132} width={148} height={16} rx={4} fill="#e65100" stroke="#1a0800" strokeWidth={2} />
+            <rect x={12}  y={142} width={148} height={10} rx={3} fill="#ff7043" opacity={0.55} />
           </>
         )}
 
-        {/* ── Slides 5 & 6: Coconut palm + water ── */}
+        {/* ── Slides 5 & 6: Coconut palm + water strip ── */}
         {(slideIndex === 5 || slideIndex === 6) && (
           <>
-            <rect x={298} y={96}  width={12} height={144} rx={6} fill="#8B5A2B" stroke="#1a0800" strokeWidth={2} />
-            <ellipse cx={304} cy={90} rx={36} ry={24} fill="#2d6a1a" stroke="#1a4006" strokeWidth={2} />
-            <ellipse cx={304} cy={90} rx={24} ry={16} fill="#3d8a2a" />
-            <rect x={0}   y={218} width={400} height={22} fill="rgba(0,180,240,0.15)" />
+            <rect x={298} y={108} width={12} height={132} rx={6} fill="#8B5A2B" stroke="#1a0800" strokeWidth={2} />
+            <ellipse cx={304} cy={102} rx={38} ry={28} fill="#2d6a1a" stroke="#1a4006" strokeWidth={2} />
+            <ellipse cx={304} cy={102} rx={25} ry={18} fill="#3d8a2a" />
+            <rect x={0}   y={218} width={400} height={22} fill="rgba(0,180,240,0.18)" />
           </>
         )}
 
         {/* ── Slide 7: Table with glow ── */}
         {slideIndex === 7 && (
           <>
-            <rect x={100} y={188} width={200} height={20} rx={6} fill="#5c3317" stroke="#1a0800" strokeWidth={2} />
-            <rect x={110} y={208} width={12}  height={32} rx={4} fill="#5c3317" stroke="#1a0800" strokeWidth={1.5} />
-            <rect x={278} y={208} width={12}  height={32} rx={4} fill="#5c3317" stroke="#1a0800" strokeWidth={1.5} />
+            <rect x={90}  y={188} width={220} height={20} rx={6} fill="#5c3317" stroke="#1a0800" strokeWidth={2} />
+            <rect x={100} y={208} width={12}  height={32} rx={4} fill="#5c3317" stroke="#1a0800" strokeWidth={1.5} />
+            <rect x={288} y={208} width={12}  height={32} rx={4} fill="#5c3317" stroke="#1a0800" strokeWidth={1.5} />
             <line x1={200} y1={60} x2={200} y2={188} stroke="rgba(82,183,136,0.35)" strokeWidth={2} strokeDasharray="5 4" />
           </>
         )}
@@ -814,6 +828,23 @@ export default function MathsCartoonLesson({
 
   const beniSize = storyPage === 8 ? 158 : 140;
 
+  // ── Full-screen assessment takes over entirely ──
+  if (sessionMode === "activity" && activity) {
+    return (
+      <AssessmentScreen
+        activity={activity}
+        actIdx={actIdx}
+        totalActs={activities.length}
+        actSelected={actSelected}
+        actWrong={actWrong}
+        lang={lang}
+        profile={profile}
+        onAnswer={onActivityAnswer}
+        onNext={onNextStoryPage}
+      />
+    );
+  }
+
   return (
     <div className="mcl-screen">
 
@@ -831,8 +862,8 @@ export default function MathsCartoonLesson({
         </motion.div>
       </AnimatePresence>
 
-      {/* Layer 1 — Ambient particles */}
-      <AmbientParticles slideIndex={storyPage} />
+      {/* Layer 1 — Ambient particles (hidden during activity to avoid clutter) */}
+      {sessionMode === "story" && <AmbientParticles slideIndex={storyPage} />}
 
       {/* Layer 1.5 — Subtle PNG map silhouette */}
       <PNGMapBackground />
@@ -907,7 +938,7 @@ export default function MathsCartoonLesson({
               style={{
                 position: "absolute", left: "4%", bottom: "24%",
                 cursor: "pointer", userSelect: "none", zIndex: 9,
-                width: 200, height: 280,
+                width: storyPage === 4 ? 260 : 200, height: storyPage === 4 ? 340 : 280,
                 pointerEvents: "all",
               }}
               whileTap={{ scale: 0.93 }}
@@ -1012,7 +1043,7 @@ export default function MathsCartoonLesson({
                 </svg>
               ) : (
                 /* ── Cartoon coconut palm — Chhota Bheem style: thick outlines, baked shadows ── */
-                <svg viewBox="0 0 130 180" width={200} height={280} style={{ overflow: "visible" }}>
+                <svg viewBox="0 0 130 180" width={260} height={340} style={{ overflow: "visible" }}>
                   {/* Ground shadow blob */}
                   <ellipse cx={68} cy={175} rx={52} ry={9}  fill="rgba(0,0,0,0.22)" />
                   {/* Ground patch */}
@@ -1109,9 +1140,10 @@ export default function MathsCartoonLesson({
                 style={{
                   position: "absolute", left: "18%", top: "28%",
                   background: "rgba(255,217,61,0.95)",
-                  borderRadius: 20, padding: "5px 12px",
-                  fontSize: 11, fontWeight: 900, color: "#1a0a00",
+                  borderRadius: 28, padding: "10px 22px",
+                  fontSize: 16, fontWeight: 900, color: "#1a0a00",
                   zIndex: 10, pointerEvents: "none",
+                  boxShadow: "0 4px 18px rgba(255,217,61,0.5)",
                 }}
                 animate={{ y: [0, -5, 0], opacity: [0.8, 1, 0.8] }}
                 transition={{ duration: 1.2, repeat: Infinity }}
@@ -1124,7 +1156,7 @@ export default function MathsCartoonLesson({
             <motion.div
               style={{
                 position: "absolute", right: "8%", bottom: "24%",
-                zIndex: 9, width: 108, height: 102,
+                zIndex: 9, width: 160, height: 160,
               }}
               animate={basketShake
                 ? { rotate: [-5, 5, -4, 4, 0], y: [0, -8, 0] }
@@ -1132,7 +1164,7 @@ export default function MathsCartoonLesson({
               }
               transition={basketShake ? { duration: 0.4 } : { duration: 3, repeat: Infinity }}
             >
-              <svg viewBox="0 0 72 72" width={108} height={108}>
+              <svg viewBox="0 0 72 72" width={160} height={160}>
                 {/* Ground shadow */}
                 <ellipse cx={38} cy={69} rx={28} ry={5} fill="rgba(0,0,0,0.22)" />
 
@@ -1202,9 +1234,9 @@ export default function MathsCartoonLesson({
         {/* ── Tap-add: two groups + PLUS button ── */}
         {isTapAdd && sessionMode === "story" && !addCombined && (
           <>
-            {/* Group A — left */}
+            {/* Group A — left of centre, above table */}
             <div style={{
-              position: "absolute", left: "18%", top: "38%",
+              position: "absolute", left: "32%", top: "36%",
               display: "flex", gap: 8, zIndex: 9,
             }}>
               {[...Array(slide?.tapCountA ?? 0)].map((_, i) => (
@@ -1215,9 +1247,9 @@ export default function MathsCartoonLesson({
               ))}
             </div>
 
-            {/* Group B — right */}
+            {/* Group B — right of centre, above table */}
             <div style={{
-              position: "absolute", right: "14%", top: "38%",
+              position: "absolute", right: "26%", top: "36%",
               display: "flex", gap: 8, zIndex: 9,
             }}>
               {[...Array(slide?.tapCountB ?? 0)].map((_, i) => (
@@ -1242,8 +1274,7 @@ export default function MathsCartoonLesson({
               transition={{ duration: 1.4, repeat: Infinity }}
               whileTap={{ scale: 0.8, rotate: 90 }}
               style={{
-                position: "absolute", left: "50%", top: "40%",
-                transform: "translateX(-50%)",
+                position: "absolute", left: "calc(50% - 36px)", top: "38%",
                 width: 72, height: 72, borderRadius: "50%",
                 background: "linear-gradient(135deg, #52B788, #2d6a4f)",
                 border: "3px solid #A8DADC",
@@ -1316,16 +1347,23 @@ export default function MathsCartoonLesson({
         ))}
       </div>
 
-      {/* Layer 4 — Speech bubble (story mode) */}
+      {/* Layer 4 — Speech bubble (story mode) — flex wrapper aligns to top without fighting Framer Motion y */}
       {sessionMode === "story" && slide && (
-        <AnimatePresence mode="wait">
-          <SpeechBubble
-            key={`speech-${storyPage}`}
-            words={slide.words}
-            en={slide.en}
-            litWordIdx={litWordIdx}
-          />
-        </AnimatePresence>
+        <div style={{
+          position: "absolute", inset: 0,
+          display: "flex", alignItems: "flex-start", justifyContent: "center",
+          paddingTop: 60,
+          zIndex: 6, pointerEvents: "none",
+        }}>
+          <AnimatePresence mode="wait">
+            <SpeechBubble
+              key={`speech-${storyPage}`}
+              words={slide.words}
+              en={slide.en}
+              litWordIdx={litWordIdx}
+            />
+          </AnimatePresence>
+        </div>
       )}
 
       {/* Layer 5 — Chalkboard (activity mode) */}
