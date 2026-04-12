@@ -76,11 +76,13 @@ export default function BeniCharacter({ state = "idle", size = 120, style, flipX
   const legAnimR = state === "walk" ? { rotate: [-16, 16, -16] } : {};
   const legTrans: Transition = { duration: 0.38, repeat: Infinity, ease: "linear" };
 
-  // ── Mouth ──
+  // ── Mouth ── (nose=y38, head-bottom=y56 → mouth at ~y47)
   const mouthPath =
-    state === "sad"       ? "M 37 63 Q 50 59 63 63"
-    : state === "thinking" ? "M 40 62 L 60 62"
-    : "M 36 61 Q 50 72 64 61";
+    state === "sad"       ? "M 37 48 Q 50 44 63 48"
+    : state === "thinking" ? "M 40 47 L 60 47"
+    : (state === "excited" || state === "correct")
+    ? "M 36 46 Q 50 58 64 46"   // wide open smile
+    : "M 37 47 Q 50 56 63 47";  // normal smile
 
   return (
     <motion.div
@@ -229,18 +231,24 @@ export default function BeniCharacter({ state = "idle", size = 120, style, flipX
           {/* Nose — simple dot */}
           <circle cx={50} cy={38} r={2.5} fill="#5a2c0a" opacity={0.7} />
 
-          {/* Mouth */}
-          <path d={mouthPath}
-            stroke={OL} strokeWidth={2.8} fill="none" strokeLinecap="round" />
-
-          {/* Teeth — excited/correct */}
+          {/* Teeth — rendered BEFORE mouth stroke so the lip line draws on top */}
           {(state === "excited" || state === "correct") && (
             <>
-              <path d="M 40 64 L 60 64 L 58 70 L 42 70 Z" fill="white" stroke={OL} strokeWidth={1.5} />
+              {/* Mouth cavity dark fill */}
+              <path d="M 38 47 Q 50 58 62 47 L 60 51 L 40 51 Z" fill="#1a0800" />
+              {/* Teeth block */}
+              <path d="M 40 47 L 60 47 L 58 53 L 42 53 Z" fill="white" />
               {/* Tooth divider */}
-              <line x1={50} y1={64} x2={50} y2={70} stroke={OL} strokeWidth={1} />
+              <line x1={50} y1={47} x2={50} y2={53} stroke={OL} strokeWidth={1} />
+              {/* Teeth outline */}
+              <path d="M 40 47 L 60 47 L 58 53 L 42 53 Z"
+                fill="none" stroke={OL} strokeWidth={1.2} />
             </>
           )}
+
+          {/* Mouth stroke — drawn on top so it overlaps the top edge of teeth */}
+          <path d={mouthPath}
+            stroke={OL} strokeWidth={3} fill="none" strokeLinecap="round" />
 
           {/* Thinking bubble */}
           {state === "thinking" && (

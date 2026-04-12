@@ -33,6 +33,7 @@ interface Props {
   mathsPath?: "meri" | "sione" | null;
   onNextStoryPage: () => void;
   onActivityAnswer: (val: string) => void;
+  onLangToggle?: () => void;
 }
 
 export default function SessionScreen({
@@ -55,6 +56,7 @@ export default function SessionScreen({
   mathsPath,
   onNextStoryPage,
   onActivityAnswer,
+  onLangToggle,
 }: Props) {
   const isMathsDemo = mathsPath != null;
 
@@ -225,6 +227,7 @@ export default function SessionScreen({
         actWrong={actWrong}
         onNextStoryPage={onNextStoryPage}
         onActivityAnswer={onActivityAnswer}
+        onLangToggle={onLangToggle}
       />
     );
   }

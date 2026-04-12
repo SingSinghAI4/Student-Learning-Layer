@@ -1,22 +1,27 @@
-/**
- * PNGJourneyMap — SVG outline of Papua New Guinea with province markers
- * Beni animates to the student's home province position
- * Province dots pulse and light up as the student unlocks them
- */
 import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { PROVINCE_DATA, CULTURAL_REGIONS } from "../data";
 import BeniCharacter from "./BeniCharacter";
 
-interface Props {
-  homeProvince?: string;
-  unlockedCount: number;
-  lang?: "tok" | "en";
+type Lang = "tok" | "en";
+
+interface ProvincePoint {
+  id: string;
+  name: string;
+  shortLabel?: string;
+  mapX: number;
+  mapY: number;
+  region: keyof typeof CULTURAL_REGIONS;
 }
 
-// ── Simplified but recognisable SVG path for Papua New Guinea ──
-// viewBox: 0 0 520 380
-// Includes main island + key island groups
+interface Props {
+  homeProvinceId?: string;
+  currentProvinceId?: string;
+  unlockedProvinceIds: string[];
+  lang?: Lang;
+  onProvinceSelect?: (provinceId: string) => void;
+}
+
 const PNG_PATH =
   "M 35,55 C 58,40 92,27 128,23 C 164,19 196,21 225,30 C 254,39 272,39 292,37 " +
   "L 310,43 C 322,52 335,63 344,78 C 353,92 364,108 370,124 " +
@@ -27,244 +32,364 @@ const PNG_PATH =
   "C 118,253 94,248 70,243 C 50,239 34,232 30,218 " +
   "C 26,202 27,175 29,148 C 31,120 33,90 35,65 Z";
 
-// Manus Island
-const MANUS_PATH = "M 278,10 C 290,6 306,6 318,11 C 326,16 326,24 318,28 C 306,33 290,33 278,28 C 270,24 270,16 278,10 Z";
+const MANUS_PATH =
+  "M 278,10 C 290,6 306,6 318,11 C 326,16 326,24 318,28 C 306,33 290,33 278,28 C 270,24 270,16 278,10 Z";
 
-// New Britain (large elongated)
 const NEW_BRITAIN_PATH =
   "M 378,132 C 395,122 415,118 435,124 C 450,130 458,144 455,158 " +
   "C 451,172 436,180 416,177 C 394,174 378,164 376,150 Z";
 
-// New Ireland (slim)
 const NEW_IRELAND_PATH =
   "M 428,88 C 438,80 452,79 460,86 C 466,93 466,106 458,114 " +
   "C 448,124 434,125 426,117 C 418,109 418,96 428,88 Z";
 
-// Bougainville
 const BOUGAINVILLE_PATH =
   "M 468,100 C 478,92 492,92 500,100 C 508,108 507,124 498,132 " +
   "C 487,141 472,140 464,132 C 456,123 456,108 468,100 Z";
 
-// Province name labels for small dots
-const DOT_LABELS: Record<string, string> = {
-  "NCD": "Port Moresby",
-  "Morobe": "Lae",
-  "E. Highlands": "Goroka",
-  "W. Highlands": "Mt Hagen",
-  "Madang": "Madang",
-  "Milne Bay": "Milne Bay",
-  "Gulf": "Gulf",
-  "Chimbu": "Kundiawa",
-  "Oro": "Popondetta",
-  "Manus": "Manus",
+const KEY_LABELS: Record<string, string> = {
+  ncd: "NCD",
+  morobe: "Morobe",
+  eastern_highlands: "E. Highlands",
+  manus: "Manus",
+  milne_bay: "Milne Bay",
 };
 
-export default function PNGJourneyMap({ homeProvince, unlockedCount, lang = "tok" }: Props) {
-  const [hoveredProv, setHoveredProv] = React.useState<string | null>(null);
+function normalizeProvinceData(data: any[]): ProvincePoint[] {
+  return data.map((p) => ({
+    id: p.id ?? p.name?.toLowerCase().replace(/\./g, "").replace(/\s+/g, "_"),
+    name: p.name,
+    shortLabel: p.shortLabel,
+    mapX: p.mapX,
+    mapY: p.mapY,
+    region: p.region,
+  }));
+}
 
-  // Find home province position for Beni
-  const homeData = PROVINCE_DATA.find(p => p.name === homeProvince);
-  const beniX = homeData ? homeData.mapX - 14 : 305 - 14; // centre Beni on dot
-  const beniY = homeData ? homeData.mapY - 38 : 230 - 38;
+export default function PNGJourneyMapSimple({
+  homeProvinceId,
+  currentProvinceId,
+  unlockedProvinceIds,
+  lang = "tok",
+  onProvinceSelect,
+}: Props) {
+  const reduceMotion = useReducedMotion();
+  const provinces = React.useMemo(
+    () => normalizeProvinceData(PROVINCE_DATA),
+    [],
+  );
+  const unlockedSet = React.useMemo(
+    () => new Set(unlockedProvinceIds),
+    [unlockedProvinceIds],
+  );
+
+  const homeData = provinces.find((p) => p.id === homeProvinceId);
+  const currentData =
+    provinces.find((p) => p.id === currentProvinceId) ?? homeData;
+
+  const beniLeft = currentData ? `${(currentData.mapX / 520) * 100}%` : "50%";
+  const beniTop = currentData ? `${(currentData.mapY / 300) * 100}%` : "50%";
+
+  const labelText = {
+    tok: {
+      home: "Haus",
+      next: "Neks",
+      done: "Pinis",
+      map: "Map bilong PNG",
+    },
+    en: {
+      home: "Home",
+      next: "Next",
+      done: "Done",
+      map: "PNG map",
+    },
+  }[lang];
 
   return (
-    <div style={{ position: "relative", width: "100%" }}>
+    <div
+      style={{
+        position: "relative",
+        width: "100%",
+        borderRadius: 18,
+        overflow: "hidden",
+        background:
+          "radial-gradient(circle at 50% 45%, rgba(13,63,102,0.95) 0%, rgba(4,20,42,1) 100%)",
+        border: "1px solid rgba(255,255,255,0.08)",
+      }}
+    >
       <svg
         viewBox="0 0 520 300"
-        style={{ width: "100%", height: "auto", display: "block", overflow: "visible" }}
+        role="img"
+        aria-label={labelText.map}
+        style={{ width: "100%", height: "auto", display: "block" }}
       >
-        {/* ── Glow filters ── */}
         <defs>
-          <filter id="mapGlow" x="-20%" y="-20%" width="140%" height="140%">
-            <feGaussianBlur stdDeviation="4" result="blur" />
-            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+          <linearGradient
+            id="mapFillSimple"
+            x1="0%"
+            y1="0%"
+            x2="100%"
+            y2="100%"
+          >
+            <stop offset="0%" stopColor="#1f7a4d" />
+            <stop offset="100%" stopColor="#184f35" />
+          </linearGradient>
+
+          <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+            <feGaussianBlur stdDeviation="2.5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
           </filter>
-          <filter id="dotGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="3" result="blur" />
-            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-          </filter>
-          <radialGradient id="mapFill" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#1B4332" stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#0d2818" stopOpacity="0.9" />
-          </radialGradient>
         </defs>
 
-        {/* ── Ocean background ── */}
-        <rect x={0} y={0} width={520} height={300} fill="rgba(6,28,50,0.0)" />
+        <rect x={0} y={0} width={520} height={300} fill="transparent" />
 
-        {/* ── Subtle sea texture dots ── */}
-        {[...Array(18)].map((_, i) => (
-          <motion.circle
-            key={i}
-            cx={20 + (i * 28) % 490}
-            cy={15 + (i * 17) % 270}
-            r={1.5}
-            fill="rgba(82,183,136,0.12)"
-            animate={{ opacity: [0.12, 0.28, 0.12] }}
-            transition={{ duration: 3 + i * 0.3, repeat: Infinity, delay: i * 0.2 }}
-          />
-        ))}
-
-        {/* ── Main island border glow ── */}
         <path
           d={PNG_PATH}
-          fill="none"
-          stroke="rgba(82,183,136,0.3)"
-          strokeWidth={8}
-          filter="url(#mapGlow)"
+          fill="url(#mapFillSimple)"
+          stroke="rgba(110,255,177,0.35)"
+          strokeWidth={1.5}
         />
-        {/* Island fills */}
-        <path d={MANUS_PATH}       fill="rgba(82,183,136,0.3)" stroke="rgba(82,183,136,0.5)" strokeWidth={4} filter="url(#mapGlow)" />
-        <path d={NEW_BRITAIN_PATH} fill="rgba(82,183,136,0.3)" stroke="rgba(82,183,136,0.5)" strokeWidth={4} filter="url(#mapGlow)" />
-        <path d={NEW_IRELAND_PATH} fill="rgba(82,183,136,0.3)" stroke="rgba(82,183,136,0.5)" strokeWidth={4} filter="url(#mapGlow)" />
-        <path d={BOUGAINVILLE_PATH} fill="rgba(82,183,136,0.3)" stroke="rgba(82,183,136,0.5)" strokeWidth={4} filter="url(#mapGlow)" />
+        <path
+          d={MANUS_PATH}
+          fill="#245c3f"
+          stroke="rgba(110,255,177,0.25)"
+          strokeWidth={1}
+        />
+        <path
+          d={NEW_BRITAIN_PATH}
+          fill="#2a355f"
+          stroke="rgba(177,128,255,0.35)"
+          strokeWidth={1.2}
+        />
+        <path
+          d={NEW_IRELAND_PATH}
+          fill="#2a355f"
+          stroke="rgba(177,128,255,0.35)"
+          strokeWidth={1.2}
+        />
+        <path
+          d={BOUGAINVILLE_PATH}
+          fill="#2a355f"
+          stroke="rgba(177,128,255,0.35)"
+          strokeWidth={1.2}
+        />
 
-        {/* ── Main island fill ── */}
-        <path d={PNG_PATH} fill="url(#mapFill)" />
-        {/* Inner terrain texture lines */}
-        <path d={PNG_PATH} fill="none" stroke="rgba(82,183,136,0.12)" strokeWidth={1} />
+        {currentData && homeData && currentData.id !== homeData.id && (
+          <line
+            x1={homeData.mapX}
+            y1={homeData.mapY}
+            x2={currentData.mapX}
+            y2={currentData.mapY}
+            stroke="rgba(255,217,61,0.45)"
+            strokeWidth={4}
+            strokeLinecap="round"
+            strokeDasharray="6 8"
+          />
+        )}
 
-        {/* ── Island fills ── */}
-        <path d={MANUS_PATH}        fill="#163d28" />
-        <path d={NEW_BRITAIN_PATH}  fill="#163d28" />
-        <path d={NEW_IRELAND_PATH}  fill="#163d28" />
-        <path d={BOUGAINVILLE_PATH} fill="#163d28" />
+        {provinces.map((p) => {
+          const isHome = p.id === homeProvinceId;
+          const isCurrent = p.id === currentProvinceId;
+          const isUnlocked = unlockedSet.has(p.id);
+          const isKeyLabel = Boolean(KEY_LABELS[p.id]) || isHome || isCurrent;
 
-        {/* ── River lines (Sepik / Fly) ── */}
-        <path d="M 35,130 C 60,125 85,118 110,120 C 140,122 162,128 185,125" fill="none" stroke="rgba(168,218,220,0.22)" strokeWidth={2} />
-        <path d="M 85,160 C 100,155 118,148 135,152 C 148,155 158,162 170,158" fill="none" stroke="rgba(168,218,220,0.18)" strokeWidth={1.5} />
-
-        {/* ── Province markers ── */}
-        {PROVINCE_DATA.map((p, i) => {
-          const isHome     = p.name === homeProvince;
-          const isUnlocked = i < unlockedCount;
-          const isHovered  = hoveredProv === p.name;
-          const region     = p.region;
-          const dotColor   = isHome
-            ? "#FFD93D"
-            : isUnlocked
-            ? CULTURAL_REGIONS[region].glow.replace("0.5)", "1)").replace("0.55)", "1)")
-            : "rgba(255,255,255,0.18)";
+          let fill = "rgba(255,255,255,0.24)";
+          if (isUnlocked) fill = "rgba(255,255,255,0.78)";
+          if (isHome) fill = "#FFD93D";
+          if (isCurrent) fill = "#FFE98A";
 
           return (
-            <g key={p.name}
-              style={{ cursor: "pointer" }}
-              onMouseEnter={() => setHoveredProv(p.name)}
-              onMouseLeave={() => setHoveredProv(null)}
-            >
-              {/* Pulse ring on home province */}
-              {isHome && (
+            <g key={p.id}>
+              <g
+                role="button"
+                tabIndex={0}
+                aria-label={p.name}
+                onClick={() => onProvinceSelect?.(p.id)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onProvinceSelect?.(p.id);
+                  }
+                }}
+                style={{ cursor: onProvinceSelect ? "pointer" : "default" }}
+              >
+                {(isHome || isCurrent) && (
+                  <motion.circle
+                    cx={p.mapX}
+                    cy={p.mapY}
+                    r={11}
+                    fill="none"
+                    stroke="#FFD93D"
+                    strokeWidth={1.5}
+                    filter="url(#softGlow)"
+                    animate={
+                      reduceMotion
+                        ? { opacity: 0.65 }
+                        : { scale: [1, 1.18, 1], opacity: [0.7, 0.28, 0.7] }
+                    }
+                    transition={
+                      reduceMotion
+                        ? undefined
+                        : { duration: 1.8, repeat: Infinity, ease: "easeOut" }
+                    }
+                    style={{ transformOrigin: `${p.mapX}px ${p.mapY}px` }}
+                  />
+                )}
+
+                <motion.circle
+                  cx={p.mapX}
+                  cy={p.mapY}
+                  r={isHome || isCurrent ? 6.5 : 5}
+                  fill={fill}
+                  filter={isHome || isCurrent ? "url(#softGlow)" : undefined}
+                  animate={
+                    reduceMotion || (!isHome && !isCurrent)
+                      ? undefined
+                      : { scale: [1, 1.05, 1] }
+                  }
+                  transition={
+                    reduceMotion || (!isHome && !isCurrent)
+                      ? undefined
+                      : { duration: 1.6, repeat: Infinity }
+                  }
+                  style={{ transformOrigin: `${p.mapX}px ${p.mapY}px` }}
+                />
+
+                {(isHome || isCurrent) && (
+                  <circle cx={p.mapX} cy={p.mapY} r={2.2} fill="#fff" />
+                )}
+              </g>
+
+              {isKeyLabel && (
                 <>
-                  {[0, 0.4, 0.8].map((delay, ri) => (
-                    <motion.circle
-                      key={ri}
-                      cx={p.mapX} cy={p.mapY}
-                      r={10 + ri * 5}
-                      fill="none"
-                      stroke="#FFD93D"
-                      strokeWidth={1.5}
-                      animate={{ scale: [1, 1.5, 1], opacity: [0.6, 0, 0.6] }}
-                      transition={{ duration: 2, repeat: Infinity, delay, ease: "easeOut" }}
-                      style={{ transformOrigin: `${p.mapX}px ${p.mapY}px` }}
-                    />
-                  ))}
+                  <rect
+                    x={p.mapX - 24}
+                    y={p.mapY + 8}
+                    width={48}
+                    height={16}
+                    rx={8}
+                    fill="rgba(7,18,34,0.86)"
+                    stroke="rgba(255,255,255,0.08)"
+                  />
+                  <text
+                    x={p.mapX}
+                    y={p.mapY + 19}
+                    textAnchor="middle"
+                    fontSize={8.8}
+                    fontWeight={700}
+                    fill={
+                      isHome || isCurrent ? "#FFD93D" : "rgba(255,255,255,0.92)"
+                    }
+                    fontFamily="'Nunito', sans-serif"
+                  >
+                    {KEY_LABELS[p.id] || p.shortLabel || p.name}
+                  </text>
                 </>
               )}
-
-              {/* Glow for unlocked */}
-              {isUnlocked && !isHome && (
-                <motion.circle
-                  cx={p.mapX} cy={p.mapY} r={8}
-                  fill={CULTURAL_REGIONS[region].glow}
-                  filter="url(#dotGlow)"
-                  animate={{ opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 1.8, repeat: Infinity, delay: i * 0.2 }}
-                />
-              )}
-
-              {/* Main dot */}
-              <motion.circle
-                cx={p.mapX} cy={p.mapY}
-                r={isHome ? 7 : 5}
-                fill={dotColor}
-                filter={isUnlocked || isHome ? "url(#dotGlow)" : undefined}
-                animate={isUnlocked || isHome ? {
-                  scale: isHome ? [1, 1.15, 1] : [1, 1.08, 1],
-                } : {}}
-                transition={{ duration: 2, repeat: Infinity, delay: i * 0.15 }}
-                style={{ transformOrigin: `${p.mapX}px ${p.mapY}px` }}
-              />
-
-              {/* Centre dot (home only) */}
-              {isHome && (
-                <circle cx={p.mapX} cy={p.mapY} r={3} fill="white" />
-              )}
-
-              {/* Hover label */}
-              <AnimatePresence>
-                {isHovered && (
-                  <motion.g
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.18 }}
-                  >
-                    <rect
-                      x={p.mapX - 28} y={p.mapY - 24}
-                      width={56} height={16}
-                      rx={4}
-                      fill="rgba(0,0,0,0.82)"
-                    />
-                    <text
-                      x={p.mapX} y={p.mapY - 12}
-                      textAnchor="middle"
-                      fontSize={7.5}
-                      fontWeight={800}
-                      fill={isHome ? "#FFD93D" : "rgba(255,255,255,0.85)"}
-                      fontFamily="'Nunito', sans-serif"
-                    >
-                      {DOT_LABELS[p.name] || p.name}
-                    </text>
-                  </motion.g>
-                )}
-              </AnimatePresence>
             </g>
           );
         })}
 
-        {/* ── Beni on home province ── */}
-        {homeData && (
-          <motion.foreignObject
-            x={beniX}
-            y={beniY}
-            width={28}
-            height={38}
-            initial={{ scale: 0, y: beniY + 10, opacity: 0 }}
-            animate={{ scale: 1, y: beniY, opacity: 1 }}
-            transition={{ delay: 0.8, type: "spring", bounce: 0.6 }}
-            style={{ overflow: "visible" }}
-          >
-            <BeniCharacter state="excited" size={28} />
-          </motion.foreignObject>
-        )}
-
-        {/* ── PNG text label ── */}
-        <text x={155} y={290} textAnchor="middle" fontSize={9}
-          fill="rgba(255,255,255,0.18)" fontWeight={800} fontFamily="'Nunito', sans-serif"
-          letterSpacing={2}
+        <text
+          x={18}
+          y={24}
+          fontSize={10}
+          fontWeight={800}
+          fill="rgba(255,255,255,0.9)"
+          fontFamily="'Nunito', sans-serif"
         >
-          PAPUA NEW GUINEA
+          {lang === "tok" ? "Bihainim rot bilong yu" : "Follow your journey"}
         </text>
 
-        {/* ── Compass rose (mini) ── */}
-        <g transform="translate(490, 30)">
-          <circle cx={0} cy={0} r={10} fill="rgba(0,0,0,0.4)" stroke="rgba(255,255,255,0.12)" strokeWidth={1} />
-          <text x={0} y={-14} textAnchor="middle" fontSize={7} fill="rgba(255,255,255,0.4)" fontWeight={900}>N</text>
-          <line x1={0} y1={-8} x2={0} y2={8} stroke="rgba(255,255,255,0.25)" strokeWidth={1} />
-          <line x1={-8} y1={0} x2={8} y2={0} stroke="rgba(255,255,255,0.25)" strokeWidth={1} />
-          <circle cx={0} cy={0} r={2} fill="rgba(255,255,255,0.4)" />
-        </g>
+        <text
+          x={18}
+          y={38}
+          fontSize={7.5}
+          fill="rgba(255,255,255,0.62)"
+          fontFamily="'Nunito', sans-serif"
+        >
+          {lang === "tok"
+            ? "Wanpela ples tasol long lukim taim"
+            : "Show one place at a time"}
+        </text>
       </svg>
+
+      {currentData && (
+        <div
+          style={{
+            position: "absolute",
+            left: beniLeft,
+            top: beniTop,
+            transform: "translate(-50%, -115%)",
+            pointerEvents: "none",
+          }}
+          aria-hidden="true"
+        >
+          <motion.div
+            initial={reduceMotion ? false : { opacity: 0, y: 8, scale: 0.92 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.35 }}
+            style={{
+              width: 34,
+              height: 42,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <BeniCharacter state="excited" size={34} />
+          </motion.div>
+        </div>
+      )}
+
+      <div
+        style={{
+          position: "absolute",
+          left: 12,
+          right: 12,
+          bottom: 10,
+          display: "flex",
+          gap: 8,
+          justifyContent: "center",
+          flexWrap: "wrap",
+          pointerEvents: "none",
+        }}
+      >
+        <div
+          style={{
+            background: "rgba(7,18,34,0.85)",
+            color: "rgba(255,255,255,0.92)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 999,
+            padding: "6px 10px",
+            fontSize: 12,
+            fontWeight: 700,
+            fontFamily: "'Nunito', sans-serif",
+          }}
+        >
+          {labelText.home}: {homeData?.name ?? "—"}
+        </div>
+
+        {currentData && (
+          <div
+            style={{
+              background: "rgba(7,18,34,0.85)",
+              color: "rgba(255,255,255,0.92)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 999,
+              padding: "6px 10px",
+              fontSize: 12,
+              fontWeight: 700,
+              fontFamily: "'Nunito', sans-serif",
+            }}
+          >
+            {labelText.next}: {currentData.name}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

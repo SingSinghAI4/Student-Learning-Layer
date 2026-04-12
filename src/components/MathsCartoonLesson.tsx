@@ -38,6 +38,7 @@ interface Props {
   actWrong: string | null;
   onNextStoryPage: () => void;
   onActivityAnswer: (val: string) => void;
+  onLangToggle?: () => void;
 }
 
 // ── Scene ground & horizon colours (used in CSS ground layer + SVG background) ─
@@ -102,51 +103,72 @@ function PNGJourneyMap({ step }: { step: number }) {
 
   return (
     <div style={{
-      flex: 1, minWidth: 0, height: 36,
+      flex: 1, minWidth: 0,
       display: "flex", alignItems: "center",
-      padding: "0 6px", overflow: "visible",
+      padding: "0 8px", overflow: "visible",
     }}>
       <svg
-        width="100%" height="28"
-        viewBox="0 0 224 28"
+        width="100%" height="42"
+        viewBox="0 0 224 42"
         preserveAspectRatio="xMidYMid meet"
         style={{ overflow: "visible", display: "block" }}
       >
-        {/* Ghost dashed full path */}
-        <path d={pathD} fill="none" stroke="rgba(255,255,255,0.18)"
-          strokeWidth={1.8} strokeDasharray="4 3" strokeLinecap="round" />
+        {/* Road track shadow */}
+        <path d={pathD} fill="none" stroke="rgba(0,0,0,0.35)"
+          strokeWidth={7} strokeLinecap="round" />
 
-        {/* Completed gold path */}
+        {/* Ghost road */}
+        <path d={pathD} fill="none" stroke="rgba(255,255,255,0.12)"
+          strokeWidth={5} strokeLinecap="round" />
+
+        {/* Road dashes */}
+        <path d={pathD} fill="none" stroke="rgba(255,255,255,0.08)"
+          strokeWidth={1.2} strokeDasharray="5 4" strokeLinecap="round" />
+
+        {/* Completed gold road */}
         {step > 0 && (
-          <path d={doneD} fill="none" stroke="#FFD93D"
-            strokeWidth={2.5} strokeLinecap="round" />
+          <>
+            <path d={doneD} fill="none" stroke="rgba(255,217,61,0.35)"
+              strokeWidth={8} strokeLinecap="round" />
+            <path d={doneD} fill="none" stroke="#FFD93D"
+              strokeWidth={3.5} strokeLinecap="round" />
+            <path d={doneD} fill="none" stroke="rgba(255,255,255,0.45)"
+              strokeWidth={1} strokeDasharray="4 5" strokeLinecap="round" />
+          </>
         )}
 
-        {/* Past + future waypoint dots */}
+        {/* Waypoint dots */}
         {MAP_PTS.map(([x, y], i) => (
-          <circle key={i} cx={x} cy={y}
-            r={i < step ? 3 : 2}
-            fill={i < step ? "#FFD93D" : "rgba(255,255,255,0.22)"}
-            opacity={i < step ? 0.8 : 1}
-          />
+          <g key={i}>
+            {i < step && (
+              <circle cx={x} cy={y} r={6} fill="rgba(255,217,61,0.25)" />
+            )}
+            <circle cx={x} cy={y}
+              r={i < step ? 4 : 3}
+              fill={i < step ? "#FFD93D" : "rgba(255,255,255,0.2)"}
+              stroke={i < step ? "#c49000" : "rgba(255,255,255,0.12)"}
+              strokeWidth={1}
+            />
+            {i < step && <circle cx={x} cy={y} r={1.5} fill="#fff" opacity={0.7} />}
+          </g>
         ))}
 
-        {/* Current-position pulse ring (animates via framer-motion) */}
-        <motion.circle cx={cx} cy={cy} fill="none" stroke="#FFD93D" strokeWidth={1.5}
-          animate={{ r: [5, 10, 5], opacity: [0.85, 0, 0.85] }}
+        {/* Current-position pulse ring */}
+        <motion.circle cx={cx} cy={cy} r={6} fill="none" stroke="#FFD93D" strokeWidth={2}
+          animate={{ r: [6, 14, 6], opacity: [0.9, 0, 0.9] }}
           transition={{ duration: 1.4, repeat: Infinity, ease: "easeOut" }}
         />
 
-        {/* Solid gold marker dot */}
-        <circle cx={cx} cy={cy} r={5} fill="#FFD93D" />
-        {/* Inner white centre for cartoon pop */}
-        <circle cx={cx} cy={cy} r={2} fill="#fff" opacity={0.8} />
+        {/* Gold marker */}
+        <circle cx={cx} cy={cy} r={6} fill="#FFD93D"
+          style={{ filter: "drop-shadow(0 0 4px rgba(255,217,61,0.8))" }} />
+        <circle cx={cx} cy={cy} r={2.5} fill="#fff" opacity={0.9} />
 
-        {/* "PNG JOURNEY" label */}
-        <text x="112" y="27" textAnchor="middle"
-          fontSize="4.5" fill="rgba(255,255,255,0.3)"
-          fontFamily="'Baloo 2', cursive" letterSpacing="1">
-          PNG JOURNEY
+        {/* Step label above current marker */}
+        <text x={cx} y={cy - 10} textAnchor="middle"
+          fontSize="6" fontWeight="900" fill="#FFD93D" opacity={0.85}
+          fontFamily="'Baloo 2', cursive">
+          {step + 1}/{MAP_PTS.length}
         </text>
       </svg>
     </div>
@@ -703,6 +725,7 @@ export default function MathsCartoonLesson({
   actWrong,
   onNextStoryPage,
   onActivityAnswer,
+  onLangToggle,
 }: Props) {
   const activities = mathsPath === "sione" ? MATHS_ACTIVITIES_SIONE : MATHS_ACTIVITIES_MERI;
   const activity   = activities[actIdx] as MathsActivity | undefined;
@@ -841,6 +864,7 @@ export default function MathsCartoonLesson({
         profile={profile}
         onAnswer={onActivityAnswer}
         onNext={onNextStoryPage}
+        onLangToggle={onLangToggle}
       />
     );
   }
@@ -1504,7 +1528,7 @@ export default function MathsCartoonLesson({
 
       {/* Profile chip — top left */}
       <div style={{
-        position: "absolute", top: 58, left: 14, zIndex: 20,
+        position: "absolute", top: 68, left: 14, zIndex: 20,
         background: "rgba(0,0,0,0.45)", backdropFilter: "blur(8px)",
         borderRadius: 20, padding: "4px 10px 4px 6px",
         display: "flex", alignItems: "center", gap: 6,
@@ -1523,6 +1547,24 @@ export default function MathsCartoonLesson({
           {profile.name}
         </span>
       </div>
+
+      {/* Language toggle — top right */}
+      {onLangToggle && (
+        <button
+          onClick={onLangToggle}
+          style={{
+            position: "absolute", top: 68, right: 14, zIndex: 20,
+            background: "rgba(0,0,0,0.45)", backdropFilter: "blur(8px)" as any,
+            borderRadius: 20, padding: "5px 14px",
+            border: "1px solid rgba(255,217,61,0.35)",
+            fontSize: 12, fontWeight: 900, color: "#FFD93D",
+            cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+            letterSpacing: 1,
+          }}
+        >
+          {lang === "tok" ? "EN" : "TOK"}
+        </button>
+      )}
     </div>
   );
 }

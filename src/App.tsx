@@ -392,41 +392,41 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
   // ── Render ──
   return (
     <div className="app">
-      {/* Student info bar — top left (hidden during lesson) */}
-      {screen !== "session" && <div className="student-bar">
-        {/* Avatar */}
-        <div className="sbar-avatar" style={{ background: "#1a3a2a", borderColor: "#52B788" }}>
-          {profile.name.charAt(0).toUpperCase()}
-        </div>
-        {/* Name + grade */}
-        <div className="sbar-info">
-          <div className="sbar-name">{profile.name}</div>
-          <div className="sbar-grade">Grade {profile.grade}</div>
-        </div>
-        {/* Divider */}
-        <div className="sbar-divider"/>
-        {/* Streak */}
-        <div className="sbar-stat">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2C12 2 6 8 6 13a6 6 0 0012 0c0-5-6-11-6-11z" fill="#FF6B35"/>
-            <path d="M12 8C12 8 9 12 9 14.5a3 3 0 006 0C15 12 12 8 12 8z" fill="#FFD93D"/>
-          </svg>
-          <span>{profile.streak ?? 0}</span>
-        </div>
-        {/* Stars */}
-        <div className="sbar-stat">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2l2.9 6.4 7 .7-5.1 4.8 1.5 6.9L12 17.7l-6.3 3.1 1.5-6.9L2.1 9.1l7-.7z" fill="#FFD93D"/>
-          </svg>
-          <span>12</span>
-        </div>
-      </div>}
+      {/* Top bar — profile card + language toggle inline (hidden during lesson) */}
+      {screen !== "session" && (
+        <div className="top-bar">
+          {/* Profile card */}
+          <div className="student-bar">
+            <div className="sbar-avatar" style={{ background: "#1a3a2a", borderColor: "#52B788" }}>
+              {profile.name.charAt(0).toUpperCase()}
+            </div>
+            <div className="sbar-info">
+              <div className="sbar-name">{profile.name}</div>
+              <div className="sbar-grade">Grade {profile.grade}</div>
+            </div>
+            <div className="sbar-divider"/>
+            <div className="sbar-stat">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2C12 2 6 8 6 13a6 6 0 0012 0c0-5-6-11-6-11z" fill="#FF6B35"/>
+                <path d="M12 8C12 8 9 12 9 14.5a3 3 0 006 0C15 12 12 8 12 8z" fill="#FFD93D"/>
+              </svg>
+              <span>{profile.streak ?? 0}</span>
+            </div>
+            <div className="sbar-stat">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2l2.9 6.4 7 .7-5.1 4.8 1.5 6.9L12 17.7l-6.3 3.1 1.5-6.9L2.1 9.1l7-.7z" fill="#FFD93D"/>
+              </svg>
+              <span>12</span>
+            </div>
+          </div>
 
-      {/* Language toggle */}
-      <div className="lang-toggle-wrap">
-        <button className={`lang-btn${lang === "tok" ? " active" : ""}`} onClick={() => setLang("tok")}>Tok Pisin</button>
-        <button className={`lang-btn${lang === "en"  ? " active" : ""}`} onClick={() => setLang("en")}>English</button>
-      </div>
+          {/* Language toggle */}
+          <div className="lang-toggle-wrap">
+            <button className={`lang-btn${lang === "tok" ? " active" : ""}`} onClick={() => setLang("tok")}>Tok Pisin</button>
+            <button className={`lang-btn${lang === "en"  ? " active" : ""}`} onClick={() => setLang("en")}>English</button>
+          </div>
+        </div>
+      )}
 
       {/* Screens */}
       <AnimatePresence mode="wait">
@@ -466,6 +466,7 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
               chapter={chapter} consecutiveCorrect={consecutiveCorrect}
               mathsPath={mathsPath}
               onNextStoryPage={handleNextStoryPage} onActivityAnswer={handleActivityAnswer}
+              onLangToggle={() => setLang(l => l === "tok" ? "en" : "tok")}
             />
           </motion.div>
         )}

@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { PartyPopper, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import confetti from "canvas-confetti";
 import { StudentProfile } from "../LoginScreen";
-import { PROVINCE_DATA, CULTURAL_REGIONS } from "../data";
-import DavidCharacter from "./DavidCharacter";
+import { PROVINCE_DATA, CULTURAL_REGIONS, AVATARS } from "../data";
 import BeniCharacter from "./BeniCharacter";
-import PNGJourneyMap from "./PNGJourneyMap";
+import PNGRoadMap from "./PNGRoadMap";
 import ProvinceGuardian from "./ProvinceGuardian";
 
 interface Props {
@@ -18,85 +17,27 @@ interface Props {
 
 const BILUM_ITEMS = ["🥭", "🦜", "🐚", "🌺", "⭐"];
 
-const DAVID_MESSAGES = [
-  { tok: "Gutpela wok tru! Yu save!", en: "Excellent work! You know this!" },
-  { tok: "Bikpela man bilong lainim!", en: "A great learner!" },
-  { tok: "PNG i praut long yu!", en: "PNG is proud of you!" },
-  { tok: "Yu strong tru — kirapim!", en: "You're strong — keep going!" },
-];
 
 function fireConfetti() {
-  // Centre burst
   confetti({
-    particleCount: 120,
-    spread: 80,
-    origin: { y: 0.55 },
+    particleCount: 140, spread: 90, origin: { y: 0.5 },
     colors: ["#FFD93D", "#52B788", "#A8DADC", "#E63946", "#ffffff"],
   });
-  // Left cannon
-  setTimeout(() => {
-    confetti({ particleCount: 60, angle: 60, spread: 55, origin: { x: 0, y: 0.6 } });
-  }, 200);
-  // Right cannon
-  setTimeout(() => {
-    confetti({ particleCount: 60, angle: 120, spread: 55, origin: { x: 1, y: 0.6 } });
-  }, 350);
-}
-
-// ── Floating sparkle micro-particle ──
-function MicroStar({ delay, x, color }: { delay: number; x: string; color: string }) {
-  return (
-    <motion.div
-      style={{
-        position: "absolute", left: x, top: "10%",
-        fontSize: 8, color, pointerEvents: "none", userSelect: "none",
-      }}
-      animate={{ y: [0, -14, 0], opacity: [0.5, 1, 0.5], scale: [0.8, 1.3, 0.8] }}
-      transition={{ duration: 2.2, repeat: Infinity, delay, ease: "easeInOut" }}
-    >✦</motion.div>
-  );
-}
-
-// ── Beacon rings (concentric pulses) for home province ──
-function BeaconRings() {
-  return (
-    <>
-      {[0, 0.35, 0.7].map((delay, i) => (
-        <motion.div
-          key={i}
-          style={{
-            position: "absolute",
-            inset: -(i + 1) * 5,
-            borderRadius: 14 + (i + 1) * 4,
-            border: `1.5px solid #FFD93D`,
-            pointerEvents: "none",
-          }}
-          animate={{ scale: [1, 1.28 + i * 0.1, 1], opacity: [0.7 - i * 0.15, 0, 0.7 - i * 0.15] }}
-          transition={{ duration: 1.8, repeat: Infinity, delay, ease: "easeOut" }}
-        />
-      ))}
-    </>
-  );
+  setTimeout(() => confetti({ particleCount: 70, angle: 60,  spread: 60, origin: { x: 0, y: 0.55 } }), 200);
+  setTimeout(() => confetti({ particleCount: 70, angle: 120, spread: 60, origin: { x: 1, y: 0.55 } }), 350);
 }
 
 export default function CelebrationScreen({ profile, lang, onDashboard, onSessionEnd }: Props) {
   const [visibleCount, setVisibleCount] = useState(0);
+  const [showXPPop, setShowXPPop] = useState(false);
 
   useEffect(() => {
     fireConfetti();
-    const t = setTimeout(fireConfetti, 1200);
-    return () => clearTimeout(t);
+    const t1 = setTimeout(fireConfetti, 1300);
+    const t2 = setTimeout(() => setShowXPPop(true), 800);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
-  const unlockedCount = Math.max(1, Math.floor((profile.lessonProgress || 20) / 20));
-  const davidMsg = DAVID_MESSAGES[(profile.lessonProgress || 0) % DAVID_MESSAGES.length];
-
-  // Find cultural region of home province
-  const homeProvData = PROVINCE_DATA.find(p => p.name === profile.province);
-  const guardianRegion = homeProvData?.region ?? "papuan";
-  const regionInfo = CULTURAL_REGIONS[guardianRegion];
-
-  // Sequentially "illuminate" provinces for visual drama
   useEffect(() => {
     let i = 0;
     const iv = setInterval(() => {
@@ -108,250 +49,286 @@ export default function CelebrationScreen({ profile, lang, onDashboard, onSessio
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const unlockedCount = Math.max(1, Math.floor((profile.lessonProgress || 20) / 20));
+  const homeProvData  = PROVINCE_DATA.find(p => p.name === profile.province);
+  const guardianRegion = homeProvData?.region ?? "papuan";
+  const regionInfo     = CULTURAL_REGIONS[guardianRegion];
+  const regionGlow     = regionInfo.glow.replace(/[\d.]+\)$/, "1)");
+
   return (
-    <div className="screen celebration-screen">
-      <div className="cel-content">
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 1200,
+      display: "flex", flexDirection: "column",
+      fontFamily: "'Baloo 2', cursive",
+      overflow: "hidden",
+      background: "linear-gradient(to bottom, #0a1628 0%, #0d2240 50%, #0a1628 100%)",
+    }}>
 
-        <motion.div
-          className="cel-emoji"
-          initial={{ scale: 0, rotate: -20 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", bounce: 0.6, duration: 0.7 }}
-        >
-          <PartyPopper size={64} strokeWidth={1.5} />
-        </motion.div>
+      {/* ── Gold top accent bar ── */}
+      <motion.div
+        style={{
+          position: "absolute", top: 0, left: 0, right: 0,
+          height: 5, zIndex: 30,
+          background: "linear-gradient(to right, #FFD93D, #ff8f00, #FFD93D)",
+          boxShadow: "0 0 20px rgba(255,217,61,0.7)",
+        }}
+        initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      />
 
-        <motion.div
-          className="cel-title"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.35, duration: 0.4 }}
-        >
-          Gutpela Wok, {profile.name}! <Star size={20} fill="#FFD93D" stroke="#FFD93D" style={{verticalAlign:"middle",marginLeft:4}} />
-        </motion.div>
+      {/* ── Floating particles ── */}
+      {["⭐","🌺","🥭","🐚","🦜","✨","🏆"].map((em, i) => (
+        <motion.div key={i}
+          style={{
+            position: "absolute", fontSize: 18 + (i % 3) * 4,
+            left: `${8 + i * 13}%`, top: "-30px",
+            pointerEvents: "none", zIndex: 2,
+          }}
+          animate={{ y: ["0vh", "110vh"], rotate: [0, 360], opacity: [0, 0.9, 0] }}
+          transition={{ duration: 8 + i * 1.5, repeat: Infinity, delay: i * 1.2, ease: "linear" }}
+        >{em}</motion.div>
+      ))}
 
-        <motion.div
-          className="cel-sub"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.55, duration: 0.4 }}
-        >
-          You completed today's lesson. Your tutor is proud of you. See you tomorrow!
-        </motion.div>
+      {/* ════════ HEADER ════════ */}
+      <div style={{
+        position: "relative", zIndex: 20,
+        display: "flex", alignItems: "center", gap: 12,
+        padding: "10px 20px",
+        background: "rgba(0,0,0,0.5)",
+        backdropFilter: "blur(14px)",
+        borderBottom: "1px solid rgba(255,255,255,0.1)",
+        flexShrink: 0,
+      }}>
 
-        {/* Bilum items */}
-        <div className="bilum-row">
-          {BILUM_ITEMS.map((item, i) => (
-            <motion.div
-              key={i}
-              className="bilum-item"
-              initial={{ scale: 0, y: 30, opacity: 0 }}
-              animate={{ scale: 1, y: 0, opacity: 1 }}
-              transition={{ delay: 0.5 + i * 0.1, type: "spring", bounce: 0.55 }}
-            >
-              {item}
-            </motion.div>
-          ))}
+        {/* Avatar chip */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: 8,
+          background: "rgba(255,255,255,0.08)", borderRadius: 20,
+          padding: "4px 12px 4px 6px",
+          border: "1px solid rgba(255,255,255,0.12)",
+          flexShrink: 0,
+        }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: "50%",
+            background: "linear-gradient(135deg, #52B788, #2d6a4f)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 17,
+          }}>
+            {AVATARS[profile.avatarIdx]?.emoji ?? "🧒"}
+          </div>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 900, color: "#fff", lineHeight: 1.1 }}>{profile.name}</div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.55)", fontFamily: "'Nunito', sans-serif" }}>
+              {profile.province} · Grade {profile.grade}
+            </div>
+          </div>
         </div>
 
-        <motion.div
-          style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", marginTop: 4 }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.1 }}
-        >
-          Bilum bilong yu i pulap! (Your bilum is filling up!)
-        </motion.div>
-
-        {/* ── Cultural Province Guardian ── */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ delay: 0.85, type: "spring", bounce: 0.5 }}
-          style={{
-            display: "flex", alignItems: "center", gap: 16,
-            background: `linear-gradient(135deg, rgba(0,0,0,0.35), rgba(0,0,0,0.2))`,
-            border: `1.5px solid ${regionInfo.glow.replace("0.5)", "0.35)").replace("0.55)", "0.35)")}`,
-            borderRadius: 20, padding: "14px 18px",
-            boxShadow: `0 0 30px ${regionInfo.glow.replace("0.5)", "0.2)").replace("0.55)", "0.2)")}`,
-          }}
-        >
-          <motion.div
-            animate={{ y: [0, -6, 0] }}
-            transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <ProvinceGuardian region={guardianRegion} state="excited" size={80} />
-          </motion.div>
-          <div style={{ flex: 1 }}>
-            <div style={{
-              fontSize: 10, fontWeight: 900, letterSpacing: 2,
-              color: regionInfo.glow.replace("0.5)", "1)").replace("0.55)", "1)"),
-              textTransform: "uppercase", marginBottom: 4,
-            }}>
-              {profile.province} · {regionInfo.label} {lang === "tok" ? "Gaden" : "Region"}
-            </div>
+        {/* XP Badge */}
+        <AnimatePresence>
+          {showXPPop && (
             <motion.div
-              style={{ fontSize: 15, fontWeight: 800, color: "#fff", lineHeight: 1.5 }}
-              initial={{ opacity: 0, x: -12 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 1.1, duration: 0.4 }}
-            >
-              {lang === "tok"
-                ? `Gaden bilong ${regionInfo.tok} i praut long yu!`
-                : `${regionInfo.label} is proud of you!`}
-            </motion.div>
-            <motion.div
-              style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 3, fontStyle: "italic" }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.3 }}
-            >
-              {homeProvData?.food && `${homeProvData.food} ${profile.province} · PNG`}
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* ── PNG Journey Map ── */}
-        <motion.div
-          className="journey-section"
-          initial={{ opacity: 0, scale: 0.92, y: 28 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ delay: 1.0, type: "spring", bounce: 0.3 }}
-        >
-          {/* Header */}
-          <div className="journey-header">
-            <div>
-              <div className="journey-title">
-                {lang === "tok" ? "YU TRAMP LONG PNG!" : "YOUR PNG JOURNEY"}
-              </div>
-              <div style={{ fontSize: 9, color: "rgba(255,255,255,0.25)", fontWeight: 700, marginTop: 2, letterSpacing: 1 }}>
-                Papua New Guinea · AI Learning Map
-              </div>
-            </div>
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 1.5, type: "spring", bounce: 0.6 }}
+              initial={{ scale: 0, opacity: 0, y: 10 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              transition={{ type: "spring", bounce: 0.6 }}
               style={{
-                background: "rgba(82,183,136,0.15)",
-                border: "1px solid rgba(82,183,136,0.3)",
-                borderRadius: 20, padding: "4px 10px",
-                fontSize: 11, fontWeight: 800, color: "#52B788",
+                background: "linear-gradient(135deg, #FFD93D, #ff8f00)",
+                borderRadius: 12, padding: "6px 16px",
+                fontSize: 18, fontWeight: 900, color: "#1a0a00",
+                boxShadow: "0 0 24px rgba(255,217,61,0.55)",
+                flexShrink: 0,
               }}
             >
-              {unlockedCount} / {PROVINCE_DATA.length}
+              +{profile.lessonProgress || 20} XP ⭐
             </motion.div>
-          </div>
+          )}
+        </AnimatePresence>
 
-          {/* Real PNG Map */}
+        {/* Title — absolutely centred so it ignores left/right flex items */}
+        <div style={{
+          position: "absolute", left: "50%", transform: "translateX(-50%)",
+          textAlign: "center", pointerEvents: "none",
+        }}>
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.2, duration: 0.6 }}
-            style={{
-              background: "rgba(6,28,50,0.5)",
-              borderRadius: 14,
-              border: "1px solid rgba(82,183,136,0.15)",
-              padding: "10px 6px 4px",
-              marginBottom: 10,
-            }}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            style={{ fontSize: 22, fontWeight: 900, color: "#FFD93D", lineHeight: 1.1 }}
           >
-            <PNGJourneyMap
+            {lang === "tok" ? "Gutpela Wok!" : "Great Work!"}
+            <Star size={18} fill="#FFD93D" stroke="#FFD93D" style={{ verticalAlign: "middle", marginLeft: 6 }} />
+          </motion.div>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.5)", fontFamily: "'Nunito', sans-serif" }}>
+            {lang === "tok" ? "Yu pinisim leson bilong tude!" : "You completed today's lesson!"}
+          </div>
+        </div>
+
+      </div>
+
+      {/* ════════ MAIN CONTENT ════════ */}
+      <div style={{
+        flex: 1, display: "flex", gap: 0,
+        position: "relative", overflow: "hidden",
+        minHeight: 0,
+      }}>
+
+        {/* ── LEFT: Map takes most of the screen ── */}
+        <div style={{
+          flex: "1 1 60%", position: "relative",
+          display: "flex", flexDirection: "column",
+          alignItems: "stretch", justifyContent: "center",
+          padding: "12px 8px 12px 16px",
+          minWidth: 0,
+        }}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.4, duration: 0.8, ease: "easeOut" }}
+            style={{ width: "100%", maxHeight: "100%", overflow: "hidden" }}
+          >
+            <PNGRoadMap
               homeProvince={profile.province}
               unlockedCount={visibleCount}
               lang={lang}
             />
           </motion.div>
+        </div>
 
-          {/* Journey progress bar */}
-          <div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5 }}>
-              <span style={{ fontSize: 9, color: "rgba(255,255,255,0.28)", fontWeight: 700, letterSpacing: 1 }}>
-                {lang === "tok" ? "TRAMP BILONG YU" : "JOURNEY PROGRESS"}
-              </span>
-              <span style={{ fontSize: 9, color: "#52B788", fontWeight: 800 }}>
-                {Math.round((unlockedCount / PROVINCE_DATA.length) * 100)}%
-              </span>
-            </div>
-            <div style={{ height: 5, background: "rgba(255,255,255,0.07)", borderRadius: 10, overflow: "hidden" }}>
-              <motion.div
-                initial={{ width: 0 }}
-                animate={{ width: `${(unlockedCount / PROVINCE_DATA.length) * 100}%` }}
-                transition={{ delay: 1.4, duration: 0.9, ease: "easeOut" }}
-                style={{
-                  height: "100%", borderRadius: 10,
-                  background: "linear-gradient(90deg, #52B788, #A8DADC, #FFD93D)",
-                  boxShadow: "0 0 8px rgba(82,183,136,0.6)",
-                }}
-              />
-            </div>
-          </div>
-        </motion.div>
+        {/* ── RIGHT: Stats panel ── */}
+        <div style={{
+          flex: "0 0 320px",
+          display: "flex", flexDirection: "column",
+          justifyContent: "center",
+          gap: 14,
+          padding: "16px 20px 16px 8px",
+          overflow: "hidden",
+        }}>
 
-        {/* ── David encouragement bubble ── */}
-        <motion.div
-          className="david-cel-bubble"
-          initial={{ opacity: 0, x: -30, scale: 0.88 }}
-          animate={{ opacity: 1, x: 0, scale: 1 }}
-          transition={{ delay: 1.7, type: "spring", bounce: 0.55 }}
-        >
+          {/* Province Guardian */}
           <motion.div
-            style={{ flexShrink: 0 }}
-            animate={{ y: [0, -5, 0] }}
-            transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+            initial={{ opacity: 0, x: 30, scale: 0.9 }}
+            animate={{ opacity: 1, x: 0, scale: 1 }}
+            transition={{ delay: 0.6, type: "spring", bounce: 0.4 }}
+            style={{
+              display: "flex", alignItems: "center", gap: 14,
+              background: "rgba(0,0,0,0.45)",
+              backdropFilter: "blur(12px)",
+              border: `1.5px solid ${regionInfo.glow.replace(/[\d.]+\)$/, "0.4)")}`,
+              borderRadius: 20, padding: "12px 16px",
+              boxShadow: `0 0 28px ${regionInfo.glow.replace(/[\d.]+\)$/, "0.2)")}`,
+            }}
           >
-            <DavidCharacter state="excited" size={58} />
+            <motion.div
+              animate={{ y: [0, -8, 0] }}
+              transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <ProvinceGuardian region={guardianRegion} state="excited" size={68} />
+            </motion.div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{
+                fontSize: 9, fontWeight: 900, letterSpacing: 1.5,
+                color: regionGlow, textTransform: "uppercase", marginBottom: 4,
+              }}>
+                {profile.province} · {regionInfo.label}
+              </div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#fff", lineHeight: 1.4 }}>
+                {lang === "tok"
+                  ? `${regionInfo.tok} i praut long yu!`
+                  : `${regionInfo.label} is proud of you!`}
+              </div>
+            </div>
           </motion.div>
-          <div style={{ flex: 1 }}>
-            <motion.div
-              className="david-cel-speech"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 2.0, duration: 0.35 }}
-            >{davidMsg.tok}</motion.div>
-            <motion.div
-              className="david-cel-speech-en"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 2.2, duration: 0.35 }}
-            >{davidMsg.en}</motion.div>
-          </div>
-        </motion.div>
 
-        <motion.button
-          className="cel-btn"
-          onClick={onDashboard}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.97 }}
-        >
-          View Class Dashboard →
-        </motion.button>
+          {/* Beni hero */}
+          <motion.div
+            initial={{ y: 40, opacity: 0, scale: 0.7 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            transition={{ type: "spring", bounce: 0.5, duration: 0.7, delay: 0.3 }}
+            style={{
+              display: "flex", justifyContent: "center",
+              filter: "drop-shadow(0 12px 24px rgba(0,0,0,0.5))",
+            }}
+          >
+            <BeniCharacter state="excited" size={140} />
+          </motion.div>
 
-        <motion.button
-          onClick={onSessionEnd}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.4 }}
-          whileHover={{ color: "rgba(255,255,255,0.85)" }}
-          style={{
-            marginTop: 8,
-            background: "none",
-            border: "1px solid rgba(255,255,255,0.15)",
-            borderRadius: 50,
-            padding: "10px 28px",
-            color: "rgba(255,255,255,0.4)",
-            fontSize: 13,
-            fontWeight: 700,
-            cursor: "pointer",
-            fontFamily: "inherit",
-          }}
-        >
-          {lang === "tok" ? "Pinis — Nekis Student ▶" : "Done — Next Student ▶"}
-        </motion.button>
+          {/* Bilum items */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            style={{
+              background: "rgba(0,0,0,0.35)",
+              backdropFilter: "blur(10px)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              borderRadius: 18, padding: "12px 16px",
+            }}
+          >
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", fontWeight: 700, letterSpacing: 1, marginBottom: 10 }}>
+              {lang === "tok" ? "BILUM BILONG YU I PULAP!" : "YOUR BILUM IS FILLING UP!"}
+            </div>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+              {BILUM_ITEMS.map((item, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ scale: 0, y: 12, opacity: 0 }}
+                  animate={{ scale: 1, y: 0, opacity: 1 }}
+                  transition={{ delay: 0.6 + i * 0.09, type: "spring", bounce: 0.6 }}
+                  style={{
+                    background: "rgba(255,255,255,0.1)",
+                    border: "1.5px solid rgba(255,255,255,0.18)",
+                    borderRadius: "50%",
+                    width: 44, height: 44,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: 22,
+                  }}
+                >
+                  {item}
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
 
+          {/* CTA buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.1 }}
+            style={{ display: "flex", flexDirection: "column", gap: 10 }}
+          >
+            <motion.button
+              onClick={onDashboard}
+              whileHover={{ scale: 1.03, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              style={{
+                width: "100%", padding: "14px 0",
+                background: "linear-gradient(135deg, #FFD93D, #ff8f00)",
+                border: "none", borderRadius: 18,
+                fontSize: 16, fontWeight: 900, color: "#1a0a00",
+                cursor: "pointer", fontFamily: "'Baloo 2', cursive",
+                boxShadow: "0 6px 24px rgba(255,217,61,0.4)",
+              }}
+            >
+              View Class Dashboard →
+            </motion.button>
+            <motion.button
+              onClick={onSessionEnd}
+              whileHover={{ scale: 1.03, y: -2 }}
+              whileTap={{ scale: 0.97 }}
+              style={{
+                width: "100%", padding: "13px 0",
+                background: "rgba(255,255,255,0.07)",
+                border: "1.5px solid rgba(255,255,255,0.16)",
+                borderRadius: 18,
+                fontSize: 14, fontWeight: 800, color: "rgba(255,255,255,0.72)",
+                cursor: "pointer", fontFamily: "'Baloo 2', cursive",
+              }}
+            >
+              {lang === "tok" ? "Pinis — Nekis Student ▶" : "Done — Next Student ▶"}
+            </motion.button>
+          </motion.div>
+
+        </div>
       </div>
     </div>
   );

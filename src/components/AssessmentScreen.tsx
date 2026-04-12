@@ -1,14 +1,14 @@
 /**
- * AssessmentScreen — full-screen quiz matching the cf77c37 session-screen style.
- * Dark jungle-green background, floating maths particles, white activity card,
- * large white answer buttons with jungle-green correct / red wrong states.
+ * AssessmentScreen — full-screen quiz styled to match MathsCartoonLesson.
+ * Bright cartoon sky + ground scene, Beni mascot, frosted-glass topbar.
  */
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import { MathsActivity, AVATARS } from "../data";
 import { StudentProfile } from "../LoginScreen";
 import TeachMoment from "./TeachMoment";
+import BeniCharacter from "./BeniCharacter";
 
 interface Props {
   activity: MathsActivity;
@@ -20,6 +20,7 @@ interface Props {
   profile: StudentProfile;
   onAnswer: (v: string) => void;
   onNext: () => void;
+  onLangToggle?: () => void;
 }
 
 const PARTICLES = [
@@ -44,11 +45,12 @@ export default function AssessmentScreen({
   profile,
   onAnswer,
   onNext,
+  onLangToggle,
 }: Props) {
   const isCorrectAnswer = actSelected === activity.correct;
 
   // Mascot animation state
-  const [mascotState, setMascotState] = useState<"idle" | "correct" | "wrong">("idle");
+  const [mascotState, setMascotState] = useState<"idle" | "correct" | "sad">("idle");
   const [showCorrectFlash, setShowCorrectFlash] = useState(false);
   const [showWrongFlash,   setShowWrongFlash]   = useState(false);
   const [showXP, setShowXP] = useState(false);
@@ -85,7 +87,7 @@ export default function AssessmentScreen({
   useEffect(() => {
     if (actWrong && actWrong !== prevActWrong.current) {
       prevActWrong.current = actWrong;
-      setMascotState("wrong");
+      setMascotState("sad");
       setShowWrongFlash(true);
       setTimeout(() => setMascotState("idle"), 750);
       setTimeout(() => setShowWrongFlash(false), 420);
@@ -103,17 +105,66 @@ export default function AssessmentScreen({
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 1100,
-      background: `
-        radial-gradient(ellipse 65% 55% at 12% 8%, rgba(40,110,18,0.65) 0%, transparent 58%),
-        radial-gradient(ellipse 50% 45% at 90% 88%, rgba(210,90,10,0.38) 0%, transparent 52%),
-        radial-gradient(ellipse 38% 55% at 78% 18%, rgba(22,80,10,0.42) 0%, transparent 48%),
-        radial-gradient(ellipse 55% 38% at 28% 82%, rgba(8,52,4,0.5) 0%, transparent 48%),
-        #0A1A07
-      `,
       display: "flex", flexDirection: "column",
-      fontFamily: "'Nunito', sans-serif",
+      fontFamily: "'Baloo 2', cursive",
       overflow: "hidden",
     }}>
+
+      {/* ── Cartoon sky background ── */}
+      <div style={{
+        position: "absolute",
+        top: 0, left: 0, right: 0, bottom: "22%",
+        background: "linear-gradient(to bottom, #0d47a1 0%, #1976d2 45%, #64b5f6 100%)",
+        zIndex: 0,
+        overflow: "hidden",
+      }}>
+        {/* Sun */}
+        <motion.div style={{
+          position: "absolute", top: "10%", right: "8%",
+          width: 60, height: 60, borderRadius: "50%",
+          background: "radial-gradient(circle, #FFE566 35%, #FFB300 100%)",
+          boxShadow: "0 0 44px 22px rgba(255,190,0,0.38), 0 0 88px 44px rgba(255,150,0,0.16)",
+          pointerEvents: "none",
+        }}
+          animate={{ scale: [1, 1.07, 1] }}
+          transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+        />
+        {/* Clouds */}
+        <motion.div style={{
+          position: "absolute", top: "16%",
+          width: 180, height: 48, borderRadius: 24,
+          background: "rgba(255,255,255,0.92)",
+          boxShadow: "34px -16px 0 9px rgba(255,255,255,0.92), -20px -10px 0 4px rgba(255,255,255,0.92), 80px -20px 0 14px rgba(255,255,255,0.92)",
+          pointerEvents: "none",
+        }}
+          animate={{ x: ["-220px", "110vw"] }}
+          transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.div style={{
+          position: "absolute", top: "38%",
+          width: 130, height: 34, borderRadius: 17,
+          background: "rgba(255,255,255,0.78)",
+          boxShadow: "24px -12px 0 6px rgba(255,255,255,0.78), 60px -14px 0 10px rgba(255,255,255,0.78)",
+          pointerEvents: "none",
+        }}
+          animate={{ x: ["-160px", "110vw"] }}
+          transition={{ duration: 36, repeat: Infinity, ease: "linear", delay: 14 }}
+        />
+      </div>
+
+      {/* ── Ground strip ── */}
+      <div style={{
+        position: "absolute",
+        bottom: 0, left: 0, right: 0, height: "22%",
+        background: "linear-gradient(to bottom, #2d6a1a 0%, #1a4a0a 100%)",
+        zIndex: 0,
+      }}>
+        {/* Grass texture line */}
+        <div style={{
+          position: "absolute", top: 0, left: 0, right: 0, height: 6,
+          background: "linear-gradient(to right, #52B788 0%, #40916C 30%, #74c69d 60%, #52B788 100%)",
+        }} />
+      </div>
 
       {/* ── Floating background particles ── */}
       {PARTICLES.map((p, i) => (
@@ -169,53 +220,78 @@ export default function AssessmentScreen({
         )}
       </AnimatePresence>
 
-      {/* ── Top bar ── */}
-      <div className="session-topbar">
-        <div className="session-avatar-wrap">
-          <div className="s-avatar">
+      {/* ── Frosted-glass topbar ── */}
+      <div style={{
+        position: "relative", zIndex: 20,
+        display: "flex", alignItems: "center", gap: 10,
+        padding: "10px 16px",
+        background: "rgba(0,0,0,0.35)",
+        backdropFilter: "blur(10px)",
+        borderBottom: "1px solid rgba(255,255,255,0.1)",
+      }}>
+        {/* Avatar chip */}
+        <div style={{
+          display: "flex", alignItems: "center", gap: 8,
+          background: "rgba(255,255,255,0.1)", borderRadius: 20,
+          padding: "4px 12px 4px 6px",
+          border: "1px solid rgba(255,255,255,0.15)",
+          flexShrink: 0,
+        }}>
+          <div style={{
+            width: 30, height: 30, borderRadius: "50%",
+            background: "linear-gradient(135deg, #52B788, #2d6a4f)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 16,
+          }}>
             {AVATARS[profile.avatarIdx]?.emoji ?? "🧒"}
           </div>
           <div>
-            <div className="s-name">{profile.name}</div>
-            <div className="s-level">⭐ Maths · Quiz {actIdx + 1} of {totalActs}</div>
+            <div style={{ fontSize: 13, fontWeight: 800, color: "#fff", lineHeight: 1.1 }}>{profile.name}</div>
+            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.6)" }}>
+              ⭐ Quiz {actIdx + 1} of {totalActs}
+            </div>
           </div>
         </div>
-        <div className="progress-wrap">
-          <div className="progress-label">
-            {lang === "tok" ? "Askim" : "Quiz Progress"} — {Math.round(progressPct)}% {lang === "tok" ? "Pinis" : "Complete"}
+
+        {/* Progress bar */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.65)", marginBottom: 4, fontFamily: "'Nunito', sans-serif" }}>
+            {lang === "tok" ? "Askim" : "Quiz"} — {Math.round(progressPct)}% {lang === "tok" ? "Pinis" : "done"}
           </div>
-          <div className="progress-bar">
+          <div style={{ height: 7, background: "rgba(255,255,255,0.15)", borderRadius: 4, overflow: "hidden" }}>
             <motion.div
-              className="progress-fill"
               animate={{ width: `${progressPct}%` }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              style={{ width: 0 }}
+              style={{ height: "100%", background: "linear-gradient(to right, #FFD93D, #ff8f00)", borderRadius: 4, width: 0 }}
             />
           </div>
         </div>
-        <div className="offline-pill">
-          <span>●</span> Offline — Works Anywhere
-        </div>
-      </div>
 
-      {/* ── Role banner ── */}
-      <div className="role-banner">
-        <div className="role-pill role-ai">
-          <span className="role-icon">🤖</span>
-          <div className="role-text">
-            <span className="role-label">AI Tutor</span>
-            <span className="role-desc">Curriculum · Pacing · Assessment</span>
-          </div>
+        {/* Lang toggle pill */}
+        {onLangToggle && (
+          <button
+            onClick={onLangToggle}
+            style={{
+              fontSize: 11, fontWeight: 800, whiteSpace: "nowrap",
+              background: "rgba(255,255,255,0.1)",
+              border: "1px solid rgba(255,255,255,0.2)",
+              borderRadius: 12, padding: "4px 10px",
+              color: "#FFD93D", cursor: "pointer", flexShrink: 0,
+              fontFamily: "'Nunito', sans-serif",
+            }}
+          >
+            {lang === "tok" ? "EN" : "TOK"}
+          </button>
+        )}
+
+        {/* Offline pill */}
+        <div style={{
+          fontSize: 10, color: "rgba(255,255,255,0.55)", whiteSpace: "nowrap",
+          background: "rgba(255,255,255,0.08)", borderRadius: 10, padding: "3px 8px",
+          flexShrink: 0,
+        }}>
+          ● Offline
         </div>
-        <div className="role-divider">+</div>
-        <div className="role-pill role-human">
-          <span className="role-icon">👩‍🏫</span>
-          <div className="role-text">
-            <span className="role-label">Lab Supervisor</span>
-            <span className="role-desc">Coaching · Wellbeing · Order</span>
-          </div>
-        </div>
-        <div className="role-tagline">Every child. Every session. No exceptions.</div>
       </div>
 
       {/* ── Content area ── */}
@@ -311,25 +387,17 @@ export default function AssessmentScreen({
         </AnimatePresence>
       </div>
 
-      {/* ── Mascot ── */}
-      <div className="mascot-wrap">
-        <motion.div
-          className="mascot-char"
-          animate={
-            mascotState === "correct"
-              ? { y: [0, -60, -20, 0], scale: [1, 1.45, 1.2, 1], rotate: [0, 18, -14, 0] }
-              : mascotState === "wrong"
-              ? { x: [0, -14, 14, -10, 10, -6, 6, 0] }
-              : { y: [0, -11, 0] }
-          }
-          transition={
-            mascotState === "idle"
-              ? { repeat: Infinity, duration: 2.9, ease: "easeInOut" }
-              : { duration: 0.7, type: "spring", bounce: 0.38 }
-          }
-        >
-          🦜
-        </motion.div>
+      {/* ── Beni mascot (bottom-right, standing on ground) ── */}
+      <div style={{
+        position: "absolute", bottom: "20%", right: "5%",
+        zIndex: 10, pointerEvents: "none",
+        filter: "drop-shadow(0 8px 18px rgba(0,0,0,0.35))",
+      }}>
+        <BeniCharacter
+          state={mascotState}
+          size={110}
+          flipX
+        />
       </div>
 
     </div>
