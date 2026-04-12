@@ -1,6 +1,10 @@
 /**
  * AssessmentScreen — full-screen quiz styled to match MathsCartoonLesson.
- * Bright cartoon sky + ground scene, Beni mascot, frosted-glass topbar.
+ * PNG-themed enhancements:
+ *  • Bird of Paradise feather burst on correct answer
+ *  • "Traim gen!" speech bubble on wrong answer
+ *  • Bilum knot dots progress tracker
+ *  • PNG flag confetti (red, black, yellow)
  */
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -35,6 +39,25 @@ const PARTICLES = [
   { emoji: "➕", left: "50%", size: 16, dur: 12, delay: 3.5 },
 ];
 
+// Bird of Paradise feather colours
+const BOP_COLOURS = ["#FFD93D", "#E63946", "#2dc653", "#ff8800", "#c084fc", "#38bdf8", "#f472b6", "#a3e635"];
+
+// PNG flag confetti
+function firePNGConfetti() {
+  confetti({
+    particleCount: 90, spread: 70, origin: { y: 0.5 },
+    colors: ["#FFD93D", "#c8102e", "#000000", "#ffffff"],
+  });
+  setTimeout(() => confetti({
+    particleCount: 50, angle: 60, spread: 55, origin: { x: 0, y: 0.5 },
+    colors: ["#FFD93D", "#c8102e", "#000000"],
+  }), 180);
+  setTimeout(() => confetti({
+    particleCount: 50, angle: 120, spread: 55, origin: { x: 1, y: 0.5 },
+    colors: ["#FFD93D", "#c8102e", "#000000"],
+  }), 320);
+}
+
 export default function AssessmentScreen({
   activity,
   actIdx,
@@ -49,18 +72,18 @@ export default function AssessmentScreen({
 }: Props) {
   const isCorrectAnswer = actSelected === activity.correct;
 
-  // Mascot animation state
-  const [mascotState, setMascotState] = useState<"idle" | "correct" | "sad">("idle");
+  const [mascotState, setMascotState]         = useState<"idle" | "correct" | "sad">("idle");
   const [showCorrectFlash, setShowCorrectFlash] = useState(false);
   const [showWrongFlash,   setShowWrongFlash]   = useState(false);
-  const [showXP, setShowXP] = useState(false);
-
-  const [showTeachMoment, setShowTeachMoment] = useState(false);
+  const [showXP,           setShowXP]           = useState(false);
+  const [showBoPBurst,     setShowBoPBurst]      = useState(false);
+  const [showTraimGen,     setShowTraimGen]      = useState(false);
+  const [showTeachMoment,  setShowTeachMoment]   = useState(false);
   const [wrongAttemptCount, setWrongAttemptCount] = useState(0);
 
-  const prevActSelected = useRef<string | null>(null);
-  const prevActWrong    = useRef<string | null>(null);
-  const prevActWrongTM  = useRef<string | null>(null);
+  const prevActSelected  = useRef<string | null>(null);
+  const prevActWrong     = useRef<string | null>(null);
+  const prevActWrongTM   = useRef<string | null>(null);
 
   useEffect(() => {
     prevActSelected.current = null;
@@ -69,28 +92,35 @@ export default function AssessmentScreen({
     setMascotState("idle");
     setShowTeachMoment(false);
     setWrongAttemptCount(0);
+    setShowTraimGen(false);
   }, [actIdx]);
 
+  // Correct answer
   useEffect(() => {
     if (actSelected && actSelected !== prevActSelected.current) {
       prevActSelected.current = actSelected;
       setMascotState("correct");
       setShowCorrectFlash(true);
       setShowXP(true);
-      confetti({ particleCount: 80, spread: 65, origin: { y: 0.55 }, colors: ["#FFD93D","#52B788","#A8DADC","#E63946"] });
-      setTimeout(() => setMascotState("idle"), 1300);
-      setTimeout(() => setShowCorrectFlash(false), 450);
-      setTimeout(() => setShowXP(false), 1100);
+      setShowBoPBurst(true);
+      firePNGConfetti();
+      setTimeout(() => setMascotState("idle"),      1300);
+      setTimeout(() => setShowCorrectFlash(false),   450);
+      setTimeout(() => setShowXP(false),            1100);
+      setTimeout(() => setShowBoPBurst(false),       1000);
     }
   }, [actSelected]);
 
+  // Wrong answer
   useEffect(() => {
     if (actWrong && actWrong !== prevActWrong.current) {
       prevActWrong.current = actWrong;
       setMascotState("sad");
       setShowWrongFlash(true);
-      setTimeout(() => setMascotState("idle"), 750);
-      setTimeout(() => setShowWrongFlash(false), 420);
+      setShowTraimGen(true);
+      setTimeout(() => setMascotState("idle"),    750);
+      setTimeout(() => setShowWrongFlash(false),  420);
+      setTimeout(() => setShowTraimGen(false),    1600);
     }
     if (actWrong && actWrong !== prevActWrongTM.current) {
       prevActWrongTM.current = actWrong;
@@ -100,8 +130,6 @@ export default function AssessmentScreen({
     }
   }, [actWrong]);
 
-  const progressPct = totalActs > 1 ? (actIdx / (totalActs - 1)) * 100 : 0;
-
   return (
     <div style={{
       position: "fixed", inset: 0, zIndex: 1100,
@@ -110,15 +138,12 @@ export default function AssessmentScreen({
       overflow: "hidden",
     }}>
 
-      {/* ── Cartoon sky background ── */}
+      {/* ── Cartoon sky ── */}
       <div style={{
-        position: "absolute",
-        top: 0, left: 0, right: 0, bottom: "22%",
+        position: "absolute", top: 0, left: 0, right: 0, bottom: "22%",
         background: "linear-gradient(to bottom, #0d47a1 0%, #1976d2 45%, #64b5f6 100%)",
-        zIndex: 0,
-        overflow: "hidden",
+        zIndex: 0, overflow: "hidden",
       }}>
-        {/* Sun */}
         <motion.div style={{
           position: "absolute", top: "10%", right: "8%",
           width: 60, height: 60, borderRadius: "50%",
@@ -129,7 +154,6 @@ export default function AssessmentScreen({
           animate={{ scale: [1, 1.07, 1] }}
           transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
         />
-        {/* Clouds */}
         <motion.div style={{
           position: "absolute", top: "16%",
           width: 180, height: 48, borderRadius: 24,
@@ -152,21 +176,19 @@ export default function AssessmentScreen({
         />
       </div>
 
-      {/* ── Ground strip ── */}
+      {/* ── Ground ── */}
       <div style={{
-        position: "absolute",
-        bottom: 0, left: 0, right: 0, height: "22%",
+        position: "absolute", bottom: 0, left: 0, right: 0, height: "22%",
         background: "linear-gradient(to bottom, #2d6a1a 0%, #1a4a0a 100%)",
         zIndex: 0,
       }}>
-        {/* Grass texture line */}
         <div style={{
           position: "absolute", top: 0, left: 0, right: 0, height: 6,
           background: "linear-gradient(to right, #52B788 0%, #40916C 30%, #74c69d 60%, #52B788 100%)",
         }} />
       </div>
 
-      {/* ── Floating background particles ── */}
+      {/* ── Floating particles ── */}
       {PARTICLES.map((p, i) => (
         <div key={i} className="float-particle" style={{
           left: p.left, bottom: "-60px",
@@ -176,7 +198,7 @@ export default function AssessmentScreen({
         }}>{p.emoji}</div>
       ))}
 
-      {/* ── Screen flash overlays ── */}
+      {/* ── Screen flashes ── */}
       <AnimatePresence>
         {showCorrectFlash && (
           <motion.div key="cfl" className="screen-flash correct-fl"
@@ -204,6 +226,77 @@ export default function AssessmentScreen({
         )}
       </AnimatePresence>
 
+      {/* ── Bird of Paradise feather burst ── */}
+      <AnimatePresence>
+        {showBoPBurst && (
+          <div key="bop" style={{
+            position: "absolute", bottom: "24%", right: "8%",
+            zIndex: 18, pointerEvents: "none",
+          }}>
+            {BOP_COLOURS.map((colour, i) => {
+              const angle = (i / BOP_COLOURS.length) * Math.PI * 2;
+              const dist  = 70 + (i % 3) * 20;
+              return (
+                <motion.div key={i}
+                  initial={{ x: 0, y: 0, opacity: 1, scale: 1.2, rotate: 0 }}
+                  animate={{
+                    x: Math.cos(angle) * dist,
+                    y: Math.sin(angle) * -dist,
+                    opacity: 0, scale: 0.4,
+                    rotate: angle * (180 / Math.PI),
+                  }}
+                  transition={{ duration: 0.85, ease: "easeOut", delay: i * 0.04 }}
+                  style={{
+                    position: "absolute",
+                    fontSize: 22,
+                    color: colour,
+                    textShadow: `0 0 8px ${colour}`,
+                  }}
+                >🪶</motion.div>
+              );
+            })}
+            {/* Central star burst */}
+            <motion.div
+              initial={{ scale: 0, opacity: 1 }}
+              animate={{ scale: 2.5, opacity: 0 }}
+              transition={{ duration: 0.5 }}
+              style={{
+                position: "absolute", fontSize: 28,
+                transform: "translate(-14px, -14px)",
+              }}
+            >✨</motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ── "Traim gen!" speech bubble ── */}
+      <AnimatePresence>
+        {showTraimGen && (
+          <motion.div key="traim"
+            initial={{ opacity: 0, scale: 0.6, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 5 }}
+            transition={{ type: "spring", bounce: 0.5 }}
+            style={{
+              position: "absolute", bottom: "42%", right: "14%",
+              zIndex: 20, pointerEvents: "none",
+              background: "#fff",
+              borderRadius: "16px 16px 4px 16px",
+              padding: "8px 14px",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.25)",
+              border: "2px solid #E63946",
+            }}
+          >
+            <div style={{ fontSize: 15, fontWeight: 900, color: "#E63946", lineHeight: 1.2 }}>
+              {lang === "tok" ? "Traim gen! 💪" : "Try again! 💪"}
+            </div>
+            <div style={{ fontSize: 10, color: "#888", fontFamily: "'Nunito', sans-serif" }}>
+              {lang === "tok" ? "Yu inap!" : "You've got this!"}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* ── TeachMoment overlay ── */}
       <AnimatePresence>
         {showTeachMoment && (
@@ -220,7 +313,7 @@ export default function AssessmentScreen({
         )}
       </AnimatePresence>
 
-      {/* ── Frosted-glass topbar ── */}
+      {/* ── Frosted topbar ── */}
       <div style={{
         position: "relative", zIndex: 20,
         display: "flex", alignItems: "center", gap: 10,
@@ -253,33 +346,51 @@ export default function AssessmentScreen({
           </div>
         </div>
 
-        {/* Progress bar */}
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.65)", marginBottom: 4, fontFamily: "'Nunito', sans-serif" }}>
-            {lang === "tok" ? "Askim" : "Quiz"} — {Math.round(progressPct)}% {lang === "tok" ? "Pinis" : "done"}
+        {/* Bilum knot progress dots */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 5, minWidth: 0 }}>
+          <div style={{ fontSize: 10, color: "rgba(255,255,255,0.55)", fontFamily: "'Nunito', sans-serif" }}>
+            {lang === "tok" ? "Askim" : "Quiz"} {actIdx + 1}/{totalActs}
           </div>
-          <div style={{ height: 7, background: "rgba(255,255,255,0.15)", borderRadius: 4, overflow: "hidden" }}>
-            <motion.div
-              animate={{ width: `${progressPct}%` }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              style={{ height: "100%", background: "linear-gradient(to right, #FFD93D, #ff8f00)", borderRadius: 4, width: 0 }}
-            />
+          <div style={{ display: "flex", gap: 5, alignItems: "center", flexWrap: "wrap" }}>
+            {Array.from({ length: totalActs }).map((_, i) => {
+              const done    = i < actIdx;
+              const current = i === actIdx;
+              return (
+                <motion.div key={i}
+                  animate={current ? { scale: [1, 1.3, 1] } : {}}
+                  transition={{ duration: 0.8, repeat: current ? Infinity : 0 }}
+                  style={{
+                    width:  current ? 12 : done ? 10 : 8,
+                    height: current ? 12 : done ? 10 : 8,
+                    borderRadius: "50%",
+                    background: done
+                      ? "#FFD93D"
+                      : current
+                      ? "#ff8f00"
+                      : "rgba(255,255,255,0.18)",
+                    boxShadow: done || current
+                      ? "0 0 6px rgba(255,217,61,0.7)"
+                      : "none",
+                    border: current ? "2px solid #FFD93D" : "none",
+                    flexShrink: 0,
+                    transition: "all 0.3s",
+                  }}
+                />
+              );
+            })}
           </div>
         </div>
 
-        {/* Lang toggle pill */}
+        {/* Lang toggle */}
         {onLangToggle && (
-          <button
-            onClick={onLangToggle}
-            style={{
-              fontSize: 11, fontWeight: 800, whiteSpace: "nowrap",
-              background: "rgba(255,255,255,0.1)",
-              border: "1px solid rgba(255,255,255,0.2)",
-              borderRadius: 12, padding: "4px 10px",
-              color: "#FFD93D", cursor: "pointer", flexShrink: 0,
-              fontFamily: "'Nunito', sans-serif",
-            }}
-          >
+          <button onClick={onLangToggle} style={{
+            fontSize: 11, fontWeight: 800, whiteSpace: "nowrap",
+            background: "rgba(255,255,255,0.1)",
+            border: "1px solid rgba(255,255,255,0.2)",
+            borderRadius: 12, padding: "4px 10px",
+            color: "#FFD93D", cursor: "pointer", flexShrink: 0,
+            fontFamily: "'Nunito', sans-serif",
+          }}>
             {lang === "tok" ? "EN" : "TOK"}
           </button>
         )}
@@ -294,7 +405,7 @@ export default function AssessmentScreen({
         </div>
       </div>
 
-      {/* ── Content area ── */}
+      {/* ── Content ── */}
       <div style={{
         flex: 1, display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
@@ -302,8 +413,6 @@ export default function AssessmentScreen({
         gap: 16, overflow: "hidden",
         position: "relative", zIndex: 1,
       }}>
-
-        {/* Activity card */}
         <AnimatePresence mode="wait">
           <motion.div
             key={`activity-${actIdx}`}
@@ -317,8 +426,7 @@ export default function AssessmentScreen({
             <div className="act-q">{activity.q}</div>
             <div className="act-q-tok">{activity.tok}</div>
             {activity.visual && (
-              <motion.div
-                className="act-visual"
+              <motion.div className="act-visual"
                 initial={{ scale: 0.85 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", bounce: 0.5 }}
@@ -355,7 +463,6 @@ export default function AssessmentScreen({
               })}
             </div>
 
-            {/* Next button appears inside card after answering */}
             <AnimatePresence>
               {actSelected && (
                 <motion.button
@@ -367,14 +474,16 @@ export default function AssessmentScreen({
                   whileTap={{ scale: 0.96 }}
                   onClick={onNext}
                   style={{
-                    marginTop: 18, width: "100%",
-                    padding: "14px",
-                    background: "linear-gradient(135deg, #2D6A4F, #40916C)",
+                    marginTop: 18, width: "100%", padding: "14px",
+                    background: isCorrectAnswer
+                      ? "linear-gradient(135deg, #2D6A4F, #40916C)"
+                      : "linear-gradient(135deg, #c8102e, #e63946)",
                     border: "none", borderRadius: 18,
                     fontSize: 17, fontWeight: 900, color: "#fff",
-                    cursor: "pointer",
-                    fontFamily: "'Baloo 2', cursive",
-                    boxShadow: "0 6px 24px rgba(45,106,79,0.45)",
+                    cursor: "pointer", fontFamily: "'Baloo 2', cursive",
+                    boxShadow: isCorrectAnswer
+                      ? "0 6px 24px rgba(45,106,79,0.45)"
+                      : "0 6px 24px rgba(200,16,46,0.35)",
                   }}
                 >
                   {isCorrectAnswer
@@ -387,17 +496,13 @@ export default function AssessmentScreen({
         </AnimatePresence>
       </div>
 
-      {/* ── Beni mascot (bottom-right, standing on ground) ── */}
+      {/* ── Beni mascot ── */}
       <div style={{
         position: "absolute", bottom: "20%", right: "5%",
         zIndex: 10, pointerEvents: "none",
         filter: "drop-shadow(0 8px 18px rgba(0,0,0,0.35))",
       }}>
-        <BeniCharacter
-          state={mascotState}
-          size={110}
-          flipX
-        />
+        <BeniCharacter state={mascotState} size={110} flipX />
       </div>
 
     </div>
