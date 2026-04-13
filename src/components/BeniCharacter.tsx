@@ -60,11 +60,15 @@ export default function BeniCharacter({ state = "idle", size = 120, style, flipX
   }, []);
 
   // ── Arm swing ──
+  // Negative = counterclockwise = left arm raises UP; positive = right arm raises UP
   const armRotL =
-    state === "excited" || state === "correct" ? [-24, 38, -24]
+    state === "excited" || state === "correct" ? [-130, -100, -130]
     : state === "walk"  ? [-26, 26, -26]
     : [0, 8, 0];
-  const armRotR = armRotL.map(v => -v);
+  const armRotR =
+    state === "excited" || state === "correct" ? [130, 100, 130]
+    : state === "walk"  ? [26, -26, 26]
+    : [0, -8, 0];
   const armTrans: Transition =
     state === "walk"      ? { duration: 0.38, repeat: Infinity, ease: "linear" }
     : state === "excited" || state === "correct"
@@ -140,20 +144,18 @@ export default function BeniCharacter({ state = "idle", size = 120, style, flipX
         {/* Shirt highlight strip */}
         <rect x={28} y={52} width={14} height={44} rx={8} fill="rgba(255,120,80,0.22)" />
 
-        {/* ══ LEFT ARM ══ */}
-        <motion.g animate={{ rotate: armRotL }} transition={armTrans} style={{ transformOrigin: "27px 58px" }}>
-          {/* Shadow */}
+        {/* ══ LEFT ARM — pivot exactly at shoulder in scaled CSS px ══ */}
+        <motion.g animate={{ rotate: armRotL }} transition={armTrans}
+          style={{ transformOrigin: `${27 * size / 100}px ${57 * size / 100}px` }}>
           <rect x={16} y={58} width={11} height={27} rx={6} fill="#5a2c0a" />
-          {/* Arm */}
           <rect x={13} y={57} width={14} height={29} rx={7} fill="#8B4a1e" stroke={OL} strokeWidth={OW} />
-          {/* Hand */}
           <circle cx={20} cy={89} r={8}  fill="#a05a28" stroke={OL} strokeWidth={OW} />
-          {/* Hand highlight */}
           <circle cx={18} cy={87} r={3}  fill="#c07038" opacity={0.5} />
         </motion.g>
 
-        {/* ══ RIGHT ARM ══ */}
-        <motion.g animate={{ rotate: armRotR }} transition={armTrans} style={{ transformOrigin: "73px 58px" }}>
+        {/* ══ RIGHT ARM — pivot exactly at shoulder in scaled CSS px ══ */}
+        <motion.g animate={{ rotate: armRotR }} transition={armTrans}
+          style={{ transformOrigin: `${73 * size / 100}px ${57 * size / 100}px` }}>
           <rect x={73} y={58} width={11} height={27} rx={6} fill="#5a2c0a" />
           <rect x={73} y={57} width={14} height={29} rx={7} fill="#8B4a1e" stroke={OL} strokeWidth={OW} />
           <circle cx={80} cy={89} r={8}  fill="#a05a28" stroke={OL} strokeWidth={OW} />

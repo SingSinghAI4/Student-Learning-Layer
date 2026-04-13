@@ -4,8 +4,8 @@
  * 10 unique neon-glow SVG backgrounds, Beni at 140px, physics fruit arcs
  * Chalkboard activity panel slides up from bottom
  */
-import React, { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence, type Transition } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 import {
   MATHS_STORY_PAGES, MATHS_ACTIVITIES_MERI, MATHS_ACTIVITIES_SIONE,
@@ -44,7 +44,7 @@ interface Props {
 // ── Scene ground & horizon colours (used in CSS ground layer + SVG background) ─
 // Sky top → bottom gradient per slide
 const SCENE_SKY: [string, string][] = [
-  ["#0d1b4b", "#bf4f00"],  // 0 dawn
+  ["#0d1b4b", "#1e3a6e"],  // 0 dawn — deep navy to muted pre-dawn blue
   ["#1565c0", "#4fc3f7"],  // 1 village
   ["#0288d1", "#81d4fa"],  // 2 walking
   ["#e65100", "#ff9800"],  // 3 mango
@@ -69,7 +69,7 @@ const SCENE_GROUND: string[] = [
   "#0a0a1a", // 9 turn
 ];
 const SCENE_HORIZON: string[] = [
-  "#ff8c00", "#00e5ff", "#40c4ff", "#FFD93D", "#ffea00",
+  "#4a7ab5", "#00e5ff", "#40c4ff", "#FFD93D", "#ffea00",
   "#00e5ff", "#7c4dff", "#52B788", "#FFD93D", "#7c4dff",
 ];
 
@@ -85,8 +85,6 @@ const DAVID_MESSAGES: Array<{ tok: string; en: string }> = [
   { tok: "Yu mekim gut!",         en: "You're doing great!" },
 ];
 
-// ── Small inline SVG waypoint icons ──────────────────────────────────────────
-// Each icon is drawn in a 10×10 viewBox, rendered at ~8px
 // ── PNG journey map — fixed 220×28 viewBox, no distortion ────────────────
 // 10 waypoints at evenly-spaced x, slight y-wave to feel like a path
 const MAP_PTS: [number, number][] = [
@@ -360,14 +358,6 @@ function SceneBackground({ slideIndex }: { slideIndex: number }) {
         )}
 
         {/* ── Slides 3 & 4: Market stall ── */}
-        {(slideIndex === 3 || slideIndex === 4) && (
-          <>
-            <rect x={18}  y={140} width={14} height={100} rx={4} fill="#5c3317" stroke="#1a0800" strokeWidth={1.5} />
-            <rect x={136} y={140} width={14} height={100} rx={4} fill="#5c3317" stroke="#1a0800" strokeWidth={1.5} />
-            <rect x={12}  y={132} width={148} height={16} rx={4} fill="#e65100" stroke="#1a0800" strokeWidth={2} />
-            <rect x={12}  y={142} width={148} height={10} rx={3} fill="#ff7043" opacity={0.55} />
-          </>
-        )}
 
         {/* ── Slides 5 & 6: Coconut palm + water strip ── */}
         {(slideIndex === 5 || slideIndex === 6) && (
@@ -421,11 +411,21 @@ function SceneBackground({ slideIndex }: { slideIndex: number }) {
             <rect x={174} y={178} width={52} height={50} rx={4} fill="#FFD93D" opacity={0.9} />
             <rect x={164} y={174} width={72} height={12} rx={4} fill="#FFA000" />
             <polygon points="200,30 170,174 230,174" fill="rgba(255,255,255,0.06)" />
-            <motion.text x={200} y={216} textAnchor="middle" fontSize={26} fill="#1a0a00"
+            <motion.g
               animate={{ scale: [1, 1.14, 1] }}
               transition={{ duration: 1.2, repeat: Infinity }}
               style={{ transformOrigin: "200px 200px" }}
-            >🏆</motion.text>
+            >
+              {/* Trophy cup */}
+              <path d="M188,196 Q188,218 200,222 Q212,218 212,196 Z" fill="#FFD93D" stroke="#1a0800" strokeWidth={2}/>
+              <rect x={196} y={222} width={8} height={8} fill="#FFD93D" stroke="#1a0800" strokeWidth={1.5}/>
+              <rect x={191} y={229} width={18} height={4} rx={2} fill="#FFD93D" stroke="#1a0800" strokeWidth={1.5}/>
+              {/* Handles */}
+              <path d="M188,200 Q182,200 182,208 Q182,216 188,214" fill="none" stroke="#FFD93D" strokeWidth={3} strokeLinecap="round"/>
+              <path d="M212,200 Q218,200 218,208 Q218,216 212,214" fill="none" stroke="#FFD93D" strokeWidth={3} strokeLinecap="round"/>
+              {/* Star on cup */}
+              <text x={200} y={214} textAnchor="middle" fontSize={10} fill="#1a0a00" fontWeight={900}>★</text>
+            </motion.g>
           </>
         )}
       </svg>
@@ -642,13 +642,12 @@ function SpeechBubble({ words, en, litWordIdx }: { words: string[]; en: string; 
 
 // ── Chalkboard activity panel ─────────────────────────────────────────────
 function ChalkboardPanel({
-  activity, actSelected, actWrong, onAnswer, beniStateRef,
+  activity, actSelected, actWrong, onAnswer,
 }: {
   activity: MathsActivity;
   actSelected: string | null;
   actWrong: string | null;
   onAnswer: (v: string) => void;
-  beniStateRef: React.MutableRefObject<(s: BeniState) => void>;
 }) {
   return (
     <motion.div
@@ -735,9 +734,6 @@ export default function MathsCartoonLesson({
   const [addCombined, setAddCombined] = useState(false);
   const [flyingFruits, setFlyingFruits] = useState<FlyingFruit[]>([]);
   const [basketShake, setBasketShake] = useState(false);
-  const beniStateCallbackRef = useRef<(s: BeniState) => void>(setBeniState);
-  beniStateCallbackRef.current = setBeniState;
-
   // ── David encouragement system ──────────────────────────────────────────
   const [davidMsgIdx,  setDavidMsgIdx]  = useState(0);
   const [showDavidMsg, setShowDavidMsg] = useState(false);
@@ -925,10 +921,43 @@ export default function MathsCartoonLesson({
         </motion.div>
       </AnimatePresence>
 
-      {/* Layer 2 — HUD strip */}
+      {/* Layer 2 — HUD strip (profile chip + journey map + lang toggle) */}
       <div className="mcl-hud">
-        <div className="mcl-slide-counter">{storyPage + 1} / {MATHS_STORY_PAGES.length}</div>
+        {/* Profile card — same style as home screen */}
+        <div className="student-bar" style={{ flexShrink: 0 }}>
+          <div className="sbar-avatar" style={{ background: "#1a3a2a", borderColor: "#52B788" }}>
+            {profile.name.charAt(0).toUpperCase()}
+          </div>
+          <div className="sbar-info">
+            <div className="sbar-name">{profile.name}</div>
+            <div className="sbar-grade">Grade {profile.grade}</div>
+          </div>
+          <div className="sbar-divider"/>
+          <div className="sbar-stat">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2C12 2 6 8 6 13a6 6 0 0012 0c0-5-6-11-6-11z" fill="#FF6B35"/>
+              <path d="M12 8C12 8 9 12 9 14.5a3 3 0 006 0C15 12 12 8 12 8z" fill="#FFD93D"/>
+            </svg>
+            <span>{profile.streak ?? 0}</span>
+          </div>
+        </div>
+
+        {/* Journey map — takes remaining space */}
         <PNGJourneyMap step={storyPage} />
+
+        {/* Language toggle — same style as home screen */}
+        {onLangToggle && (
+          <div className="lang-toggle-wrap" style={{ flexShrink: 0 }}>
+            <button
+              className={`lang-btn${lang === "tok" ? " active" : ""}`}
+              onClick={onLangToggle}
+            >Tok Pisin</button>
+            <button
+              className={`lang-btn${lang === "en" ? " active" : ""}`}
+              onClick={onLangToggle}
+            >English</button>
+          </div>
+        )}
       </div>
 
       {/* Layer 3 — Characters + interactive scene */}
@@ -960,9 +989,9 @@ export default function MathsCartoonLesson({
             {/* Tree / source — left side (SVG, no emoji) */}
             <motion.div
               style={{
-                position: "absolute", left: "4%", bottom: "24%",
+                position: "absolute", left: "4%", bottom: "20%",
                 cursor: "pointer", userSelect: "none", zIndex: 9,
-                width: storyPage === 4 ? 260 : 200, height: storyPage === 4 ? 340 : 280,
+                width: 320, height: 440,
                 pointerEvents: "all",
               }}
               whileTap={{ scale: 0.93 }}
@@ -972,7 +1001,7 @@ export default function MathsCartoonLesson({
             >
               {storyPage === 3 ? (
                 /* ── Cartoon mango tree — Chhota Bheem style: thick outlines, baked shadows ── */
-                <svg viewBox="0 0 130 180" width={200} height={280} style={{ overflow: "visible" }}>
+                <svg viewBox="0 0 130 180" width={320} height={440} style={{ overflow: "visible" }}>
                   {/* Ground shadow blob */}
                   <ellipse cx={68} cy={175} rx={56} ry={9}  fill="rgba(0,0,0,0.22)" />
                   {/* Ground patch */}
@@ -1067,7 +1096,7 @@ export default function MathsCartoonLesson({
                 </svg>
               ) : (
                 /* ── Cartoon coconut palm — Chhota Bheem style: thick outlines, baked shadows ── */
-                <svg viewBox="0 0 130 180" width={260} height={340} style={{ overflow: "visible" }}>
+                <svg viewBox="0 0 130 180" width={320} height={440} style={{ overflow: "visible" }}>
                   {/* Ground shadow blob */}
                   <ellipse cx={68} cy={175} rx={52} ry={9}  fill="rgba(0,0,0,0.22)" />
                   {/* Ground patch */}
@@ -1314,8 +1343,8 @@ export default function MathsCartoonLesson({
         {isTapAdd && addCombined && sessionMode === "story" && (
           <motion.div
             style={{
-              position: "absolute", left: "50%", top: "32%",
-              transform: "translateX(-50%)",
+              position: "absolute", left: 0, right: 0, top: "30%",
+              display: "flex", flexDirection: "column", alignItems: "center",
               textAlign: "center", zIndex: 12,
             }}
             initial={{ scale: 0 }}
@@ -1376,7 +1405,7 @@ export default function MathsCartoonLesson({
         <div style={{
           position: "absolute", inset: 0,
           display: "flex", alignItems: "flex-start", justifyContent: "center",
-          paddingTop: 60,
+          paddingTop: 70,
           zIndex: 6, pointerEvents: "none",
         }}>
           <AnimatePresence mode="wait">
@@ -1398,7 +1427,6 @@ export default function MathsCartoonLesson({
             actSelected={actSelected}
             actWrong={actWrong}
             onAnswer={onActivityAnswer}
-            beniStateRef={beniStateCallbackRef}
           />
         )}
       </AnimatePresence>
@@ -1419,7 +1447,7 @@ export default function MathsCartoonLesson({
             >
               {storyPage < MATHS_STORY_PAGES.length - 1
                 ? (lang === "tok" ? "Nekis ▶" : "Next ▶")
-                : (lang === "tok" ? "Stat Askim! 🎯" : "Start Quiz! 🎯")}
+                : (lang === "tok" ? "Stat Askim!" : "Start Quiz!")}
             </motion.button>
           )}
         </AnimatePresence>
@@ -1498,10 +1526,14 @@ export default function MathsCartoonLesson({
                 <circle cx={138} cy={44} r={42} fill="rgba(200,220,255,0.12)" />
               </svg>
 
-              {/* Text sits inside the cloud body */}
+              {/* Text anchored to the flat base of the cloud (rect at y=74–104) */}
               <div style={{
                 position: "absolute",
-                top: 22, left: 28, right: 16,
+                top: 0, left: 26, right: 0,
+                height: 104,
+                display: "flex", flexDirection: "column",
+                alignItems: "center", justifyContent: "flex-end",
+                paddingBottom: 10,
                 textAlign: "center",
               }}>
                 <motion.div
@@ -1526,45 +1558,6 @@ export default function MathsCartoonLesson({
         )}
       </AnimatePresence>
 
-      {/* Profile chip — top left */}
-      <div style={{
-        position: "absolute", top: 68, left: 14, zIndex: 20,
-        background: "rgba(0,0,0,0.45)", backdropFilter: "blur(8px)",
-        borderRadius: 20, padding: "4px 10px 4px 6px",
-        display: "flex", alignItems: "center", gap: 6,
-        border: "1px solid rgba(255,255,255,0.08)",
-      }}>
-        <div style={{
-          width: 26, height: 26, borderRadius: "50%",
-          background: "linear-gradient(135deg, #52B788, #2d6a4f)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 12, fontWeight: 900, color: "#fff",
-          fontFamily: "'Baloo 2', cursive",
-        }}>
-          {profile.name.charAt(0)}
-        </div>
-        <span style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.7)" }}>
-          {profile.name}
-        </span>
-      </div>
-
-      {/* Language toggle — top right */}
-      {onLangToggle && (
-        <button
-          onClick={onLangToggle}
-          style={{
-            position: "absolute", top: 68, right: 14, zIndex: 20,
-            background: "rgba(0,0,0,0.45)", backdropFilter: "blur(8px)" as any,
-            borderRadius: 20, padding: "5px 14px",
-            border: "1px solid rgba(255,217,61,0.35)",
-            fontSize: 12, fontWeight: 900, color: "#FFD93D",
-            cursor: "pointer", fontFamily: "'Nunito', sans-serif",
-            letterSpacing: 1,
-          }}
-        >
-          {lang === "tok" ? "EN" : "TOK"}
-        </button>
-      )}
     </div>
   );
 }

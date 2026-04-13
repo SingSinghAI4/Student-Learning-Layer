@@ -95,7 +95,7 @@ export default function AssessmentScreen({
     setShowTraimGen(false);
   }, [actIdx]);
 
-  // Correct answer
+  // Correct answer — parent advances actIdx at 1400ms; just play feedback here
   useEffect(() => {
     if (actSelected && actSelected !== prevActSelected.current) {
       prevActSelected.current = actSelected;
@@ -104,10 +104,10 @@ export default function AssessmentScreen({
       setShowXP(true);
       setShowBoPBurst(true);
       firePNGConfetti();
-      setTimeout(() => setMascotState("idle"),      1300);
-      setTimeout(() => setShowCorrectFlash(false),   450);
-      setTimeout(() => setShowXP(false),            1100);
-      setTimeout(() => setShowBoPBurst(false),       1000);
+      setTimeout(() => setMascotState("idle"),     1300);
+      setTimeout(() => setShowCorrectFlash(false),  450);
+      setTimeout(() => setShowXP(false),           1100);
+      setTimeout(() => setShowBoPBurst(false),      1000);
     }
   }, [actSelected]);
 
@@ -463,35 +463,6 @@ export default function AssessmentScreen({
               })}
             </div>
 
-            <AnimatePresence>
-              {actSelected && (
-                <motion.button
-                  initial={{ opacity: 0, y: 16, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ delay: 0.5, type: "spring", bounce: 0.5 }}
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.96 }}
-                  onClick={onNext}
-                  style={{
-                    marginTop: 18, width: "100%", padding: "14px",
-                    background: isCorrectAnswer
-                      ? "linear-gradient(135deg, #2D6A4F, #40916C)"
-                      : "linear-gradient(135deg, #c8102e, #e63946)",
-                    border: "none", borderRadius: 18,
-                    fontSize: 17, fontWeight: 900, color: "#fff",
-                    cursor: "pointer", fontFamily: "'Baloo 2', cursive",
-                    boxShadow: isCorrectAnswer
-                      ? "0 6px 24px rgba(45,106,79,0.45)"
-                      : "0 6px 24px rgba(200,16,46,0.35)",
-                  }}
-                >
-                  {isCorrectAnswer
-                    ? (lang === "tok" ? "Gutpela! Nekis ▶" : "Correct! Next ▶")
-                    : (lang === "tok" ? "Nekis ▶" : "Next ▶")}
-                </motion.button>
-              )}
-            </AnimatePresence>
           </motion.div>
         </AnimatePresence>
       </div>
