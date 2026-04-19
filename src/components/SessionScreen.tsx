@@ -12,8 +12,10 @@ import TeachMoment from "./TeachMoment";
 import MathsStoryScene from "./MathsStoryScene";
 import DavidCharacter from "./DavidCharacter";
 import MathsCartoonLesson from "./MathsCartoonLesson";
+import type { CompanionAvatar } from "./AvatarPicker";
 
 interface Props {
+  companion?: CompanionAvatar | null;
   profile: StudentProfile;
   lang: "tok" | "en";
   selectedAvatar: number;
@@ -54,6 +56,7 @@ export default function SessionScreen({
   chapter,
   consecutiveCorrect,
   mathsPath,
+  companion,
   onNextStoryPage,
   onActivityAnswer,
   onLangToggle,
@@ -225,6 +228,7 @@ export default function SessionScreen({
         actIdx={actIdx}
         actSelected={actSelected}
         actWrong={actWrong}
+        companion={companion}
         onNextStoryPage={onNextStoryPage}
         onActivityAnswer={onActivityAnswer}
         onLangToggle={onLangToggle}
@@ -244,6 +248,30 @@ export default function SessionScreen({
           animationDelay: `${p.delay}s`,
         }}>{p.emoji}</div>
       ))}
+
+      {/* ── Companion badge ── */}
+      {companion && (
+        <div style={{
+          position: "absolute", top: 16, right: 16, zIndex: 20,
+          display: "flex", alignItems: "center", gap: 8,
+          background: `linear-gradient(135deg, ${companion.accentColor}22, ${companion.accentColor}0a)`,
+          border: `1.5px solid ${companion.accentColor}55`,
+          borderRadius: 50, padding: "6px 14px 6px 8px",
+          boxShadow: `0 0 16px ${companion.accentColor}33`,
+        }}>
+          <div style={{
+            width: 28, height: 28, borderRadius: "50%",
+            background: `${companion.accentColor}33`,
+            border: `1.5px solid ${companion.accentColor}`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 14,
+          }}>🪶</div>
+          <span style={{
+            fontSize: 12, fontWeight: 800, color: companion.accentColor,
+            fontFamily: "'Nunito', sans-serif",
+          }}>{companion.name}</span>
+        </div>
+      )}
 
       <div className="session-main">
 

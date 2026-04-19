@@ -13,6 +13,8 @@ import { MathsActivity, AVATARS } from "../data";
 import { StudentProfile } from "../LoginScreen";
 import TeachMoment from "./TeachMoment";
 import BeniCharacter from "./BeniCharacter";
+import CompanionAssistant from "./CompanionAssistant";
+import type { CompanionAvatar } from "./AvatarPicker";
 
 interface Props {
   activity: MathsActivity;
@@ -22,6 +24,7 @@ interface Props {
   actWrong: string | null;
   lang: "tok" | "en";
   profile: StudentProfile;
+  companion?: CompanionAvatar | null;
   onAnswer: (v: string) => void;
   onNext: () => void;
   onLangToggle?: () => void;
@@ -66,6 +69,7 @@ export default function AssessmentScreen({
   actWrong,
   lang,
   profile,
+  companion,
   onAnswer,
   onNext,
   onLangToggle,
@@ -475,6 +479,16 @@ export default function AssessmentScreen({
       }}>
         <BeniCharacter state={mascotState} size={110} flipX />
       </div>
+
+      {/* ── Companion voice assistant ── */}
+      {companion && (
+        <CompanionAssistant
+          companion={companion}
+          studentName={profile.name}
+          lessonContext="Grade 2 Maths – Chapter 2: Adding Up. Quiz time — student is answering maths questions about adding groups of fruit."
+          lang={lang}
+        />
+      )}
 
     </div>
   );

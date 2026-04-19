@@ -15,6 +15,7 @@ import Dashboard from "./components/Dashboard";
 import SubjectScreen from "./components/SubjectScreen";
 import ChapterScreen from "./components/ChapterScreen";
 import AIPanel from "./components/AIPanel";
+import AvatarPicker, { CompanionAvatar } from "./components/AvatarPicker";
 import { SubjectId } from "./data";
 
 
@@ -32,6 +33,7 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
   const [mathsPath, setMathsPath] = useState<"meri" | "sione" | null>(null);
 
   const [selectedAvatar] = useState<number>(profile.avatarIdx);
+  const [companion, setCompanion] = useState<CompanionAvatar | null>(null);
   const [selectedGrade] = useState<number>(profile.grade);
 
   // ── Diagnostic state ──
@@ -114,7 +116,6 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
       const langNote = isConfident
         ? `Language: English primary. Tok Pisin as secondary label only.`
         : `Language: Tok Pisin first. English translation shown below each question.`;
-      setScreen("session");
       setSessionMode("story");
       setStoryPage(0);
       setSessionProgress(20);
@@ -127,13 +128,13 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
         { type: "info",     label: "Language Setting",              text: langNote, time: nowStr() },
       ]);
       setCurrentDecision(`${profile.name} — ${learnerType} path. Story loading…`);
+      setScreen("avatar-picker");
       return;
     }
 
     if (!isNew && profile.placement) {
-      // Returning student — skip diagnostic, go straight to session
+      // Returning student — skip diagnostic, go straight to avatar picker
       const streakBonus = profile.streak >= 5 ? "🔥 5-day streak — AI boosting difficulty." : profile.streak >= 3 ? `${profile.streak}-day streak active.` : "Returning student.";
-      setScreen("session");
       setSessionMode("story");
       setStoryPage(0);
       setSessionAILog([
@@ -141,8 +142,9 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
         { type: "decision", label: "Placement Active", text: `Level confirmed: ${profile.placement}. Chapter ${chapterId} selected. No re-testing needed.`, time: nowStr() },
       ]);
       setCurrentDecision(`${profile.name} resumed — story narration loading`);
+      setScreen("avatar-picker");
     } else {
-      setScreen("diagnostic");
+      setScreen("avatar-picker");
     }
   }
 
@@ -442,6 +444,12 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
           </motion.div>
         )}
 
+        {screen === "avatar-picker" && (
+          <motion.div key="avatar-picker" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.35 }} style={{ display: "contents" }}>
+            <AvatarPicker onSelect={(chosen) => { setCompanion(chosen); setScreen("session"); }} />
+          </motion.div>
+        )}
+
         {screen === "diagnostic" && (
           <motion.div key="diagnostic" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} style={{ display: "contents" }}>
             <DiagnosticScreen
@@ -464,7 +472,7 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
               actIdx={actIdx} actSelected={actSelected} actWrong={actWrong}
               sessionProgress={sessionProgress} showTutor={showTutor} tutorMsg={tutorMsg}
               chapter={chapter} consecutiveCorrect={consecutiveCorrect}
-              mathsPath={mathsPath}
+              mathsPath={mathsPath} companion={companion}
               onNextStoryPage={handleNextStoryPage} onActivityAnswer={handleActivityAnswer}
               onLangToggle={() => setLang(l => l === "tok" ? "en" : "tok")}
             />

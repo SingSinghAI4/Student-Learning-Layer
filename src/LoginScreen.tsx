@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PROVINCE_DATA, CULTURAL_REGIONS } from "./data";
 import ProvinceGuardian from "./components/ProvinceGuardian";
+import Logo from "./components/Logo";
 
 // ── TYPES ──────────────────────────────────────────────
 export interface StudentProfile {
@@ -26,7 +27,21 @@ const CLASS_CODE = "PNG1";
 // Full pool of bilum items shown in the picker
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const BILUM_POOL = [
-  "🥭","🐚","🌺","⭐","🪸","🌿","🦋","🌟","🪴","🥥","🌸","🍃","🐦","🌊","🪨",
+  "🥭",
+  "🐚",
+  "🌺",
+  "⭐",
+  "🪸",
+  "🌿",
+  "🦋",
+  "🌟",
+  "🪴",
+  "🥥",
+  "🌸",
+  "🍃",
+  "🐦",
+  "🌊",
+  "🪨",
 ];
 
 interface LoginScreenProps {
@@ -45,11 +60,11 @@ const AVATAR_COLORS = [
 
 const AVATAR_ANIMALS = [
   { symbol: "B", name: "Bird of Paradise", tok: "Pisin Paradais" },
-  { symbol: "C", name: "Cassowary",        tok: "Muruk" },
-  { symbol: "K", name: "Crocodile",        tok: "Pukpuk" },
-  { symbol: "T", name: "Turtle",           tok: "Honu" },
-  { symbol: "F", name: "Butterfly",        tok: "Bataplai" },
-  { symbol: "S", name: "Coral Fish",       tok: "Pis Solwara" },
+  { symbol: "C", name: "Cassowary", tok: "Muruk" },
+  { symbol: "K", name: "Crocodile", tok: "Pukpuk" },
+  { symbol: "T", name: "Turtle", tok: "Honu" },
+  { symbol: "F", name: "Butterfly", tok: "Bataplai" },
+  { symbol: "S", name: "Coral Fish", tok: "Pis Solwara" },
 ];
 
 const GRADES = [1, 2, 3, 4, 5];
@@ -236,9 +251,7 @@ function ProgressBar({ pct }: { pct: number }) {
         >
           Progress
         </span>
-        <span style={{ fontSize: 12, fontWeight: 900, color }}>
-          {pct}%
-        </span>
+        <span style={{ fontSize: 12, fontWeight: 900, color }}>{pct}%</span>
       </div>
       <div
         style={{
@@ -310,14 +323,43 @@ function StudentCard({
         el.style.background = "rgba(255,255,255,0.045)";
       }}
     >
-      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: c.accent, borderRadius: "20px 20px 0 0", opacity: 0.65 }} />
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 3,
+          background: c.accent,
+          borderRadius: "20px 20px 0 0",
+          opacity: 0.65,
+        }}
+      />
 
-      <InitialAvatar name={profile.name} avatarIdx={profile.avatarIdx} size={80} />
+      <InitialAvatar
+        name={profile.name}
+        avatarIdx={profile.avatarIdx}
+        size={80}
+      />
 
-      <div style={{ fontSize: 22, fontWeight: 900, fontFamily: "'Baloo 2', cursive", color: "#fff", lineHeight: 1 }}>
+      <div
+        style={{
+          fontSize: 22,
+          fontWeight: 900,
+          fontFamily: "'Baloo 2', cursive",
+          color: "#fff",
+          lineHeight: 1,
+        }}
+      >
         {profile.name}
       </div>
-      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)", fontWeight: 600 }}>
+      <div
+        style={{
+          fontSize: 11,
+          color: "rgba(255,255,255,0.35)",
+          fontWeight: 600,
+        }}
+      >
         Grade {profile.grade}
       </div>
     </button>
@@ -325,11 +367,32 @@ function StudentCard({
 }
 
 // ── SHARED PAGE SHELL ──────────────────────────────────
-const PAGE_BG = "radial-gradient(ellipse 70% 60% at 15% 10%, rgba(34,95,15,0.55) 0%, transparent 55%), radial-gradient(ellipse 55% 50% at 88% 85%, rgba(200,80,8,0.32) 0%, transparent 50%), #091507";
+const PAGE_BG =
+  "radial-gradient(ellipse 70% 60% at 15% 10%, rgba(34,95,15,0.55) 0%, transparent 55%), radial-gradient(ellipse 55% 50% at 88% 85%, rgba(200,80,8,0.32) 0%, transparent 50%), #091507";
 
-function PageShell({ children, onBack, lang }: { children: React.ReactNode; onBack: () => void; lang: "tok" | "en" }) {
+function PageShell({
+  children,
+  onBack,
+  lang,
+}: {
+  children: React.ReactNode;
+  onBack: () => void;
+  lang: "tok" | "en";
+}) {
   return (
-    <div style={{ width: "100vw", minHeight: "100vh", background: PAGE_BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px", position: "relative" }}>
+    <div
+      style={{
+        width: "100vw",
+        minHeight: "100vh",
+        background: PAGE_BG,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "32px",
+        position: "relative",
+      }}
+    >
       <style>{`
         @keyframes shake { 0%,100%{transform:translateX(0)} 20%{transform:translateX(-8px)} 40%{transform:translateX(8px)} 60%{transform:translateX(-6px)} 80%{transform:translateX(6px)} }
         .v-shake { animation: shake 0.45s ease; }
@@ -339,7 +402,25 @@ function PageShell({ children, onBack, lang }: { children: React.ReactNode; onBa
         .id-input:focus { border-color:#F5A623; background:rgba(245,166,35,0.04); }
         .id-input::placeholder { color:rgba(255,255,255,0.16); letter-spacing:0; font-weight:600; }
       `}</style>
-      <button onClick={onBack} style={{ position:"absolute", top:24, left:28, background:"none", border:"none", color:"rgba(255,255,255,0.3)", fontSize:13, fontWeight:800, fontFamily:"'Nunito',sans-serif", cursor:"pointer", display:"flex", alignItems:"center", gap:6, padding:"6px 4px" }}>
+      <button
+        onClick={onBack}
+        style={{
+          position: "absolute",
+          top: 24,
+          left: 28,
+          background: "none",
+          border: "none",
+          color: "rgba(255,255,255,0.3)",
+          fontSize: 13,
+          fontWeight: 800,
+          fontFamily: "'Nunito',sans-serif",
+          cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "6px 4px",
+        }}
+      >
         ← {lang === "tok" ? "Go Bek" : "Back"}
       </button>
       {children}
@@ -348,7 +429,15 @@ function PageShell({ children, onBack, lang }: { children: React.ReactNode; onBa
 }
 
 // ── CLASS CODE SCREEN (Grade 1–2) ──────────────────────
-function ClassCodeScreen({ lang, onSuccess, onBack }: { lang: "tok" | "en"; onSuccess: () => void; onBack: () => void }) {
+function ClassCodeScreen({
+  lang,
+  onSuccess,
+  onBack,
+}: {
+  lang: "tok" | "en";
+  onSuccess: () => void;
+  onBack: () => void;
+}) {
   const [code, setCode] = React.useState("");
   const [shake, setShake] = React.useState(false);
   const [error, setError] = React.useState(false);
@@ -360,7 +449,10 @@ function ClassCodeScreen({ lang, onSuccess, onBack }: { lang: "tok" | "en"; onSu
       setShake(true);
       setError(true);
       setTimeout(() => setShake(false), 450);
-      setTimeout(() => { setError(false); setCode(""); }, 1800);
+      setTimeout(() => {
+        setError(false);
+        setCode("");
+      }, 1800);
     }
   }
 
@@ -368,49 +460,138 @@ function ClassCodeScreen({ lang, onSuccess, onBack }: { lang: "tok" | "en"; onSu
     <PageShell onBack={onBack} lang={lang}>
       <div style={{ textAlign: "center", maxWidth: 480, width: "100%" }}>
         {/* Icon */}
-        <div style={{ marginBottom: 24, display: "flex", justifyContent: "center" }}>
-          <div style={{ width: 72, height: 72, borderRadius: 20, background: "rgba(245,166,35,0.12)", border: "1.5px solid rgba(245,166,35,0.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div
+          style={{
+            marginBottom: 24,
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            style={{
+              width: 72,
+              height: 72,
+              borderRadius: 20,
+              background: "rgba(245,166,35,0.12)",
+              border: "1.5px solid rgba(245,166,35,0.3)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
-              <rect x="3" y="9" width="28" height="20" rx="4" stroke="#F5A623" strokeWidth="2"/>
-              <path d="M11 9V7a6 6 0 0112 0v2" stroke="#F5A623" strokeWidth="2" strokeLinecap="round"/>
-              <circle cx="17" cy="19" r="3" fill="#F5A623" opacity="0.7"/>
+              <rect
+                x="3"
+                y="9"
+                width="28"
+                height="20"
+                rx="4"
+                stroke="#F5A623"
+                strokeWidth="2"
+              />
+              <path
+                d="M11 9V7a6 6 0 0112 0v2"
+                stroke="#F5A623"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <circle cx="17" cy="19" r="3" fill="#F5A623" opacity="0.7" />
             </svg>
           </div>
         </div>
 
-        <div style={{ fontFamily: "'Baloo 2', cursive", fontSize: 30, fontWeight: 900, color: "#fff", marginBottom: 8 }}>
+        <div
+          style={{
+            fontFamily: "'Baloo 2', cursive",
+            fontSize: 30,
+            fontWeight: 900,
+            color: "#fff",
+            marginBottom: 8,
+          }}
+        >
           {lang === "tok" ? "Putim Kod Bilong Klas" : "Enter Class Code"}
         </div>
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.35)", fontWeight: 600, marginBottom: 12 }}>
-          {lang === "tok" ? "Lukim bord — tisa i raitim kod tude" : "Look at the board — your teacher wrote today's code"}
+        <div
+          style={{
+            fontSize: 14,
+            color: "rgba(255,255,255,0.35)",
+            fontWeight: 600,
+            marginBottom: 12,
+          }}
+        >
+          {lang === "tok"
+            ? "Lukim bord — tisa i raitim kod tude"
+            : "Look at the board — your teacher wrote today's code"}
         </div>
-        <div style={{ fontSize: 12, color: "rgba(255,255,255,0.2)", fontWeight: 600, marginBottom: 36, fontStyle: "italic" }}>
-          Demo code: <span style={{ color: "#F5A623", fontStyle: "normal", fontWeight: 800 }}>PNG1</span>
+        <div
+          style={{
+            fontSize: 12,
+            color: "rgba(255,255,255,0.2)",
+            fontWeight: 600,
+            marginBottom: 36,
+            fontStyle: "italic",
+          }}
+        >
+          Demo code:{" "}
+          <span
+            style={{ color: "#F5A623", fontStyle: "normal", fontWeight: 800 }}
+          >
+            PNG1
+          </span>
         </div>
 
         <div className={shake ? "v-shake" : ""} style={{ marginBottom: 24 }}>
           <input
             className="id-input"
-            style={{ fontSize: 28, fontWeight: 900, textAlign: "center", letterSpacing: 8, borderColor: error ? "#FB923C" : undefined }}
+            style={{
+              fontSize: 28,
+              fontWeight: 900,
+              textAlign: "center",
+              letterSpacing: 8,
+              borderColor: error ? "#FB923C" : undefined,
+            }}
             placeholder="____"
             value={code}
             maxLength={6}
-            onChange={e => setCode(e.target.value.toUpperCase())}
-            onKeyDown={e => e.key === "Enter" && handleSubmit()}
+            onChange={(e) => setCode(e.target.value.toUpperCase())}
+            onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
             autoFocus
           />
         </div>
 
         {error && (
-          <div style={{ color: "#FB923C", fontWeight: 700, fontSize: 13, marginBottom: 16 }}>
-            {lang === "tok" ? "Kod i no stret — traim gen" : "Wrong code — try again"}
+          <div
+            style={{
+              color: "#FB923C",
+              fontWeight: 700,
+              fontSize: 13,
+              marginBottom: 16,
+            }}
+          >
+            {lang === "tok"
+              ? "Kod i no stret — traim gen"
+              : "Wrong code — try again"}
           </div>
         )}
 
         <button
           onClick={handleSubmit}
           disabled={code.trim().length < 3}
-          style={{ width: "100%", background: "linear-gradient(135deg, #F5A623, #FF6B35)", border: "none", borderRadius: 14, padding: "16px", fontSize: 17, fontWeight: 900, color: "#1A0A00", fontFamily: "'Baloo 2', cursive", cursor: code.length < 3 ? "not-allowed" : "pointer", opacity: code.length < 3 ? 0.35 : 1, transition: "all 0.2s" }}>
+          style={{
+            width: "100%",
+            background: "linear-gradient(135deg, #F5A623, #FF6B35)",
+            border: "none",
+            borderRadius: 14,
+            padding: "16px",
+            fontSize: 17,
+            fontWeight: 900,
+            color: "#1A0A00",
+            fontFamily: "'Baloo 2', cursive",
+            cursor: code.length < 3 ? "not-allowed" : "pointer",
+            opacity: code.length < 3 ? 0.35 : 1,
+            transition: "all 0.2s",
+          }}
+        >
           {lang === "tok" ? "Go Insait" : "Enter Class"}
         </button>
       </div>
@@ -420,15 +601,25 @@ function ClassCodeScreen({ lang, onSuccess, onBack }: { lang: "tok" | "en"; onSu
 
 // ── COLOUR VERIFY (Grade 1–2) ──────────────────────────
 const COLOUR_OPTIONS = [
-  { label: "Green",  tok: "Grin",    hex: "#52B788" },
-  { label: "Blue",   tok: "Blu",     hex: "#60A5FA" },
-  { label: "Pink",   tok: "Pik",     hex: "#F9A8D4" },
-  { label: "Orange", tok: "Orens",   hex: "#F5A623" },
-  { label: "Yellow", tok: "Yelo",    hex: "#86EFAC" },
-  { label: "Purple", tok: "Popol",   hex: "#C4B5FD" },
+  { label: "Green", tok: "Grin", hex: "#52B788" },
+  { label: "Blue", tok: "Blu", hex: "#60A5FA" },
+  { label: "Pink", tok: "Pik", hex: "#F9A8D4" },
+  { label: "Orange", tok: "Orens", hex: "#F5A623" },
+  { label: "Yellow", tok: "Yelo", hex: "#86EFAC" },
+  { label: "Purple", tok: "Popol", hex: "#C4B5FD" },
 ];
 
-function ColourVerifyScreen({ profile, lang, onSuccess, onBack }: { profile: StudentProfile; lang: "tok" | "en"; onSuccess: () => void; onBack: () => void }) {
+function ColourVerifyScreen({
+  profile,
+  lang,
+  onSuccess,
+  onBack,
+}: {
+  profile: StudentProfile;
+  lang: "tok" | "en";
+  onSuccess: () => void;
+  onBack: () => void;
+}) {
   const [shake, setShake] = React.useState<number | null>(null);
   const [error, setError] = React.useState(false);
   const [wrongCount, setWrongCount] = React.useState(0);
@@ -439,9 +630,10 @@ function ColourVerifyScreen({ profile, lang, onSuccess, onBack }: { profile: Stu
 
   // Shuffle once per profile
   const shuffled = React.useMemo(() => {
-    return [...COLOUR_OPTIONS.map((c, i) => ({ ...c, origIdx: i }))]
-      .sort(() => Math.random() - 0.5);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    return [...COLOUR_OPTIONS.map((c, i) => ({ ...c, origIdx: i }))].sort(
+      () => Math.random() - 0.5,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile.id]);
 
   function handlePick(origIdx: number, btnIdx: number) {
@@ -457,7 +649,10 @@ function ColourVerifyScreen({ profile, lang, onSuccess, onBack }: { profile: Stu
       setTimeout(() => setError(false), 1800);
       if (newCount >= 3) {
         setLocked(true);
-        setTimeout(() => { setWrongCount(0); setLocked(false); }, 5000);
+        setTimeout(() => {
+          setWrongCount(0);
+          setLocked(false);
+        }, 5000);
       }
     }
   }
@@ -465,18 +660,52 @@ function ColourVerifyScreen({ profile, lang, onSuccess, onBack }: { profile: Stu
   return (
     <PageShell onBack={onBack} lang={lang}>
       <div style={{ textAlign: "center", maxWidth: 520, width: "100%" }}>
-        <div style={{ marginBottom: 20, display: "flex", justifyContent: "center" }}>
-          <InitialAvatar name={profile.name} avatarIdx={profile.avatarIdx} size={88} />
+        <div
+          style={{
+            marginBottom: 20,
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <InitialAvatar
+            name={profile.name}
+            avatarIdx={profile.avatarIdx}
+            size={88}
+          />
         </div>
 
-        <div style={{ fontFamily: "'Baloo 2', cursive", fontSize: 30, fontWeight: 900, color: "#fff", marginBottom: 8 }}>
+        <div
+          style={{
+            fontFamily: "'Baloo 2', cursive",
+            fontSize: 30,
+            fontWeight: 900,
+            color: "#fff",
+            marginBottom: 8,
+          }}
+        >
           {profile.name}
         </div>
-        <div style={{ fontSize: 15, color: "rgba(255,255,255,0.38)", fontWeight: 600, marginBottom: 48 }}>
-          {lang === "tok" ? "Wanem colour bilong yu?" : "What's your favourite colour?"}
+        <div
+          style={{
+            fontSize: 15,
+            color: "rgba(255,255,255,0.38)",
+            fontWeight: 600,
+            marginBottom: 48,
+          }}
+        >
+          {lang === "tok"
+            ? "Wanem colour bilong yu?"
+            : "What's your favourite colour?"}
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, marginBottom: 28 }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, 1fr)",
+            gap: 16,
+            marginBottom: 28,
+          }}
+        >
           {shuffled.map(({ hex, label, tok, origIdx }, btnIdx) => (
             <button
               key={btnIdx}
@@ -496,21 +725,42 @@ function ColourVerifyScreen({ profile, lang, onSuccess, onBack }: { profile: Stu
                 transition: "all 0.18s ease",
                 opacity: locked ? 0.4 : 1,
               }}
-              onMouseEnter={e => {
+              onMouseEnter={(e) => {
                 if (!locked) {
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = hex;
-                  (e.currentTarget as HTMLButtonElement).style.background = `${hex}28`;
-                  (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-4px)";
+                  (e.currentTarget as HTMLButtonElement).style.borderColor =
+                    hex;
+                  (e.currentTarget as HTMLButtonElement).style.background =
+                    `${hex}28`;
+                  (e.currentTarget as HTMLButtonElement).style.transform =
+                    "translateY(-4px)";
                 }
               }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLButtonElement).style.borderColor = `${hex}55`;
-                (e.currentTarget as HTMLButtonElement).style.background = `${hex}18`;
-                (e.currentTarget as HTMLButtonElement).style.transform = "translateY(0)";
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.borderColor =
+                  `${hex}55`;
+                (e.currentTarget as HTMLButtonElement).style.background =
+                  `${hex}18`;
+                (e.currentTarget as HTMLButtonElement).style.transform =
+                  "translateY(0)";
               }}
             >
-              <div style={{ width: 52, height: 52, borderRadius: "50%", background: hex, boxShadow: `0 0 20px ${hex}55` }} />
-              <div style={{ fontFamily: "'Baloo 2', cursive", fontWeight: 900, fontSize: 16, color: hex }}>
+              <div
+                style={{
+                  width: 52,
+                  height: 52,
+                  borderRadius: "50%",
+                  background: hex,
+                  boxShadow: `0 0 20px ${hex}55`,
+                }}
+              />
+              <div
+                style={{
+                  fontFamily: "'Baloo 2', cursive",
+                  fontWeight: 900,
+                  fontSize: 16,
+                  color: hex,
+                }}
+              >
                 {lang === "tok" ? tok : label}
               </div>
             </button>
@@ -524,7 +774,9 @@ function ColourVerifyScreen({ profile, lang, onSuccess, onBack }: { profile: Stu
         )}
         {locked && (
           <div style={{ color: "#FB923C", fontWeight: 700, fontSize: 13 }}>
-            {lang === "tok" ? "Tupela taim rong. Wet liklik..." : "Too many attempts. Please wait..."}
+            {lang === "tok"
+              ? "Tupela taim rong. Wet liklik..."
+              : "Too many attempts. Please wait..."}
           </div>
         )}
       </div>
@@ -533,7 +785,17 @@ function ColourVerifyScreen({ profile, lang, onSuccess, onBack }: { profile: Stu
 }
 
 // ── PIN VERIFY (Grade 3–5) ─────────────────────────────
-function PinVerifyScreen({ profile, lang, onSuccess, onBack }: { profile: StudentProfile; lang: "tok" | "en"; onSuccess: () => void; onBack: () => void }) {
+function PinVerifyScreen({
+  profile,
+  lang,
+  onSuccess,
+  onBack,
+}: {
+  profile: StudentProfile;
+  lang: "tok" | "en";
+  onSuccess: () => void;
+  onBack: () => void;
+}) {
   const [studentId, setStudentId] = React.useState("");
   const [pin, setPin] = React.useState(["", "", "", ""]);
   const [shake, setShake] = React.useState(false);
@@ -563,7 +825,9 @@ function PinVerifyScreen({ profile, lang, onSuccess, onBack }: { profile: Studen
 
   function handleSubmit() {
     if (locked) return;
-    const idOk = studentId.trim().toUpperCase() === (profile.studentId || "").toUpperCase();
+    const idOk =
+      studentId.trim().toUpperCase() ===
+      (profile.studentId || "").toUpperCase();
     const pinOk = pin.join("") === (profile.pin || "");
 
     if (idOk && pinOk) {
@@ -572,16 +836,25 @@ function PinVerifyScreen({ profile, lang, onSuccess, onBack }: { profile: Studen
       const newCount = wrongCount + 1;
       setWrongCount(newCount);
       setShake(true);
-      setError(!idOk
-        ? (lang === "tok" ? "ID i no stret" : "Student ID not recognised")
-        : (lang === "tok" ? "PIN i no stret" : "Incorrect PIN"));
+      setError(
+        !idOk
+          ? lang === "tok"
+            ? "ID i no stret"
+            : "Student ID not recognised"
+          : lang === "tok"
+            ? "PIN i no stret"
+            : "Incorrect PIN",
+      );
       setPin(["", "", "", ""]);
       pinRefs[0].current?.focus();
       setTimeout(() => setShake(false), 450);
       setTimeout(() => setError(""), 2500);
       if (newCount >= 4) {
         setLocked(true);
-        setTimeout(() => { setWrongCount(0); setLocked(false); }, 8000);
+        setTimeout(() => {
+          setWrongCount(0);
+          setLocked(false);
+        }, 8000);
       }
     }
   }
@@ -589,27 +862,71 @@ function PinVerifyScreen({ profile, lang, onSuccess, onBack }: { profile: Studen
   return (
     <PageShell onBack={onBack} lang={lang}>
       <div style={{ textAlign: "center", maxWidth: 420, width: "100%" }}>
-        <div style={{ marginBottom: 16, display: "flex", justifyContent: "center" }}>
-          <InitialAvatar name={profile.name} avatarIdx={profile.avatarIdx} size={80} />
+        <div
+          style={{
+            marginBottom: 16,
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <InitialAvatar
+            name={profile.name}
+            avatarIdx={profile.avatarIdx}
+            size={80}
+          />
         </div>
-        <div style={{ fontFamily: "'Baloo 2', cursive", fontSize: 28, fontWeight: 900, color: "#fff", marginBottom: 6 }}>
+        <div
+          style={{
+            fontFamily: "'Baloo 2', cursive",
+            fontSize: 28,
+            fontWeight: 900,
+            color: "#fff",
+            marginBottom: 6,
+          }}
+        >
           {profile.name}
         </div>
-        <div style={{ fontSize: 14, color: "rgba(255,255,255,0.35)", fontWeight: 600, marginBottom: 36 }}>
-          {lang === "tok" ? "Grade {profile.grade} — Putim ID na PIN bilong yu" : `Grade ${profile.grade} — Enter your Student ID and PIN`}
+        <div
+          style={{
+            fontSize: 14,
+            color: "rgba(255,255,255,0.35)",
+            fontWeight: 600,
+            marginBottom: 36,
+          }}
+        >
+          {lang === "tok"
+            ? "Grade {profile.grade} — Putim ID na PIN bilong yu"
+            : `Grade ${profile.grade} — Enter your Student ID and PIN`}
         </div>
 
-        <div className={shake ? "v-shake" : ""} style={{ display: "flex", flexDirection: "column", gap: 20, marginBottom: 24 }}>
+        <div
+          className={shake ? "v-shake" : ""}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 20,
+            marginBottom: 24,
+          }}
+        >
           {/* Student ID */}
           <div style={{ textAlign: "left" }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.3)", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 8 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                color: "rgba(255,255,255,0.3)",
+                letterSpacing: 1.5,
+                textTransform: "uppercase",
+                marginBottom: 8,
+              }}
+            >
               {lang === "tok" ? "Namba Bilong Studen" : "Student ID"}
             </div>
             <input
               className="id-input"
               placeholder={lang === "tok" ? "e.g. STU-002" : "e.g. STU-002"}
               value={studentId}
-              onChange={e => setStudentId(e.target.value)}
+              onChange={(e) => setStudentId(e.target.value)}
               disabled={locked}
               autoFocus
             />
@@ -617,7 +934,16 @@ function PinVerifyScreen({ profile, lang, onSuccess, onBack }: { profile: Studen
 
           {/* PIN dots */}
           <div style={{ textAlign: "left" }}>
-            <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.3)", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 8 }}>
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 800,
+                color: "rgba(255,255,255,0.3)",
+                letterSpacing: 1.5,
+                textTransform: "uppercase",
+                marginBottom: 8,
+              }}
+            >
               PIN
             </div>
             <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
@@ -630,8 +956,8 @@ function PinVerifyScreen({ profile, lang, onSuccess, onBack }: { profile: Studen
                   inputMode="numeric"
                   maxLength={1}
                   value={d}
-                  onChange={e => handlePinChange(i, e.target.value)}
-                  onKeyDown={e => handlePinKeyDown(i, e)}
+                  onChange={(e) => handlePinChange(i, e.target.value)}
+                  onKeyDown={(e) => handlePinKeyDown(i, e)}
                   disabled={locked}
                 />
               ))}
@@ -640,25 +966,65 @@ function PinVerifyScreen({ profile, lang, onSuccess, onBack }: { profile: Studen
         </div>
 
         {error && (
-          <div style={{ color: "#FB923C", fontWeight: 700, fontSize: 13, marginBottom: 12 }}>
+          <div
+            style={{
+              color: "#FB923C",
+              fontWeight: 700,
+              fontSize: 13,
+              marginBottom: 12,
+            }}
+          >
             {error}
           </div>
         )}
         {locked && (
-          <div style={{ color: "#FB923C", fontWeight: 700, fontSize: 13, marginBottom: 12 }}>
-            {lang === "tok" ? "Tupela taim rong. Wet liklik..." : "Too many attempts. Please wait..."}
+          <div
+            style={{
+              color: "#FB923C",
+              fontWeight: 700,
+              fontSize: 13,
+              marginBottom: 12,
+            }}
+          >
+            {lang === "tok"
+              ? "Tupela taim rong. Wet liklik..."
+              : "Too many attempts. Please wait..."}
           </div>
         )}
 
         <button
           onClick={handleSubmit}
-          disabled={!studentId.trim() || pin.some(d => !d) || locked}
-          style={{ width: "100%", background: "linear-gradient(135deg, #F5A623, #FF6B35)", border: "none", borderRadius: 14, padding: "15px", fontSize: 17, fontWeight: 900, color: "#1A0A00", fontFamily: "'Baloo 2', cursive", cursor: "pointer", opacity: (!studentId.trim() || pin.some(d => !d) || locked) ? 0.3 : 1, transition: "opacity 0.2s" }}>
+          disabled={!studentId.trim() || pin.some((d) => !d) || locked}
+          style={{
+            width: "100%",
+            background: "linear-gradient(135deg, #F5A623, #FF6B35)",
+            border: "none",
+            borderRadius: 14,
+            padding: "15px",
+            fontSize: 17,
+            fontWeight: 900,
+            color: "#1A0A00",
+            fontFamily: "'Baloo 2', cursive",
+            cursor: "pointer",
+            opacity:
+              !studentId.trim() || pin.some((d) => !d) || locked ? 0.3 : 1,
+            transition: "opacity 0.2s",
+          }}
+        >
           {lang === "tok" ? "Go Insait" : "Log In"}
         </button>
 
-        <div style={{ marginTop: 16, fontSize: 12, color: "rgba(255,255,255,0.18)", fontWeight: 600 }}>
-          {lang === "tok" ? "Bagarapim PIN? Askim tisa bilong yu." : "Forgotten your PIN? Ask your teacher."}
+        <div
+          style={{
+            marginTop: 16,
+            fontSize: 12,
+            color: "rgba(255,255,255,0.18)",
+            fontWeight: 600,
+          }}
+        >
+          {lang === "tok"
+            ? "Bagarapim PIN? Askim tisa bilong yu."
+            : "Forgotten your PIN? Ask your teacher."}
         </div>
       </div>
     </PageShell>
@@ -675,12 +1041,15 @@ function GradeCard({
   onSelect: () => void;
   delay: number;
 }) {
-  const gradeLabels: Record<number, { tok: string; en: string; color: string }> = {
-    1: { tok: "Klas Wan",  en: "Grade One",   color: "#60A5FA" },
-    2: { tok: "Klas Tu",   en: "Grade Two",   color: "#52B788" },
-    3: { tok: "Klas Tri",  en: "Grade Three", color: "#F5A623" },
-    4: { tok: "Klas Foa",  en: "Grade Four",  color: "#F9A8D4" },
-    5: { tok: "Klas Faiv", en: "Grade Five",  color: "#C4B5FD" },
+  const gradeLabels: Record<
+    number,
+    { tok: string; en: string; color: string }
+  > = {
+    1: { tok: "Klas Wan", en: "Grade One", color: "#60A5FA" },
+    2: { tok: "Klas Tu", en: "Grade Two", color: "#52B788" },
+    3: { tok: "Klas Tri", en: "Grade Three", color: "#F5A623" },
+    4: { tok: "Klas Foa", en: "Grade Four", color: "#F9A8D4" },
+    5: { tok: "Klas Faiv", en: "Grade Five", color: "#C4B5FD" },
   };
   const info = gradeLabels[grade];
 
@@ -766,7 +1135,11 @@ function GradeCard({
 
 // ── PROVINCE PICKER ───────────────────────────────────
 function ProvincePicker({
-  lang, newProvince, setNewProvince, handleCreateProfile, onBack,
+  lang,
+  newProvince,
+  setNewProvince,
+  handleCreateProfile,
+  onBack,
 }: {
   lang: "tok" | "en";
   newProvince: string | null;
@@ -776,7 +1149,7 @@ function ProvincePicker({
 }) {
   const [hoveredProv, setHoveredProv] = React.useState<string | null>(null);
   const previewProv = hoveredProv || newProvince;
-  const previewData = PROVINCE_DATA.find(p => p.name === previewProv);
+  const previewData = PROVINCE_DATA.find((p) => p.name === previewProv);
   const previewRegion = previewData?.region ?? null;
 
   return (
@@ -789,7 +1162,12 @@ function ProvincePicker({
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
-        style={{ maxWidth: 760, display: "flex", flexDirection: "column", alignItems: "center" }}
+        style={{
+          maxWidth: 760,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
       >
         <motion.div
           className="screen-title"
@@ -798,7 +1176,9 @@ function ProvincePicker({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, type: "spring", bounce: 0.45 }}
         >
-          {lang === "tok" ? "Wanem provins bilong yu?" : "Which province are you from?"}
+          {lang === "tok"
+            ? "Wanem provins bilong yu?"
+            : "Which province are you from?"}
         </motion.div>
         <motion.div
           className="screen-sub"
@@ -813,21 +1193,32 @@ function ProvincePicker({
         </motion.div>
 
         {/* Guardian preview + province grid side by side */}
-        <div style={{ display: "flex", gap: 20, width: "100%", alignItems: "flex-start" }}>
-
+        <div
+          style={{
+            display: "flex",
+            gap: 20,
+            width: "100%",
+            alignItems: "flex-start",
+          }}
+        >
           {/* Guardian preview panel */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3, duration: 0.4 }}
             style={{
-              width: 140, flexShrink: 0,
+              width: 140,
+              flexShrink: 0,
               background: "rgba(0,0,0,0.3)",
               border: previewRegion
                 ? `1.5px solid ${CULTURAL_REGIONS[previewRegion].glow.replace("0.5)", "0.4)").replace("0.55)", "0.4)")}`
                 : "1.5px solid rgba(255,255,255,0.08)",
-              borderRadius: 20, padding: "16px 12px",
-              display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
+              borderRadius: 20,
+              padding: "16px 12px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 8,
               minHeight: 200,
               transition: "border-color 0.3s",
             }}
@@ -841,7 +1232,11 @@ function ProvincePicker({
                   exit={{ scale: 0.7, opacity: 0 }}
                   transition={{ type: "spring", bounce: 0.5, duration: 0.4 }}
                 >
-                  <ProvinceGuardian region={previewRegion} state="excited" size={96} />
+                  <ProvinceGuardian
+                    region={previewRegion}
+                    state="excited"
+                    size={96}
+                  />
                 </motion.div>
               ) : (
                 <motion.div
@@ -849,9 +1244,13 @@ function ProvincePicker({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   style={{
-                    width: 96, height: 135,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 36, opacity: 0.15,
+                    width: 96,
+                    height: 135,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 36,
+                    opacity: 0.15,
                   }}
                 >
                   🗺
@@ -868,27 +1267,45 @@ function ProvincePicker({
                   exit={{ opacity: 0 }}
                   style={{ textAlign: "center" }}
                 >
-                  <div style={{
-                    fontSize: 13, fontWeight: 900, color: "#fff", marginBottom: 2,
-                    fontFamily: "'Baloo 2', cursive",
-                  }}>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 900,
+                      color: "#fff",
+                      marginBottom: 2,
+                      fontFamily: "'Baloo 2', cursive",
+                    }}
+                  >
                     {previewData?.name}
                   </div>
-                  <div style={{
-                    fontSize: 10, fontWeight: 700,
-                    color: CULTURAL_REGIONS[previewRegion].glow.replace("0.5)", "1)").replace("0.55)", "1)"),
-                    letterSpacing: 1, textTransform: "uppercase",
-                  }}>
+                  <div
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 700,
+                      color: CULTURAL_REGIONS[previewRegion].glow
+                        .replace("0.5)", "1)")
+                        .replace("0.55)", "1)"),
+                      letterSpacing: 1,
+                      textTransform: "uppercase",
+                    }}
+                  >
                     {CULTURAL_REGIONS[previewRegion].label}
                   </div>
-                  <div style={{ fontSize: 18, marginTop: 4 }}>{previewData?.food}</div>
+                  <div style={{ fontSize: 18, marginTop: 4 }}>
+                    {previewData?.food}
+                  </div>
                 </motion.div>
               ) : (
                 <motion.div
                   key="hint"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  style={{ fontSize: 11, color: "rgba(255,255,255,0.2)", textAlign: "center", fontWeight: 600 }}
+                  style={{
+                    fontSize: 11,
+                    color: "rgba(255,255,255,0.2)",
+                    textAlign: "center",
+                    fontWeight: 600,
+                  }}
                 >
                   {lang === "tok" ? "Makim provins" : "Hover a province"}
                 </motion.div>
@@ -902,20 +1319,37 @@ function ProvincePicker({
             style={{ flex: 1 }}
             initial="hidden"
             animate="show"
-            variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
+            variants={{
+              hidden: {},
+              show: { transition: { staggerChildren: 0.05 } },
+            }}
           >
             {PROVINCE_DATA.map((p, i) => {
               const regionColor = CULTURAL_REGIONS[p.region].glow
-                .replace("0.5)", "0.85)").replace("0.55)", "0.85)");
+                .replace("0.5)", "0.85)")
+                .replace("0.55)", "0.85)");
               return (
                 <motion.button
                   key={i}
                   variants={{
                     hidden: { opacity: 0, y: 22, scale: 0.84, rotateX: -18 },
-                    show: { opacity: 1, y: 0, scale: 1, rotateX: 0,
-                      transition: { type: "spring", bounce: 0.52, duration: 0.55 } },
+                    show: {
+                      opacity: 1,
+                      y: 0,
+                      scale: 1,
+                      rotateX: 0,
+                      transition: {
+                        type: "spring",
+                        bounce: 0.52,
+                        duration: 0.55,
+                      },
+                    },
                   }}
-                  whileHover={{ y: -5, scale: 1.07, transition: { duration: 0.14 } }}
+                  whileHover={{
+                    y: -5,
+                    scale: 1.07,
+                    transition: { duration: 0.14 },
+                  }}
                   whileTap={{ scale: 0.91 }}
                   className={`prov-pick-btn${newProvince === p.name ? " sel" : ""}`}
                   onMouseEnter={() => setHoveredProv(p.name)}
@@ -929,15 +1363,30 @@ function ProvincePicker({
                   <motion.span
                     className={`prov-pick-dot${p.status === "warn" ? " warn" : ""}`}
                     animate={{
-                      scale: [1, 1.7, 1], opacity: [1, 0.35, 1],
-                      boxShadow: p.status === "warn"
-                        ? ["0 0 4px rgba(255,217,61,0.5)", "0 0 14px rgba(255,217,61,0.9)", "0 0 4px rgba(255,217,61,0.5)"]
-                        : [`0 0 4px ${CULTURAL_REGIONS[p.region].glow.replace("0.5)","0.5)").replace("0.55)","0.55)")}`,
-                           `0 0 14px ${CULTURAL_REGIONS[p.region].glow.replace("0.5)","0.9)").replace("0.55)","0.9)")}`,
-                           `0 0 4px ${CULTURAL_REGIONS[p.region].glow.replace("0.5)","0.5)").replace("0.55)","0.55)")}`],
+                      scale: [1, 1.7, 1],
+                      opacity: [1, 0.35, 1],
+                      boxShadow:
+                        p.status === "warn"
+                          ? [
+                              "0 0 4px rgba(255,217,61,0.5)",
+                              "0 0 14px rgba(255,217,61,0.9)",
+                              "0 0 4px rgba(255,217,61,0.5)",
+                            ]
+                          : [
+                              `0 0 4px ${CULTURAL_REGIONS[p.region].glow.replace("0.5)", "0.5)").replace("0.55)", "0.55)")}`,
+                              `0 0 14px ${CULTURAL_REGIONS[p.region].glow.replace("0.5)", "0.9)").replace("0.55)", "0.9)")}`,
+                              `0 0 4px ${CULTURAL_REGIONS[p.region].glow.replace("0.5)", "0.5)").replace("0.55)", "0.55)")}`,
+                            ],
                     }}
-                    style={{ background: p.status === "warn" ? "#FFD93D" : regionColor }}
-                    transition={{ duration: 2.2, repeat: Infinity, delay: i * 0.17, ease: "easeInOut" }}
+                    style={{
+                      background: p.status === "warn" ? "#FFD93D" : regionColor,
+                    }}
+                    transition={{
+                      duration: 2.2,
+                      repeat: Infinity,
+                      delay: i * 0.17,
+                      ease: "easeInOut",
+                    }}
                   />
                   <span className="prov-pick-name">{p.name}</span>
                   {newProvince === p.name && (
@@ -946,8 +1395,11 @@ function ProvincePicker({
                       animate={{ scale: 2, opacity: 0 }}
                       transition={{ duration: 0.55, ease: "easeOut" }}
                       style={{
-                        position: "absolute", inset: 0, borderRadius: 14,
-                        background: "radial-gradient(circle, rgba(255,217,61,0.5) 0%, transparent 70%)",
+                        position: "absolute",
+                        inset: 0,
+                        borderRadius: 14,
+                        background:
+                          "radial-gradient(circle, rgba(255,217,61,0.5) 0%, transparent 70%)",
                         pointerEvents: "none",
                       }}
                     />
@@ -975,13 +1427,22 @@ function ProvincePicker({
 }
 
 // ── MAIN LOGIN SCREEN ──────────────────────────────────
-type View = "welcome" | "grade" | "classCode" | "profiles" | "verify" | "new" | "province";
+type View =
+  | "welcome"
+  | "grade"
+  | "classCode"
+  | "profiles"
+  | "verify"
+  | "new"
+  | "province";
 
 export default function LoginScreen({ onLogin }: LoginScreenProps) {
   const [lang, setLang] = useState<"tok" | "en">("tok");
   const [view, setView] = useState<View>("welcome");
   const [selectedGrade, setSelectedGrade] = useState<number | null>(null);
-  const [pendingProfile, setPendingProfile] = useState<StudentProfile | null>(null);
+  const [pendingProfile, setPendingProfile] = useState<StudentProfile | null>(
+    null,
+  );
   const [newName, setNewName] = useState("");
   const [newAvatar, setNewAvatar] = useState<number | null>(null);
   const [newGrade, setNewGrade] = useState<number | null>(null);
@@ -1086,6 +1547,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
         .welcome-wrap {
           flex: 1; display: flex; flex-direction: column;
           align-items: center; justify-content: center;
+          position: relative; z-index: 1;
           text-align: center; padding: 48px 48px;
           opacity: 0; transition: opacity 0.7s ease;
           max-width: 800px; width: 100%; margin: 0 auto;
@@ -1104,17 +1566,49 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
         }
 
         .ls-logo {
+          margin-bottom: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .ls-logo-trio {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .ls-trio-word {
           font-family: 'Playfair Display', Georgia, serif;
           font-style: italic;
-          font-size: clamp(36px, 5vw, 64px);
-          font-weight: 800; line-height: 1.35; margin-bottom: 20px;
-          background: linear-gradient(135deg, #F5A623 0%, #FF6B35 50%, #FFD700 100%);
-          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-          background-clip: text;
-          filter: drop-shadow(0 4px 24px rgba(245,166,35,0.4));
+          font-size: clamp(28px, 4.2vw, 56px);
+          font-weight: 800;
           letter-spacing: -0.5px;
           white-space: nowrap;
-          padding-bottom: 0.15em;
+          padding: 0;
+          background: transparent;
+          position: relative;
+          z-index: 2;
+        }
+
+        .ls-trio-left {
+          color: #FFD93D;
+          filter: drop-shadow(0 0 18px rgba(255,217,61,0.75));
+          margin-right: -22px;
+        }
+
+        .ls-trio-right {
+          color: rgba(255,255,255,0.95);
+          filter: drop-shadow(0 0 14px rgba(255,255,255,0.4));
+          margin-left: -22px;
+        }
+
+        .ls-trio-bird {
+          background: transparent;
+          border: none;
+          padding: 0;
+          z-index: 1;
+          position: relative;
         }
 
         .ls-tagline {
@@ -1398,7 +1892,8 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
       {/* ══ WELCOME SCREEN ══ */}
       {view === "welcome" && (
         <div className="ls-page">
-          <div className="ls-lang-bar">
+
+<div className="ls-lang-bar">
             <button
               className={`ls-lang-btn${lang === "tok" ? " active" : ""}`}
               onClick={() => setLang("tok")}
@@ -1416,18 +1911,13 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
           <div className={`welcome-wrap${mounted ? " vis" : ""}`}>
             <div className="ls-badge">Papua New Guinea · AI Tutor</div>
             <div className="ls-logo">
-              SingSinghAI
-              <span style={{
-                WebkitTextFillColor: "rgba(255,255,255,0.3)",
-                margin: "0 12px",
-                fontWeight: 400,
-              }}>·</span>
-              <span style={{
-                background: "linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.55) 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}>LiteHaus</span>
+              <div className="ls-logo-trio">
+                <span className="ls-trio-word ls-trio-left">SingSinghAI</span>
+                <div className="ls-trio-bird">
+                  <Logo height={150} showText={false} />
+                </div>
+                <span className="ls-trio-word ls-trio-right">LiteHaus</span>
+              </div>
             </div>
             <div className="ls-tagline">
               {lang === "tok"
@@ -1458,10 +1948,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               </div>
             </div>
 
-            <button
-              className="ls-start-btn"
-              onClick={() => setView("grade")}
-            >
+            <button className="ls-start-btn" onClick={() => setView("grade")}>
               {lang === "tok" ? "Stat Lainim" : "Start Learning"}
             </button>
 
@@ -1498,7 +1985,9 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
           <div className="grade-wrap">
             <div className="screen-title">
-              {lang === "tok" ? "Wanem klas bilong yu?" : "Which grade are you in?"}
+              {lang === "tok"
+                ? "Wanem klas bilong yu?"
+                : "Which grade are you in?"}
             </div>
             <div className="screen-sub">
               {lang === "tok"
@@ -1565,7 +2054,10 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
                 <StudentCard
                   key={profile.id}
                   profile={profile}
-                  onSelect={() => { setPendingProfile(profile); setView("verify"); }}
+                  onSelect={() => {
+                    setPendingProfile(profile);
+                    setView("verify");
+                  }}
                   delay={i * 0.1}
                 />
               ))}
@@ -1579,10 +2071,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               <div className="divider-line" />
             </div>
 
-            <button
-              className="new-student-btn"
-              onClick={() => setView("new")}
-            >
+            <button className="new-student-btn" onClick={() => setView("new")}>
               <span style={{ fontSize: 18, fontWeight: 400 }}>+</span>
               {lang === "tok"
                 ? "Stat Nupela — Stat Lainim"
@@ -1594,21 +2083,29 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
       {/* ══ NEW STUDENT FORM ══ */}
       {/* ══ VERIFY SCREEN — routes by grade ══ */}
-      {view === "verify" && pendingProfile && (pendingProfile.grade <= 2 ? (
-        <ColourVerifyScreen
-          profile={pendingProfile}
-          lang={lang}
-          onSuccess={() => onLogin(pendingProfile, false)}
-          onBack={() => { setPendingProfile(null); setView("profiles"); }}
-        />
-      ) : (
-        <PinVerifyScreen
-          profile={pendingProfile}
-          lang={lang}
-          onSuccess={() => onLogin(pendingProfile, false)}
-          onBack={() => { setPendingProfile(null); setView("profiles"); }}
-        />
-      ))}
+      {view === "verify" &&
+        pendingProfile &&
+        (pendingProfile.grade <= 2 ? (
+          <ColourVerifyScreen
+            profile={pendingProfile}
+            lang={lang}
+            onSuccess={() => onLogin(pendingProfile, false)}
+            onBack={() => {
+              setPendingProfile(null);
+              setView("profiles");
+            }}
+          />
+        ) : (
+          <PinVerifyScreen
+            profile={pendingProfile}
+            lang={lang}
+            onSuccess={() => onLogin(pendingProfile, false)}
+            onBack={() => {
+              setPendingProfile(null);
+              setView("profiles");
+            }}
+          />
+        ))}
 
       {view === "new" && (
         <div className="ls-page">
@@ -1635,17 +2132,25 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               {lang === "tok" ? "Nupela Studen" : "New Student"}
             </div>
             <div className="screen-sub">
-              {lang === "tok" ? "Putim details bilong yu" : "Fill in your details to get started"}
+              {lang === "tok"
+                ? "Putim details bilong yu"
+                : "Fill in your details to get started"}
             </div>
 
             <div className="new-form">
               <div className="form-section">
                 <label className="form-label">
-                  {lang === "tok" ? "Wanem nem bilong yu?" : "What is your name?"}
+                  {lang === "tok"
+                    ? "Wanem nem bilong yu?"
+                    : "What is your name?"}
                 </label>
                 <input
                   className="name-input"
-                  placeholder={lang === "tok" ? "Raitim nem bilong yu..." : "Type your name..."}
+                  placeholder={
+                    lang === "tok"
+                      ? "Raitim nem bilong yu..."
+                      : "Type your name..."
+                  }
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   maxLength={20}
@@ -1654,7 +2159,9 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
               <div className="form-section">
                 <label className="form-label">
-                  {lang === "tok" ? "Makim animal bilong yu" : "Choose your animal"}
+                  {lang === "tok"
+                    ? "Makim animal bilong yu"
+                    : "Choose your animal"}
                 </label>
                 <div className="avatar-grid-new">
                   {AVATAR_ANIMALS.map((av, i) => {
@@ -1699,7 +2206,9 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
               <div className="form-section">
                 <label className="form-label">
-                  {lang === "tok" ? "Wanem klas bilong yu?" : "Which grade are you in?"}
+                  {lang === "tok"
+                    ? "Wanem klas bilong yu?"
+                    : "Which grade are you in?"}
                 </label>
                 <div className="grade-grid-new">
                   {GRADES.map((g) => (
@@ -1717,7 +2226,9 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
               <button
                 className="start-btn"
-                disabled={!newName.trim() || newAvatar === null || newGrade === null}
+                disabled={
+                  !newName.trim() || newAvatar === null || newGrade === null
+                }
                 onClick={handleNewStudent}
               >
                 {lang === "tok" ? "Nekis →" : "Next →"}

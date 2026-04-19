@@ -15,6 +15,8 @@ import { StudentProfile } from "../LoginScreen";
 import { ActivityMode } from "../types";
 import BeniCharacter from "./BeniCharacter";
 import AssessmentScreen from "./AssessmentScreen";
+import type { CompanionAvatar } from "./AvatarPicker";
+import CompanionAssistant from "./CompanionAssistant";
 
 type BeniState = "idle" | "excited" | "correct" | "sad" | "thinking" | "walk";
 
@@ -36,9 +38,47 @@ interface Props {
   actIdx: number;
   actSelected: string | null;
   actWrong: string | null;
+  companion?: CompanionAvatar | null;
   onNextStoryPage: () => void;
   onActivityAnswer: (val: string) => void;
   onLangToggle?: () => void;
+}
+
+// ── Per-companion speech lines ───────────────────────────────────────────────
+const COMPANION_LINES: Record<string, Array<{ tok: string; en: string }>> = {
+  bird: [
+    { tok: "Waaa! Yu save tumas!",   en: "Wow! You know so much!" },
+    { tok: "Flai antap, yu strong!", en: "Fly high, you're strong!" },
+    { tok: "Gutpela tru!",           en: "Truly excellent!" },
+    { tok: "Kamap, kamap!",          en: "Keep going, keep going!" },
+  ],
+  girl: [
+    { tok: "Yu save! Mi belgut!",    en: "You know it! I'm so proud!" },
+    { tok: "Gutpela wok, fren!",     en: "Great work, friend!" },
+    { tok: "Yumi wokim wantaim!",    en: "We do it together!" },
+    { tok: "Yu nambawan tru!",       en: "You're truly number one!" },
+  ],
+  teacher: [
+    { tok: "Kainkain tinking!",      en: "Excellent thinking!" },
+    { tok: "Continue — yu save!",    en: "Keep going — you've got it!" },
+    { tok: "Dispela i gutpela moa!", en: "This is getting better!" },
+    { tok: "Mi amamas long yu!",     en: "I'm happy with you!" },
+  ],
+  "boy-left": [
+    { tok: "Yes! Bagarap nating!",   en: "Yes! Nothing can stop you!" },
+    { tok: "Strong tumas, brata!",   en: "So strong, brother!" },
+    { tok: "Namba wan!",             en: "Number one!" },
+    { tok: "Yu winim dispela!",      en: "You're winning this!" },
+  ],
+  "boy-trophy": [
+    { tok: "Trophy bilong yu!",      en: "The trophy is yours!" },
+    { tok: "Champion tru!",          en: "True champion!" },
+    { tok: "Win win win!",           en: "Win win win!" },
+    { tok: "Yu save maths moa!",     en: "Your maths is getting better!" },
+  ],
+};
+function getCompanionLines(id: string) {
+  return COMPANION_LINES[id] ?? COMPANION_LINES["girl"];
 }
 
 // ── Scene ground & horizon colours (used in CSS ground layer + SVG background) ─
@@ -722,6 +762,7 @@ export default function MathsCartoonLesson({
   actIdx,
   actSelected,
   actWrong,
+  companion,
   onNextStoryPage,
   onActivityAnswer,
   onLangToggle,
@@ -738,6 +779,33 @@ export default function MathsCartoonLesson({
   const [davidMsgIdx,  setDavidMsgIdx]  = useState(0);
   const [showDavidMsg, setShowDavidMsg] = useState(false);
   const davidTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // ── Companion system ─────────────────────────────────────────────────────
+  const [showIntro,         setShowIntro]         = useState(!!companion);
+  const [companionMsgIdx,   setCompanionMsgIdx]   = useState(0);
+  const [showCompanionMsg,  setShowCompanionMsg]  = useState(false);
+  const [companionCelebrate,setCompanionCelebrate]= useState(false);
+  const [companionSad,      setCompanionSad]      = useState(false);
+  const companionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const companionLines = companion ? getCompanionLines(companion.id) : [];
+
+  // Hide intro after 2.8s
+  useEffect(() => {
+    if (!companion) return;
+    const t = setTimeout(() => setShowIntro(false), 2800);
+    return () => clearTimeout(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function triggerCompanionMsg(idx?: number) {
+    if (!companion) return;
+    if (companionTimerRef.current) clearTimeout(companionTimerRef.current);
+    const i = idx !== undefined ? idx : Math.floor(Math.random() * companionLines.length);
+    setCompanionMsgIdx(i);
+    setShowCompanionMsg(true);
+    companionTimerRef.current = setTimeout(() => setShowCompanionMsg(false), 3000);
+  }
+  useEffect(() => () => { if (companionTimerRef.current) clearTimeout(companionTimerRef.current); }, []);
 
   function triggerDavidMsg(idx?: number) {
     if (davidTimerRef.current) clearTimeout(davidTimerRef.current);
@@ -792,6 +860,10 @@ export default function MathsCartoonLesson({
       setTimeout(() => setBeniState("idle"), 1400);
       // David celebrates correct answer
       triggerDavidMsg(Math.floor(Math.random() * DAVID_MESSAGES.length));
+      // Companion celebrates
+      triggerCompanionMsg(Math.floor(Math.random() * companionLines.length));
+      setCompanionCelebrate(true);
+      setTimeout(() => setCompanionCelebrate(false), 1400);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [actSelected]);
@@ -800,6 +872,9 @@ export default function MathsCartoonLesson({
       prevActWrong.current = actWrong;
       setBeniState("sad");
       setTimeout(() => setBeniState("idle"), 1000);
+      // Companion reacts sadly
+      setCompanionSad(true);
+      setTimeout(() => setCompanionSad(false), 1000);
     }
   }, [actWrong]);
   useEffect(() => {
@@ -858,6 +933,7 @@ export default function MathsCartoonLesson({
         actWrong={actWrong}
         lang={lang}
         profile={profile}
+        companion={companion}
         onAnswer={onActivityAnswer}
         onNext={onNextStoryPage}
         onLangToggle={onLangToggle}
@@ -1557,6 +1633,16 @@ export default function MathsCartoonLesson({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Layer 8 — Companion voice assistant (draggable icon + chat panel) */}
+      {companion && (
+        <CompanionAssistant
+          companion={companion}
+          studentName={profile.name}
+          lessonContext="Grade 2 Maths – Chapter 2: Adding Up (Putim Wantaim). Story about Beni at the market adding groups of fruit."
+          lang={lang}
+        />
+      )}
 
     </div>
   );
