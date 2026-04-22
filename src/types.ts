@@ -1,4 +1,4 @@
-export type Screen = "subject" | "chapter" | "avatar-picker" | "diagnostic" | "session" | "dashboard" | "celebration" | "ai-monitor";
+export type Screen = "subject" | "chapter" | "avatar-picker" | "diagnostic" | "session" | "dashboard" | "celebration" | "ai-monitor" | "coach-endcard";
 export type ActivityMode = "story" | "activity" | "redirect" | "chapter-break";
 
 export interface AIEntry {

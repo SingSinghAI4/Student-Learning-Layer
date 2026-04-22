@@ -17,6 +17,7 @@ import BeniCharacter from "./BeniCharacter";
 import AssessmentScreen from "./AssessmentScreen";
 import type { CompanionAvatar } from "./AvatarPicker";
 import CompanionAssistant from "./CompanionAssistant";
+import CountingOverlay from "./CountingOverlay";
 
 type BeniState = "idle" | "excited" | "correct" | "sad" | "thinking" | "walk";
 
@@ -680,6 +681,7 @@ function SpeechBubble({ words, en, litWordIdx }: { words: string[]; en: string; 
   );
 }
 
+
 // ── Chalkboard activity panel ─────────────────────────────────────────────
 function ChalkboardPanel({
   activity, actSelected, actWrong, onAnswer,
@@ -779,6 +781,8 @@ export default function MathsCartoonLesson({
   const [davidMsgIdx,  setDavidMsgIdx]  = useState(0);
   const [showDavidMsg, setShowDavidMsg] = useState(false);
   const davidTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const [countingActive, setCountingActive] = useState(false);
 
   // ── Companion system ─────────────────────────────────────────────────────
   const [showIntro,         setShowIntro]         = useState(!!companion);
@@ -1635,12 +1639,25 @@ export default function MathsCartoonLesson({
       </AnimatePresence>
 
       {/* Layer 8 — Companion voice assistant (draggable icon + chat panel) */}
+      {/* Layer 8 — Counting overlay (triggered by companion help) */}
+      <AnimatePresence>
+        {countingActive && activity?.visual && (
+          <CountingOverlay
+            visual={activity.visual}
+            lang={lang}
+            onDone={() => setCountingActive(false)}
+          />
+        )}
+      </AnimatePresence>
+
       {companion && (
         <CompanionAssistant
           companion={companion}
           studentName={profile.name}
           lessonContext="Grade 2 Maths – Chapter 2: Adding Up (Putim Wantaim). Story about Beni at the market adding groups of fruit."
           lang={lang}
+          sessionMode={sessionMode}
+          onHelpCount={activity?.visual ? () => setCountingActive(true) : undefined}
         />
       )}
 

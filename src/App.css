@@ -1400,7 +1400,7 @@ body {
 
 /* ── Next / CTA button ── */
 .mcl-next-btn {
-  position: absolute; bottom: 74px; right: 18px; z-index: 20;
+  position: absolute; bottom: 24px; left: 0; right: 0; margin: 0 auto; width: fit-content; z-index: 20;
   background: linear-gradient(135deg, #FFD93D, #ff8f00);
   border: none; border-radius: 50px;
   padding: 13px 28px;
@@ -1485,5 +1485,5 @@ body {
   .mcl-speech-tok { font-size: 14px; }
   .chk-q { font-size: 15px; }
   .chk-opt-main { font-size: 26px; }
-  .mcl-next-btn { padding: 11px 22px; font-size: 15px; right: 14px; bottom: 78px; }
+  .mcl-next-btn { padding: 11px 22px; font-size: 15px; bottom: 18px; }
 }

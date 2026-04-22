@@ -16,6 +16,7 @@ import SubjectScreen from "./components/SubjectScreen";
 import ChapterScreen from "./components/ChapterScreen";
 import AIPanel from "./components/AIPanel";
 import AvatarPicker, { CompanionAvatar } from "./components/AvatarPicker";
+import CoachEndCard from "./components/CoachEndCard";
 import { SubjectId } from "./data";
 
 
@@ -322,9 +323,9 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
             }
           }
         } else if (isMathsDemo) {
-          // Maths demo complete → celebration
+          // Maths demo complete → coach end-card → celebration
           addSessionLog({ type: "success", label: "✅ Lesson Complete", text: `${profile.name} finished all ${currentActivities.length} Adding Up activities. Grade 2 Maths Ch.2 — Putim Wantaim ✓`, time: nowStr() });
-          setScreen("celebration");
+          setScreen("coach-endcard");
         } else if (chapter === 1) {
           // Chapter 1 done → transition to Chapter 2
           const diffNote = confidence >= 70
@@ -347,7 +348,7 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
             addSessionLog({ type: "info", label: "Story 2 Loading", text: `"Kila na Solwara" — beach & animals theme. Targeting phonics and reading comprehension.`, time: nowStr() });
           }, 2200);
         } else {
-          setScreen("celebration");
+          setScreen("coach-endcard");
         }
       }, 1400);
     } else {
@@ -475,6 +476,16 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
               mathsPath={mathsPath} companion={companion}
               onNextStoryPage={handleNextStoryPage} onActivityAnswer={handleActivityAnswer}
               onLangToggle={() => setLang(l => l === "tok" ? "en" : "tok")}
+            />
+          </motion.div>
+        )}
+
+        {screen === "coach-endcard" && (
+          <motion.div key="coach-endcard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.35 }} style={{ display: "contents" }}>
+            <CoachEndCard
+              profile={profile}
+              lang={lang}
+              onContinue={() => setScreen("celebration")}
             />
           </motion.div>
         )}

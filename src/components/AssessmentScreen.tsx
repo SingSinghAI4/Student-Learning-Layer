@@ -14,6 +14,7 @@ import { StudentProfile } from "../LoginScreen";
 import TeachMoment from "./TeachMoment";
 import BeniCharacter from "./BeniCharacter";
 import CompanionAssistant from "./CompanionAssistant";
+import CountingOverlay from "./CountingOverlay";
 import type { CompanionAvatar } from "./AvatarPicker";
 
 interface Props {
@@ -76,6 +77,7 @@ export default function AssessmentScreen({
 }: Props) {
   const isCorrectAnswer = actSelected === activity.correct;
 
+  const [countingActive, setCountingActive]   = useState(false);
   const [mascotState, setMascotState]         = useState<"idle" | "correct" | "sad">("idle");
   const [showCorrectFlash, setShowCorrectFlash] = useState(false);
   const [showWrongFlash,   setShowWrongFlash]   = useState(false);
@@ -480,6 +482,17 @@ export default function AssessmentScreen({
         <BeniCharacter state={mascotState} size={110} flipX />
       </div>
 
+      {/* ── Counting overlay ── */}
+      <AnimatePresence>
+        {countingActive && activity.visual && (
+          <CountingOverlay
+            visual={activity.visual}
+            lang={lang}
+            onDone={() => setCountingActive(false)}
+          />
+        )}
+      </AnimatePresence>
+
       {/* ── Companion voice assistant ── */}
       {companion && (
         <CompanionAssistant
@@ -487,6 +500,7 @@ export default function AssessmentScreen({
           studentName={profile.name}
           lessonContext="Grade 2 Maths – Chapter 2: Adding Up. Quiz time — student is answering maths questions about adding groups of fruit."
           lang={lang}
+          onHelpCount={activity.visual ? () => setCountingActive(true) : undefined}
         />
       )}
 
