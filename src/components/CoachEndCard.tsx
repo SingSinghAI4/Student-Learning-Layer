@@ -48,7 +48,9 @@ export default function CoachEndCard({ profile, lang, onContinue }: Props) {
       transition={{ duration: 0.5 }}
       style={{
         position: "fixed", inset: 0, zIndex: 2000,
-        background: "linear-gradient(165deg, #0d0d0d 0%, #1a0000 30%, #8b0000 60%, #c8102e 100%)",
+        backgroundImage: "url('/CelebrationScreen.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -56,73 +58,11 @@ export default function CoachEndCard({ profile, lang, onContinue }: Props) {
         overflow: "hidden",
       }}
     >
-      {/* PNG diagonal flag split — black upper-left, red lower-right */}
+      {/* Dark overlay so text stays readable */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 0, pointerEvents: "none",
-        background: "linear-gradient(135deg, #000000 0%, #0d0000 42%, #8b0000 58%, #c8102e 100%)",
+        background: "linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.55) 100%)",
       }} />
-
-      {/* PNG flag diagonal line */}
-      <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 1, pointerEvents: "none" }} preserveAspectRatio="none">
-        <line x1="0" y1="0" x2="100%" y2="100%" stroke="rgba(255,255,255,0.07)" strokeWidth="3" />
-      </svg>
-
-      {/* Southern Cross — top-left corner (black half of flag) */}
-      {[
-        { top: "6%",  left: "6%",  size: 28 },
-        { top: "14%", left: "16%", size: 18 },
-        { top: "22%", left: "8%",  size: 22 },
-        { top: "10%", left: "26%", size: 14 },
-        { top: "28%", left: "20%", size: 16 },
-      ].map((s, i) => (
-        <motion.div key={`sc-${i}`}
-          animate={{ opacity: [0.5, 1, 0.5], scale: [1, 1.2, 1] }}
-          transition={{ duration: 2 + i * 0.6, repeat: Infinity, delay: i * 0.4 }}
-          style={{
-            position: "absolute", top: s.top, left: s.left,
-            fontSize: s.size, pointerEvents: "none", zIndex: 2,
-            filter: "drop-shadow(0 0 6px rgba(255,255,255,0.8))",
-          }}
-        >✦</motion.div>
-      ))}
-
-      {/* Bird of Paradise — golden feathers floating (right/red half) */}
-      {[
-        { top: "8%",  right: "6%",  size: 36, delay: 0   },
-        { top: "20%", right: "18%", size: 26, delay: 0.5 },
-        { top: "55%", right: "4%",  size: 32, delay: 1   },
-        { top: "68%", right: "22%", size: 22, delay: 0.3 },
-        { top: "38%", right: "10%", size: 28, delay: 0.8 },
-      ].map((f, i) => (
-        <motion.div key={`bop-${i}`}
-          animate={{ opacity: [0.4, 0.95, 0.4], y: [0, -10, 0], rotate: [-8, 8, -8] }}
-          transition={{ duration: 3 + i * 0.5, repeat: Infinity, delay: f.delay }}
-          style={{
-            position: "absolute", top: f.top, right: f.right,
-            fontSize: f.size, pointerEvents: "none", zIndex: 2,
-            filter: "drop-shadow(0 0 8px rgba(255,200,0,0.6))",
-          }}
-        >🪶</motion.div>
-      ))}
-
-      {/* Tropical flora — scattered */}
-      {[
-        { emoji: "🌺", top: "72%", left: "5%",  size: 28, delay: 0.2 },
-        { emoji: "🌴", top: "62%", left: "12%", size: 34, delay: 0.7 },
-        { emoji: "🌺", top: "80%", left: "85%", size: 24, delay: 0.4 },
-        { emoji: "🌴", top: "65%", left: "80%", size: 30, delay: 1.1 },
-        { emoji: "🦜", top: "30%", left: "4%",  size: 30, delay: 0.9 },
-        { emoji: "🌿", top: "85%", left: "45%", size: 22, delay: 0.6 },
-      ].map((f, i) => (
-        <motion.div key={`flora-${i}`}
-          animate={{ opacity: [0.5, 0.9, 0.5], y: [0, -6, 0] }}
-          transition={{ duration: 3.5 + i * 0.4, repeat: Infinity, delay: f.delay }}
-          style={{
-            position: "absolute", top: f.top, left: f.left,
-            fontSize: f.size, pointerEvents: "none", zIndex: 2,
-          }}
-        >{f.emoji}</motion.div>
-      ))}
 
       {/* PNG flag gold + black stripe at top */}
       <div style={{
@@ -165,7 +105,7 @@ export default function CoachEndCard({ profile, lang, onContinue }: Props) {
       {/* Speech bubble — floats above the coach image */}
       <div style={{
         position: "absolute",
-        top: "16%",
+        top: "12%",
         left: "50%",
         transform: "translateX(-50%)",
         width: "min(440px, 88vw)",
@@ -226,27 +166,6 @@ export default function CoachEndCard({ profile, lang, onContinue }: Props) {
         </AnimatePresence>
       </div>
 
-      {/* Coach image — centred, large */}
-      <motion.div
-        initial={{ y: 80, opacity: 0, scale: 0.92 }}
-        animate={{ y: 0, opacity: 1, scale: 1 }}
-        transition={{ delay: 0.15, type: "spring", bounce: 0.3, duration: 0.8 }}
-        style={{ position: "relative", zIndex: 5, marginTop: 24 }}
-      >
-        <motion.img
-          src="/davidemoji.png"
-          alt="Coach"
-          animate={{ y: [0, -12, 0] }}
-          transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
-          style={{
-            height: "min(60vh, 520px)",
-            width: "auto",
-            objectFit: "contain",
-            display: "block",
-            filter: "drop-shadow(0 20px 48px rgba(0,0,0,0.5))",
-          }}
-        />
-      </motion.div>
 
       {/* Continue button */}
       <AnimatePresence>

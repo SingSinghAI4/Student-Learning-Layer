@@ -5,7 +5,7 @@
  */
 import React from "react";
 import { motion, type Transition } from "framer-motion";
-import davidSticker from "../assets/david-sticker.png";
+const davidSticker = "/davidemoji.png";
 
 type DavidState = "idle" | "excited" | "thinking";
 

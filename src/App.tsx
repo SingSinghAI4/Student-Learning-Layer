@@ -15,7 +15,7 @@ import Dashboard from "./components/Dashboard";
 import SubjectScreen from "./components/SubjectScreen";
 import ChapterScreen from "./components/ChapterScreen";
 import AIPanel from "./components/AIPanel";
-import AvatarPicker, { CompanionAvatar } from "./components/AvatarPicker";
+import { CompanionAvatar, COMPANIONS } from "./components/AvatarPicker";
 import CoachEndCard from "./components/CoachEndCard";
 import { SubjectId } from "./data";
 
@@ -34,7 +34,7 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
   const [mathsPath, setMathsPath] = useState<"meri" | "sione" | null>(null);
 
   const [selectedAvatar] = useState<number>(profile.avatarIdx);
-  const [companion, setCompanion] = useState<CompanionAvatar | null>(null);
+  const [companion] = useState<CompanionAvatar>(COMPANIONS[0]);
   const [selectedGrade] = useState<number>(profile.grade);
 
   // ── Diagnostic state ──
@@ -129,7 +129,7 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
         { type: "info",     label: "Language Setting",              text: langNote, time: nowStr() },
       ]);
       setCurrentDecision(`${profile.name} — ${learnerType} path. Story loading…`);
-      setScreen("avatar-picker");
+      setScreen("session");
       return;
     }
 
@@ -143,9 +143,9 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
         { type: "decision", label: "Placement Active", text: `Level confirmed: ${profile.placement}. Chapter ${chapterId} selected. No re-testing needed.`, time: nowStr() },
       ]);
       setCurrentDecision(`${profile.name} resumed — story narration loading`);
-      setScreen("avatar-picker");
+      setScreen("session");
     } else {
-      setScreen("avatar-picker");
+      setScreen("session");
     }
   }
 
@@ -435,7 +435,7 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
       <AnimatePresence mode="wait">
         {screen === "subject" && (
           <motion.div key="subject" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} style={{ display: "contents" }}>
-            <SubjectScreen profile={profile} onSelect={handleSubjectSelect} />
+            <SubjectScreen profile={profile} lang={lang} onSelect={handleSubjectSelect} />
           </motion.div>
         )}
 
@@ -445,13 +445,7 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
           </motion.div>
         )}
 
-        {screen === "avatar-picker" && (
-          <motion.div key="avatar-picker" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -30 }} transition={{ duration: 0.35 }} style={{ display: "contents" }}>
-            <AvatarPicker onSelect={(chosen) => { setCompanion(chosen); setScreen("session"); }} />
-          </motion.div>
-        )}
-
-        {screen === "diagnostic" && (
+{screen === "diagnostic" && (
           <motion.div key="diagnostic" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} style={{ display: "contents" }}>
             <DiagnosticScreen
               profile={profile} lang={lang}
@@ -534,59 +528,6 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
         )}
       </AnimatePresence>
 
-      {/* Nav tabs */}
-      <div className="nav-tabs">
-        <button className={`nav-tab${screen === "subject" || screen === "chapter" ? " active" : ""}`} onClick={() => setScreen("subject")}>
-          <span className="nav-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M3 9.5L12 3l9 6.5V21H3V9.5z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-              <rect x="9" y="14" width="6" height="7" rx="1" stroke="currentColor" strokeWidth="2"/>
-            </svg>
-          </span>Subjects
-        </button>
-        <button className={`nav-tab${screen === "diagnostic" ? " active" : ""}`} onClick={() => setScreen("diagnostic")}>
-          <span className="nav-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2"/>
-              <path d="M8 12h2l2-4 2 8 2-4h2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </span>Diagnostic
-        </button>
-        <button className={`nav-tab${screen === "session" ? " active" : ""}`} onClick={() => { if (diagPlaced) startSession(); }}>
-          <span className="nav-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="2"/>
-              <path d="M3 9h18" stroke="currentColor" strokeWidth="2"/>
-              <path d="M10 14l2-2 2 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </span>Session
-        </button>
-        <button className={`nav-tab${screen === "celebration" ? " active" : ""}`} onClick={() => setScreen("celebration")}>
-          <span className="nav-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2l2.9 6.4 7 .7-5.1 4.8 1.5 6.9L12 17.7l-6.3 3.1 1.5-6.9L2.1 9.1l7-.7z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"/>
-            </svg>
-          </span>Celebrate
-        </button>
-        <button className={`nav-tab${screen === "dashboard" ? " active" : ""}`} onClick={() => setScreen("dashboard")}>
-          <span className="nav-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <rect x="3" y="13" width="5" height="8" rx="1" stroke="currentColor" strokeWidth="2"/>
-              <rect x="10" y="8" width="5" height="13" rx="1" stroke="currentColor" strokeWidth="2"/>
-              <rect x="17" y="3" width="5" height="18" rx="1" stroke="currentColor" strokeWidth="2"/>
-            </svg>
-          </span>Class View
-        </button>
-        <button className={`nav-tab${screen === "ai-monitor" ? " active" : ""}`} onClick={() => setScreen("ai-monitor")}>
-          <span className="nav-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="3" fill="currentColor"/>
-              <path d="M12 2v3M12 19v3M2 12h3M19 12h3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <path d="M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </span>AI Log
-        </button>
-      </div>
     </div>
   );
 }

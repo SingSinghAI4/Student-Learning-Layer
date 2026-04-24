@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PROVINCE_DATA, CULTURAL_REGIONS } from "./data";
 import ProvinceGuardian from "./components/ProvinceGuardian";
-import Logo from "./components/Logo";
 
 // ── TYPES ──────────────────────────────────────────────
 export interface StudentProfile {
@@ -276,6 +275,37 @@ function ProgressBar({ pct }: { pct: number }) {
   );
 }
 
+// ── TAPA BORDER ────────────────────────────────────────
+function TapaBorder({ id }: { id: string }) {
+  const pid = `tapa-${id}`;
+  return (
+    <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 40, borderRadius: "0 0 18px 18px", overflow: "hidden" }}>
+      <svg width="100%" height="40" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id={pid} x="0" y="0" width="64" height="40" patternUnits="userSpaceOnUse">
+            {/* Dark background */}
+            <rect width="64" height="40" fill="#1C0900"/>
+            {/* Top gold band */}
+            <rect x="0" y="0" width="64" height="4" fill="#F5E6D3"/>
+            {/* Bottom gold band */}
+            <rect x="0" y="36" width="64" height="4" fill="#F5E6D3"/>
+            {/* Left arrow/chevron pointing right */}
+            <polygon points="2,6 28,20 2,34" fill="#F5E6D3" opacity="0.15"/>
+            <polygon points="6,12 20,20 6,28" fill="#1C0900"/>
+            {/* Right arrow/chevron pointing left */}
+            <polygon points="62,6 36,20 62,34" fill="#F5E6D3" opacity="0.15"/>
+            <polygon points="58,12 44,20 58,28" fill="#1C0900"/>
+            {/* Center diamond */}
+            <polygon points="32,8 44,20 32,32 20,20" fill="#F5E6D3" opacity="0.1"/>
+            <polygon points="32,13 39,20 32,27 25,20" fill="#1C0900"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="40" fill={`url(#${pid})`}/>
+      </svg>
+    </div>
+  );
+}
+
 // ── STUDENT CARD (name + avatar only — no private data) ──
 function StudentCard({
   profile,
@@ -292,8 +322,8 @@ function StudentCard({
     <button
       onClick={onSelect}
       style={{
-        background: "rgba(255,255,255,0.045)",
-        border: `1.5px solid rgba(255,255,255,0.1)`,
+        background: "rgba(13,27,38,0.85)",
+        border: `2px solid ${c.accent}55`,
         borderRadius: 20,
         padding: "32px 20px 28px",
         display: "flex",
@@ -307,20 +337,22 @@ function StudentCard({
         overflow: "hidden",
         animation: `cardReveal 0.45s ease ${delay}s both`,
         textAlign: "center" as const,
+        backdropFilter: "blur(8px)",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.45)",
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget as HTMLButtonElement;
         el.style.borderColor = c.accent;
         el.style.transform = "translateY(-6px)";
-        el.style.boxShadow = `0 20px 48px ${c.accent}28`;
-        el.style.background = `${c.accent}0e`;
+        el.style.boxShadow = `0 20px 48px rgba(0,0,0,0.5), 0 0 24px ${c.accent}44`;
+        el.style.background = "rgba(13,27,38,0.95)";
       }}
       onMouseLeave={(e) => {
         const el = e.currentTarget as HTMLButtonElement;
-        el.style.borderColor = "rgba(255,255,255,0.1)";
+        el.style.borderColor = `${c.accent}55`;
         el.style.transform = "translateY(0)";
-        el.style.boxShadow = "none";
-        el.style.background = "rgba(255,255,255,0.045)";
+        el.style.boxShadow = "0 8px 32px rgba(0,0,0,0.45)";
+        el.style.background = "rgba(13,27,38,0.85)";
       }}
     >
       <div
@@ -356,12 +388,15 @@ function StudentCard({
       <div
         style={{
           fontSize: 11,
-          color: "rgba(255,255,255,0.35)",
-          fontWeight: 600,
+          color: "rgba(255,255,255,0.65)",
+          fontWeight: 700,
+          marginBottom: 24,
         }}
       >
         Grade {profile.grade}
       </div>
+
+      <TapaBorder id={profile.id} />
     </button>
   );
 }
@@ -374,17 +409,22 @@ function PageShell({
   children,
   onBack,
   lang,
+  bgImage,
 }: {
   children: React.ReactNode;
   onBack: () => void;
   lang: "tok" | "en";
+  bgImage?: string;
 }) {
   return (
     <div
       style={{
         width: "100vw",
         minHeight: "100vh",
-        background: PAGE_BG,
+        background: bgImage ? undefined : PAGE_BG,
+        backgroundImage: bgImage ? `url('${bgImage}')` : undefined,
+        backgroundSize: bgImage ? "cover" : undefined,
+        backgroundPosition: bgImage ? "center" : undefined,
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -457,7 +497,7 @@ function ClassCodeScreen({
   }
 
   return (
-    <PageShell onBack={onBack} lang={lang}>
+    <PageShell onBack={onBack} lang={lang} bgImage="/ClasscodeScreen.png">
       <div style={{ textAlign: "center", maxWidth: 480, width: "100%" }}>
         {/* Icon */}
         <div
@@ -1045,11 +1085,11 @@ function GradeCard({
     number,
     { tok: string; en: string; color: string }
   > = {
-    1: { tok: "Klas Wan", en: "Grade One", color: "#60A5FA" },
-    2: { tok: "Klas Tu", en: "Grade Two", color: "#52B788" },
-    3: { tok: "Klas Tri", en: "Grade Three", color: "#F5A623" },
-    4: { tok: "Klas Foa", en: "Grade Four", color: "#F9A8D4" },
-    5: { tok: "Klas Faiv", en: "Grade Five", color: "#C4B5FD" },
+    1: { tok: "Klas Wan", en: "Grade One", color: "#FFD96A" },
+    2: { tok: "Klas Tu", en: "Grade Two", color: "#FFB82F" },
+    3: { tok: "Klas Tri", en: "Grade Three", color: "#E84D2A" },
+    4: { tok: "Klas Foa", en: "Grade Four", color: "#FFD96A" },
+    5: { tok: "Klas Faiv", en: "Grade Five", color: "#FFB82F" },
   };
   const info = gradeLabels[grade];
 
@@ -1057,8 +1097,8 @@ function GradeCard({
     <button
       onClick={onSelect}
       style={{
-        background: "rgba(255,255,255,0.045)",
-        border: `1.5px solid rgba(255,255,255,0.1)`,
+        background: "rgba(13,27,38,0.82)",
+        border: `2px solid ${info.color}55`,
         borderRadius: 24,
         padding: "48px 24px 40px",
         display: "flex",
@@ -1068,20 +1108,22 @@ function GradeCard({
         cursor: "pointer",
         transition: "all 0.22s ease",
         animation: `cardReveal 0.45s ease ${delay}s both`,
+        backdropFilter: "blur(8px)",
+        boxShadow: `0 8px 32px rgba(0,0,0,0.4)`,
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget as HTMLButtonElement;
         el.style.borderColor = info.color;
-        el.style.transform = "translateY(-6px)";
-        el.style.boxShadow = `0 20px 48px ${info.color}28`;
-        el.style.background = `${info.color}10`;
+        el.style.transform = "translateY(-8px)";
+        el.style.boxShadow = `0 24px 48px rgba(0,0,0,0.5), 0 0 32px ${info.color}44`;
+        el.style.background = `rgba(13,27,38,0.92)`;
       }}
       onMouseLeave={(e) => {
         const el = e.currentTarget as HTMLButtonElement;
-        el.style.borderColor = "rgba(255,255,255,0.1)";
+        el.style.borderColor = `${info.color}55`;
         el.style.transform = "translateY(0)";
-        el.style.boxShadow = "none";
-        el.style.background = "rgba(255,255,255,0.045)";
+        el.style.boxShadow = `0 8px 32px rgba(0,0,0,0.4)`;
+        el.style.background = "rgba(13,27,38,0.82)";
       }}
     >
       <div
@@ -1089,12 +1131,12 @@ function GradeCard({
           width: 88,
           height: 88,
           borderRadius: "50%",
-          background: `${info.color}1A`,
-          border: `2.5px solid ${info.color}66`,
+          background: `${info.color}22`,
+          border: `2.5px solid ${info.color}`,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          boxShadow: `0 0 28px ${info.color}22`,
+          boxShadow: `0 0 24px ${info.color}66`,
         }}
       >
         <span
@@ -1123,8 +1165,8 @@ function GradeCard({
       <div
         style={{
           fontSize: 13,
-          color: "rgba(255,255,255,0.35)",
-          fontWeight: 600,
+          color: "rgba(255,255,255,0.65)",
+          fontWeight: 700,
         }}
       >
         {info.en}
@@ -1465,7 +1507,8 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
   function handleGradeSelect(g: number) {
     setSelectedGrade(g);
     // Grade 1-2 → class code first; Grade 3-5 → straight to name list
-    setView(g <= 2 ? "classCode" : "profiles");
+    // setView(g <= 2 ? "classCode" : "profiles"); // class code skipped for demo
+    setView("profiles");
   }
 
   function handleNewStudent() {
@@ -1519,39 +1562,42 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
           display: flex; gap: 8px; z-index: 10;
         }
         .ls-lang-btn {
-          background: rgba(255,255,255,0.06);
-          border: 1px solid rgba(255,255,255,0.1);
-          border-radius: 20px; padding: 6px 16px;
-          font-size: 12px; font-weight: 800; color: rgba(255,255,255,0.32);
+          background: rgba(20,10,0,0.75);
+          border: none;
+          border-radius: 50px; padding: 10px 22px;
+          font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.85);
           cursor: pointer; font-family: 'Nunito', sans-serif;
           transition: all 0.2s; letter-spacing: 0.3px;
+          backdrop-filter: blur(8px);
         }
-        .ls-lang-btn:hover { color: rgba(255,255,255,0.6); }
+        .ls-lang-btn:hover { background: rgba(40,20,0,0.85); }
         .ls-lang-btn.active {
-          background: rgba(245,166,35,0.14);
-          border-color: #F5A623; color: #F5A623;
+          background: linear-gradient(135deg, #FFB82F 0%, #E84D2A 100%);
+          color: #fff;
         }
 
         /* ── BACK BUTTON ── */
         .ls-back {
           position: absolute; top: 24px; left: 28px;
-          background: none; border: none;
-          color: rgba(255,255,255,0.3); font-size: 13px; font-weight: 800;
+          background: rgba(13,27,38,0.75); border: none;
+          color: #F5E6D3; font-size: 14px; font-weight: 800;
           font-family: 'Nunito', sans-serif; cursor: pointer;
           display: flex; align-items: center; gap: 6px;
-          padding: 6px 4px; transition: color 0.2s; z-index: 10;
+          padding: 8px 16px; border-radius: 50px;
+          transition: all 0.2s; z-index: 10;
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(255,255,255,0.15);
         }
-        .ls-back:hover { color: rgba(255,255,255,0.65); }
+        .ls-back:hover { background: rgba(13,27,38,0.92); color: #FFD96A; }
 
         /* ══ WELCOME SCREEN ══ */
         .welcome-wrap {
-          flex: 1; display: flex; flex-direction: column;
-          align-items: center; justify-content: center;
-          position: relative; z-index: 1;
-          text-align: center; padding: 48px 48px;
+          position: absolute; bottom: 48px; left: 50%; transform: translateX(-50%);
+          display: flex; flex-direction: column;
+          align-items: center; z-index: 1;
+          text-align: center;
           opacity: 0; transition: opacity 0.7s ease;
-          max-width: 800px; width: 100%; margin: 0 auto;
-          overflow: hidden;
+          width: 100%;
         }
         .welcome-wrap.vis { opacity: 1; }
 
@@ -1620,45 +1666,59 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
         .ls-decorative { font-size: 24px; letter-spacing: 10px; opacity: 0.4; margin-bottom: 48px; }
 
         .ls-stats-row {
-          display: flex; gap: 16px; margin-bottom: 48px;
+          display: flex; align-items: center;
+          background: rgba(20,10,0,0.72);
+          backdrop-filter: blur(12px);
+          border-radius: 50px; padding: 16px 36px;
+          gap: 0; margin-bottom: 20px;
+          border: 1px solid rgba(255,255,255,0.1);
         }
         .ls-stat {
-          background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.07);
-          border-radius: 16px; padding: 18px 28px; text-align: center;
+          display: flex; align-items: center; gap: 10px;
+          padding: 0 28px; text-align: left;
         }
+        .ls-stat + .ls-stat {
+          border-left: 1px solid rgba(255,255,255,0.15);
+        }
+        .ls-stat-icon { flex-shrink: 0; display: block; }
         .ls-stat-val {
           font-family: 'Baloo 2', cursive;
-          font-size: 28px; font-weight: 900; color: #F5A623;
-          line-height: 1; margin-bottom: 4px;
+          font-size: 26px; font-weight: 900; color: #FFB82F;
+          line-height: 1; margin-bottom: 2px;
         }
         .ls-stat-lbl {
           font-size: 10px; font-weight: 800;
-          color: rgba(255,255,255,0.28); letter-spacing: 1px; text-transform: uppercase;
+          color: rgba(255,255,255,0.45); letter-spacing: 1px; text-transform: uppercase;
         }
 
         .ls-start-btn {
-          background: linear-gradient(135deg, #F5A623 0%, #FF6B35 100%);
-          border: none; border-radius: 18px; padding: 18px 64px;
-          font-size: 20px; font-weight: 900; color: #1A0A00;
+          background: linear-gradient(135deg, #FFD96A 0%, #FFB82F 50%, #E84D2A 100%);
+          border: none;
+          border-radius: 50px; padding: 14px 64px;
+          font-size: 20px; font-weight: 900; color: #3B1500;
           font-family: 'Baloo 2', cursive; cursor: pointer;
-          transition: all 0.22s; letter-spacing: 0.4px;
-          box-shadow: 0 8px 32px rgba(245,166,35,0.45);
-          margin-bottom: 20px;
+          transition: all 0.22s; letter-spacing: 0.5px;
+          box-shadow: 0 6px 32px rgba(0,0,0,0.5), 0 0 48px rgba(255,184,47,0.35);
+          margin-bottom: 16px;
         }
         .ls-start-btn:hover {
           transform: translateY(-3px);
-          box-shadow: 0 16px 48px rgba(245,166,35,0.6);
+          box-shadow: 0 10px 40px rgba(0,0,0,0.55), 0 0 64px rgba(255,184,47,0.5);
         }
 
         .ls-offline-pill {
-          display: inline-flex; align-items: center; gap: 8px;
-          font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.2);
+          position: absolute; bottom: 0; left: 0; right: 0;
+          display: flex; align-items: center; justify-content: center; gap: 10px;
+          font-size: 14px; font-weight: 800; color: #fff;
           letter-spacing: 0.4px;
+          background: rgba(20,10,0,0.85);
+          backdrop-filter: blur(12px);
+          padding: 14px 28px;
+          z-index: 10;
         }
         .ls-offline-dot {
-          width: 7px; height: 7px; border-radius: 50%; background: #4ADE80;
-          box-shadow: 0 0 10px rgba(74,222,128,0.7); flex-shrink: 0;
+          width: 8px; height: 8px; border-radius: 50%; background: #4ADE80;
+          box-shadow: 0 0 10px rgba(74,222,128,0.9); flex-shrink: 0;
         }
 
         /* ══ GRADE SCREEN ══ */
@@ -1670,12 +1730,14 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
         .screen-title {
           font-family: 'Baloo 2', cursive;
-          font-size: 42px; font-weight: 900; color: #fff;
+          font-size: 42px; font-weight: 900; color: #5A2E19;
           margin-bottom: 10px; text-align: center;
+          text-shadow: 0 2px 8px rgba(255,220,150,0.6), 0 1px 0 rgba(255,255,255,0.3);
         }
         .screen-sub {
-          font-size: 16px; color: rgba(255,255,255,0.3);
-          font-weight: 600; margin-bottom: 56px; text-align: center;
+          font-size: 22px; color: #0D1B26;
+          font-weight: 800; margin-bottom: 56px; text-align: center;
+          text-shadow: 0 1px 4px rgba(255,220,150,0.5);
         }
 
         .grade-grid {
@@ -1891,9 +1953,16 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
       {/* ══ WELCOME SCREEN ══ */}
       {view === "welcome" && (
-        <div className="ls-page">
+        <div
+          className="ls-page"
+          style={{
+            backgroundImage: "url('/Login-Background.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
 
-<div className="ls-lang-bar">
+          <div className="ls-lang-bar">
             <button
               className={`ls-lang-btn${lang === "tok" ? " active" : ""}`}
               onClick={() => setLang("tok")}
@@ -1909,41 +1978,108 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
           </div>
 
           <div className={`welcome-wrap${mounted ? " vis" : ""}`}>
-            <div className="ls-badge">Papua New Guinea · AI Tutor</div>
-            <div className="ls-logo">
-              <div className="ls-logo-trio">
-                <span className="ls-trio-word ls-trio-left">SingSinghAI</span>
-                <div className="ls-trio-bird">
-                  <Logo height={150} showText={false} />
-                </div>
-                <span className="ls-trio-word ls-trio-right">LiteHaus</span>
-              </div>
-            </div>
-            <div className="ls-tagline">
-              {lang === "tok"
-                ? "Skul bilong yu i stap hia. Lainim wantaim AI tutor — long olgeta hap, no nid internet."
-                : "Your school is here. Learn with an AI tutor — anywhere, no internet needed."}
-            </div>
-
-            <div className="ls-decorative">🌿 🌺 🥭 🌺 🌿</div>
-
             <div className="ls-stats-row">
               <div className="ls-stat">
-                <div className="ls-stat-val">12,480</div>
-                <div className="ls-stat-lbl">
-                  {lang === "tok" ? "Studen Tude" : "Students Today"}
+                <svg
+                  className="ls-stat-icon"
+                  width="26"
+                  height="26"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    cx="9"
+                    cy="7"
+                    r="3.5"
+                    stroke="#FFB82F"
+                    strokeWidth="1.8"
+                  />
+                  <path
+                    d="M2 20c0-3.314 3.134-6 7-6s7 2.686 7 6"
+                    stroke="#FFB82F"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                  <circle
+                    cx="18"
+                    cy="8"
+                    r="2.5"
+                    stroke="#FFB82F"
+                    strokeWidth="1.6"
+                    opacity="0.6"
+                  />
+                  <path
+                    d="M21.5 20c0-2.485-1.567-4.5-3.5-4.5"
+                    stroke="#FFB82F"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    opacity="0.6"
+                  />
+                </svg>
+                <div>
+                  <div className="ls-stat-val">12,480</div>
+                  <div className="ls-stat-lbl">
+                    {lang === "tok" ? "Studen Tude" : "Students Today"}
+                  </div>
                 </div>
               </div>
               <div className="ls-stat">
-                <div className="ls-stat-val">8</div>
-                <div className="ls-stat-lbl">
-                  {lang === "tok" ? "Provins Live" : "Provinces Live"}
+                <svg
+                  className="ls-stat-icon"
+                  width="26"
+                  height="26"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M12 2C8.686 2 6 4.686 6 8c0 4.5 6 12 6 12s6-7.5 6-12c0-3.314-2.686-6-6-6z"
+                    stroke="#FFB82F"
+                    strokeWidth="1.8"
+                  />
+                  <circle cx="12" cy="8" r="2.2" fill="#FFB82F" />
+                </svg>
+                <div>
+                  <div className="ls-stat-val">8</div>
+                  <div className="ls-stat-lbl">
+                    {lang === "tok" ? "Provins Live" : "Provinces Live"}
+                  </div>
                 </div>
               </div>
               <div className="ls-stat">
-                <div className="ls-stat-val">68%</div>
-                <div className="ls-stat-lbl">
-                  {lang === "tok" ? "Avg Komplisin" : "Avg Completion"}
+                <svg
+                  className="ls-stat-icon"
+                  width="26"
+                  height="26"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M3 9l9-5 9 5-9 5-9-5z"
+                    stroke="#FFB82F"
+                    strokeWidth="1.8"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M7 11.5V17c0 1.657 2.239 3 5 3s5-1.343 5-3v-5.5"
+                    stroke="#FFB82F"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                  <line
+                    x1="21"
+                    y1="9"
+                    x2="21"
+                    y2="14"
+                    stroke="#FFB82F"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div>
+                  <div className="ls-stat-val">68%</div>
+                  <div className="ls-stat-lbl">
+                    {lang === "tok" ? "Avg Komplisin" : "Avg Completion"}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1951,20 +2087,20 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
             <button className="ls-start-btn" onClick={() => setView("grade")}>
               {lang === "tok" ? "Stat Lainim" : "Start Learning"}
             </button>
+          </div>
 
-            <div className="ls-offline-pill">
-              <span className="ls-offline-dot" />
-              {lang === "tok"
-                ? "Wok long olgeta hap — no nid internet"
-                : "Works everywhere — no internet needed"}
-            </div>
+          <div className="ls-offline-pill">
+            <span className="ls-offline-dot" />
+            {lang === "tok"
+              ? "Wok long olgeta hap — no nid internet"
+              : "Works everywhere — no internet needed"}
           </div>
         </div>
       )}
 
       {/* ══ GRADE SELECTION SCREEN ══ */}
       {view === "grade" && (
-        <div className="ls-page">
+        <div className="ls-page" style={{ backgroundImage: "url('/GradeScreen.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
           <button className="ls-back" onClick={() => setView("welcome")}>
             ← {lang === "tok" ? "Go Bek" : "Back"}
           </button>
@@ -2020,7 +2156,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
       {/* ══ STUDENT SELECTION SCREEN ══ */}
       {view === "profiles" && (
-        <div className="ls-page">
+        <div className="ls-page" style={{ backgroundImage: "url('/ClasscodeScreen.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
           <button className="ls-back" onClick={() => setView("grade")}>
             ← {lang === "tok" ? "Go Bek" : "Back"}
           </button>
@@ -2055,8 +2191,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
                   key={profile.id}
                   profile={profile}
                   onSelect={() => {
-                    setPendingProfile(profile);
-                    setView("verify");
+                    onLogin(profile, false); // skipping verify for demo
                   }}
                   delay={i * 0.1}
                 />

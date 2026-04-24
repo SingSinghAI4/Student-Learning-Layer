@@ -177,7 +177,14 @@ export default function ChapterScreen({ profile, subjectId, onSelect, onBack }: 
   const currentId = chapters.find(c => c.unlocked && c.stars === 0)?.id ?? null;
 
   return (
-    <div className="screen chap-screen" style={{ "--sc": subject.color, "--sh": subject.shadow } as React.CSSProperties}>
+    <div className="screen chap-screen" style={{
+      "--sc": subject.color, "--sh": subject.shadow,
+      ...(subjectId === "maths" && {
+        backgroundImage: "url('/MathsScreen.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }),
+    } as React.CSSProperties}>
 
       {/* Animated background glow */}
       <div className="chap-bg-glow" />

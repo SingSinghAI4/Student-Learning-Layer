@@ -6,11 +6,8 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Star, Trophy, Sparkles as SparklesIcon, Target, PartyPopper, Plus } from "lucide-react";
-import Lottie from "lottie-react";
 import { MathsStoryPage } from "../data";
 import BeniCharacter from "./BeniCharacter";
-import trophyAnim from "../assets/lottie/lf20_touohxv0.json";
-import checkAnim from "../assets/lottie/lf20_xlkxtmul.json";
 
 interface Props {
   slideIndex: number;
@@ -244,11 +241,14 @@ function PassiveScene({ idx }: { idx: number }) {
           size={58} anim="bounce" delay={i * 0.12}
         />
       ))}
-      {/* Lottie checkmark */}
+      {/* Checkmark */}
       <motion.div style={{ position: "absolute", right: "4%", top: "4%", width: 52, height: 52 }}
         initial={{ scale: 0 }} animate={{ scale: 1 }}
         transition={{ delay: 0.6, type: "spring", bounce: 0.7 }}>
-        <Lottie animationData={checkAnim} loop={false} style={{ width: 52, height: 52 }} />
+        <svg viewBox="0 0 52 52" width={52} height={52}>
+          <circle cx={26} cy={26} r={24} fill="#52B788"/>
+          <polyline points="14,26 22,34 38,18" stroke="white" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        </svg>
       </motion.div>
       <motion.div
         initial={{ scale: 0, opacity: 0 }} animate={{ scale: [0, 1.5, 1], opacity: 1 }}
@@ -271,11 +271,18 @@ function PassiveScene({ idx }: { idx: number }) {
   );
   if (idx === 9) return ( // your turn — Lottie trophy + Beni pointing
     <>
-      {/* Lottie trophy centre-stage */}
+      {/* Trophy */}
       <motion.div style={{ position: "absolute", left: "50%", top: "4%", transform: "translateX(-50%)", width: 90, height: 90 }}
-        initial={{ scale: 0 }} animate={{ scale: 1 }}
+        initial={{ scale: 0 }} animate={{ scale: [0, 1.2, 1], rotate: [-8, 8, 0] }}
         transition={{ delay: 0.2, type: "spring", bounce: 0.6 }}>
-        <Lottie animationData={trophyAnim} loop style={{ width: 90, height: 90 }} />
+        <svg viewBox="0 0 90 90" width={90} height={90}>
+          <rect x={35} y={68} width={20} height={8} rx={3} fill="#F39C12"/>
+          <rect x={28} y={75} width={34} height={7} rx={3} fill="#F39C12"/>
+          <path d="M20,18 Q18,38 30,46 Q38,52 45,52 Q52,52 60,46 Q72,38 70,18 Z" fill="#FFD93D"/>
+          <path d="M20,18 Q10,18 10,30 Q10,42 24,44" stroke="#F39C12" strokeWidth={4} fill="none" strokeLinecap="round"/>
+          <path d="M70,18 Q80,18 80,30 Q80,42 66,44" stroke="#F39C12" strokeWidth={4} fill="none" strokeLinecap="round"/>
+          <polyline points="33,34 40,41 57,26" stroke="white" strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+        </svg>
       </motion.div>
       <Char emoji={<SparklesIcon size={38} />} x="6%"  y="8%"  size={38} anim="spin"  delay={0.2} />
       <Char emoji={<SparklesIcon size={38} />} x="78%" y="6%"  size={38} anim="spin"  delay={0.5} />

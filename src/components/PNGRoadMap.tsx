@@ -109,8 +109,8 @@ export default function PNGRoadMap({ homeProvince, unlockedCount, lang = "tok", 
       >
         <defs>
           <radialGradient id="ocean" cx="40%" cy="60%" r="60%">
-            <stop offset="0%"   stopColor="#0e2d45" />
-            <stop offset="100%" stopColor="#040e1a" />
+            <stop offset="0%"   stopColor="#0e2d45" stopOpacity="0" />
+            <stop offset="100%" stopColor="#040e1a" stopOpacity="0" />
           </radialGradient>
           <filter id="rglow" x="-80%" y="-80%" width="260%" height="260%">
             <feGaussianBlur stdDeviation={compact ? 4 : 7} result="b" />
@@ -125,15 +125,7 @@ export default function PNGRoadMap({ homeProvince, unlockedCount, lang = "tok", 
         {/* Ocean */}
         <rect x={0} y={0} width={600} height={vbH} fill="url(#ocean)" rx={compact ? 8 : 14} />
 
-        {/* Land silhouette — single unified colour, no internal borders */}
-        {PNG_PROVINCE_GEO.map(prov =>
-          prov.paths.map((d, pi) => (
-            <path key={`${prov.name}-${pi}`} d={d}
-              fill={LAND_FILL} stroke="rgba(255,255,255,0.09)" strokeWidth={0.5}
-              opacity={0.40}
-            />
-          ))
-        )}
+        {/* Land silhouette hidden — background image provides the map */}
 
         {/* ══ ROAD ══════════════════════════════════════════════════════════ */}
 

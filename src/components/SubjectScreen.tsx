@@ -6,6 +6,7 @@ import { SUBJECTS, SubjectId } from "../data";
 
 interface Props {
   profile: StudentProfile;
+  lang: "tok" | "en";
   onSelect: (id: SubjectId) => void;
 }
 
@@ -931,12 +932,12 @@ function SpotlightPanel({ subject, meta, bottomRow }: {
 }
 
 // ── MAIN ───────────────────────────────────────────────
-export default function SubjectScreen({ profile, onSelect }: Props) {
+export default function SubjectScreen({ profile, lang, onSelect }: Props) {
   const [activeId, setActiveId] = useState<string | null>(null);
   const activeSubject = SUBJECTS.find(s => s.id === activeId) ?? null;
 
   return (
-    <div className="screen subj-screen">
+    <div className="screen subj-screen" style={{ backgroundImage: "url('/SubjectScreen.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
       {/* Dim backdrop — click anywhere outside the card to close */}
       <AnimatePresence>
         {activeId && (
@@ -965,9 +966,15 @@ export default function SubjectScreen({ profile, onSelect }: Props) {
       <div className="subj-inner">
         <motion.div className="subj-header"
           initial={{ opacity:0, y:-16 }} animate={{ opacity:1, y:0 }} transition={{ duration:0.4 }}>
-          <div className="subj-greeting">Gutpela moning, {profile.name}!</div>
-          <div className="subj-title">What are you learning today?</div>
-          <div className="subj-tok">Wanem subject yu laik lainim tude?</div>
+          <div className="subj-greeting">
+            {lang === "tok" ? `Gutpela moning, ${profile.name}!` : `Good morning, ${profile.name}!`}
+          </div>
+          <div className="subj-title">
+            {lang === "tok" ? "Wanem subject yu laik lainim tude?" : "What are you learning today?"}
+          </div>
+          <div className="subj-tok">
+            {lang === "tok" ? "What are you learning today?" : "Wanem subject yu laik lainim tude?"}
+          </div>
         </motion.div>
 
         <div className="subj-cards">

@@ -13,6 +13,7 @@ interface Props {
   lang: "tok" | "en";
   sessionMode?: string;
   onHelpCount?: () => void;
+  overrideExpr?: string;
 }
 
 // ── Cartoon speech bubble — centred above avatar, tail from avatar top-centre ──
@@ -110,8 +111,36 @@ function MouthDots({ voiceState, accent }: { voiceState: VoiceState; accent: str
 }
 
 // ── Main component ──────────────────────────────────────────────────────────────
+const KUMI_EXPR: Record<string, string> = {
+  idle:        "/kumi-happy.png",
+  happy:       "/kumi-happy.png",
+  listening:   "/kumi-curious.png",
+  curious:     "/kumi-curious.png",
+  thinking:    "/kumi-thinking.png",
+  speaking:    "/kumi-cheering.png",
+  cheering:    "/kumi-cheering.png",
+  correct:     "/kumi-excited.png",
+  excited:     "/kumi-excited.png",
+  wrong:       "/kumi-oops.png",
+  oops:        "/kumi-oops.png",
+  hint:        "/kumi-wink.png",
+  wink:        "/kumi-wink.png",
+  proud:       "/kumi-proud.png",
+  done:        "/kumi-thumbsup.png",
+  thumbsup:    "/kumi-thumbsup.png",
+  reading:     "/kumi-reading.png",
+  magnify:     "/kumi-magnify.png",
+  celebrating: "/kumi-celebrating.png",
+};
+
+function kumiSrc(voiceState: string, companionId: string, overrideExpr?: string) {
+  if (companionId !== "bird") return "/char-bird.png";
+  const key = overrideExpr ?? voiceState;
+  return KUMI_EXPR[key] ?? KUMI_EXPR.idle;
+}
+
 export default function CompanionAssistant({
-  companion, studentName, lessonContext, lang, sessionMode, onHelpCount,
+  companion, studentName, lessonContext, lang, sessionMode, onHelpCount, overrideExpr,
 }: Props) {
   const [voiceState, setVoiceState]   = useState<VoiceState>("idle");
   const [response, setResponse]       = useState("");
@@ -489,7 +518,7 @@ Rules:
           transition: "border-color 0.3s, box-shadow 0.3s",
         }}>
           <img
-            src={companion.image}
+            src={kumiSrc(voiceState, companion.id, overrideExpr)}
             alt={companion.name}
             draggable={false}
             style={{

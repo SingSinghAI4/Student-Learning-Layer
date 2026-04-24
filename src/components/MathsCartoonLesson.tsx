@@ -946,7 +946,7 @@ export default function MathsCartoonLesson({
   }
 
   return (
-    <div className="mcl-screen">
+    <div className="mcl-screen" style={{ backgroundImage: "url('/MathsScreen.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
 
       {/* Layer 0 — Background */}
       <AnimatePresence mode="wait">
@@ -1658,6 +1658,14 @@ export default function MathsCartoonLesson({
           lang={lang}
           sessionMode={sessionMode}
           onHelpCount={activity?.visual ? () => setCountingActive(true) : undefined}
+          overrideExpr={
+            showIntro            ? "excited"     :
+            companionCelebrate   ? "celebrating" :
+            companionSad         ? "oops"        :
+            storyPage >= 9       ? "proud"       :
+            sessionMode === "story" ? "reading"  :
+            undefined
+          }
         />
       )}
 

@@ -152,8 +152,12 @@ export default function CelebrationScreen({ profile, lang, onDashboard, onSessio
       display: "flex", flexDirection: "column",
       fontFamily: "'Baloo 2', cursive",
       overflow: "hidden",
-      background: "linear-gradient(to bottom, #0a1628 0%, #0d2240 50%, #0a1628 100%)",
+      backgroundImage: "url('/Lastimage.png')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
     }}>
+      {/* Dark overlay so UI elements stay readable over the illustration */}
+      <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.38)", zIndex: 0, pointerEvents: "none" }} />
 
       {/* Gold accent bar */}
       <motion.div style={{
@@ -257,6 +261,7 @@ export default function CelebrationScreen({ profile, lang, onDashboard, onSessio
         position: "relative", overflow: "hidden", minHeight: 0,
       }}>
 
+
         {/* LEFT: Map */}
         <div style={{
           flex: "1 1 60%", position: "relative",
@@ -353,18 +358,6 @@ export default function CelebrationScreen({ profile, lang, onDashboard, onSessio
             </div>
           </motion.div>
 
-          {/* Beni hero */}
-          <motion.div
-            initial={{ y: 40, opacity: 0, scale: 0.7 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
-            transition={{ type: "spring", bounce: 0.5, duration: 0.7, delay: 0.3 }}
-            style={{
-              display: "flex", justifyContent: "center",
-              filter: "drop-shadow(0 12px 24px rgba(0,0,0,0.5))",
-            }}
-          >
-            <BeniCharacter state="excited" size={120} />
-          </motion.div>
 
           {/* Kina shell money earned */}
           <motion.div
@@ -479,6 +472,25 @@ export default function CelebrationScreen({ profile, lang, onDashboard, onSessio
 
         </div>
       </div>
+
+      {/* Kumi — big, bottom-right, above everything */}
+      <motion.img
+        src="/imagecopy.png"
+        alt="Kumi"
+        initial={{ x: 120, y: 80, opacity: 0, scale: 0.6 }}
+        animate={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+        transition={{ type: "spring", bounce: 0.4, duration: 1, delay: 0.5 }}
+        style={{
+          position: "fixed",
+          bottom: -30,
+          right: "22%",
+          width: "min(520px, 42vw)",
+          height: "auto",
+          zIndex: 100,
+          pointerEvents: "none",
+          filter: "drop-shadow(0 0 40px rgba(255,200,0,0.55)) drop-shadow(0 20px 40px rgba(0,0,0,0.5))",
+        }}
+      />
     </div>
   );
 }

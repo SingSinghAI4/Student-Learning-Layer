@@ -501,6 +501,12 @@ export default function AssessmentScreen({
           lessonContext="Grade 2 Maths – Chapter 2: Adding Up. Quiz time — student is answering maths questions about adding groups of fruit."
           lang={lang}
           onHelpCount={activity.visual ? () => setCountingActive(true) : undefined}
+          overrideExpr={
+            isCorrectAnswer && actSelected ? "celebrating" :
+            actWrong                       ? "oops"        :
+            wrongAttemptCount > 0          ? "magnify"     :
+            "curious"
+          }
         />
       )}
 

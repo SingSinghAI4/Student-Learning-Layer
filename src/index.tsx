@@ -13,7 +13,7 @@ function Root() {
   const [view, setView] = useState<RootView>("login");
   const [profile, setProfile] = useState<StudentProfile | null>(null);
   const [isNew, setIsNew] = useState(false);
-  const [lang] = useState<"tok" | "en">("tok");
+  const [lang, setLang] = useState<"tok" | "en">("tok");
 
   function handleLogin(p: StudentProfile, newStudent: boolean) {
     setProfile(p);
@@ -41,7 +41,9 @@ function Root() {
       <ProfileScreen
         profile={profile}
         onContinue={handleProfileContinue}
+        onBack={() => { setProfile(null); setView("login"); }}
         lang={lang}
+        setLang={setLang}
       />
     );
   }

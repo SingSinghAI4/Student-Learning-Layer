@@ -4,7 +4,9 @@ import { StudentProfile } from "./LoginScreen";
 interface ProfileScreenProps {
   profile: StudentProfile;
   onContinue: () => void;
+  onBack: () => void;
   lang: "tok" | "en";
+  setLang: (l: "tok" | "en") => void;
 }
 
 // ── AVATAR COLOURS (matches LoginScreen) ───────────────
@@ -145,7 +147,7 @@ function ProgressPath({ pct }: { pct: number }) {
 }
 
 // ── MAIN ────────────────────────────────────────────────
-export default function ProfileScreen({ profile, onContinue, lang }: ProfileScreenProps) {
+export default function ProfileScreen({ profile, onContinue, onBack, lang, setLang }: ProfileScreenProps) {
   const [visible, setVisible] = useState(false);
   const [avatarPop, setAvatarPop] = useState(false);
 
@@ -168,12 +170,13 @@ export default function ProfileScreen({ profile, onContinue, lang }: ProfileScre
         @keyframes profileFadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
         @keyframes avatarPop { 0%{transform:scale(0.5);opacity:0} 70%{transform:scale(1.12)} 100%{transform:scale(1);opacity:1} }
         @keyframes bilumItem { from{opacity:0;transform:scale(0) rotate(-20deg)} to{opacity:1;transform:scale(1) rotate(0)} }
-        @keyframes glowPulse { 0%,100%{box-shadow:0 0 32px rgba(245,166,35,0.15)} 50%{box-shadow:0 0 56px rgba(245,166,35,0.35)} }
+        @keyframes glowPulse { 0%,100%{box-shadow:0 24px 64px rgba(0,0,0,0.6),0 0 40px rgba(255,184,47,0.15)} 50%{box-shadow:0 24px 64px rgba(0,0,0,0.6),0 0 60px rgba(255,184,47,0.3)} }
       `}</style>
 
       <div style={{
         width: "100vw", height: "100vh",
-        background: "radial-gradient(ellipse 80% 60% at 50% 20%, rgba(40,110,18,0.4) 0%, transparent 60%), #0A1A07",
+        backgroundImage: "url('/ClasscodeScreen.png')",
+        backgroundSize: "cover", backgroundPosition: "center",
         display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
         padding: 32,
@@ -182,28 +185,59 @@ export default function ProfileScreen({ profile, onContinue, lang }: ProfileScre
         overflow: "hidden",
       }}>
 
+        {/* Back button */}
+        <button onClick={onBack} style={{
+          position: "absolute", top: 24, left: 28,
+          background: "rgba(13,27,38,0.75)", border: "1px solid rgba(255,255,255,0.15)",
+          borderRadius: 50, padding: "8px 16px",
+          color: "#F5E6D3", fontSize: 14, fontWeight: 800,
+          fontFamily: "'Nunito', sans-serif", cursor: "pointer",
+          display: "flex", alignItems: "center", gap: 6,
+          backdropFilter: "blur(8px)",
+        }}>
+          ← {lang === "tok" ? "Go Bek" : "Back"}
+        </button>
+
+        {/* Lang toggle */}
+        <div style={{ position: "absolute", top: 24, right: 28, display: "flex", gap: 8 }}>
+          {(["tok", "en"] as const).map(l => (
+            <button key={l} onClick={() => setLang(l)} style={{
+              background: lang === l ? "linear-gradient(135deg, #FFB82F, #E84D2A)" : "rgba(13,27,38,0.75)",
+              border: "none", borderRadius: 50, padding: "10px 22px",
+              fontSize: 14, fontWeight: 800,
+              color: lang === l ? "#fff" : "rgba(255,255,255,0.85)",
+              cursor: "pointer", fontFamily: "'Nunito', sans-serif",
+              backdropFilter: "blur(8px)",
+            }}>
+              {l === "tok" ? "Tok Pisin" : "English"}
+            </button>
+          ))}
+        </div>
+
         {/* Card */}
         <div style={{
-          background: "linear-gradient(155deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%)",
-          border: "1.5px solid rgba(255,255,255,0.1)",
+          background: "rgba(42,16,4,0.88)",
+          border: "2px solid rgba(255,184,47,0.3)",
           borderRadius: 32,
-          padding: isLowGrade ? "44px 48px" : "36px 48px",
+          padding: isLowGrade ? "44px 48px 60px" : "36px 48px 60px",
           width: "100%", maxWidth: isLowGrade ? 520 : 580,
           display: "flex", flexDirection: "column", alignItems: "center",
           gap: isLowGrade ? 28 : 22,
           backdropFilter: "blur(20px)",
           animation: "glowPulse 3s ease infinite",
           position: "relative",
+          overflow: "hidden",
+          boxShadow: "0 24px 64px rgba(0,0,0,0.6), 0 0 40px rgba(255,184,47,0.15)",
         }}>
 
           {/* Grade badge */}
           <div style={{
             position: "absolute", top: 20, left: 24,
-            background: "rgba(255,255,255,0.07)",
-            border: "1px solid rgba(255,255,255,0.1)",
+            background: "rgba(255,184,47,0.15)",
+            border: "1px solid rgba(255,184,47,0.4)",
             borderRadius: 20, padding: "4px 14px",
             fontSize: 11, fontWeight: 800,
-            color: "rgba(255,255,255,0.35)",
+            color: "#FFD96A",
             letterSpacing: 1.5, textTransform: "uppercase",
           }}>
             Grade {profile.grade}
@@ -249,14 +283,14 @@ export default function ProfileScreen({ profile, onContinue, lang }: ProfileScre
 
           {/* Tutor message */}
           <div style={{
-            background: "rgba(255,255,255,0.06)",
-            border: "1px solid rgba(255,255,255,0.1)",
+            background: "rgba(255,184,47,0.08)",
+            border: "1px solid rgba(255,184,47,0.2)",
             borderRadius: "16px 16px 16px 4px",
             padding: "14px 20px", width: "100%",
             animation: "profileFadeUp 0.5s ease 0.2s both",
           }}>
             <div style={{
-              fontSize: 11, color: "rgba(255,255,255,0.3)",
+              fontSize: 11, color: "#FFB82F",
               fontWeight: 700, textTransform: "uppercase",
               letterSpacing: 1, marginBottom: 6,
               display: "flex", alignItems: "center", gap: 6,
@@ -273,7 +307,7 @@ export default function ProfileScreen({ profile, onContinue, lang }: ProfileScre
           <div style={{ width: "100%", animation: "profileFadeUp 0.5s ease 0.35s both" }}>
             {isLowGrade && (
               <div style={{ textAlign: "center" }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 14 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "#FFB82F", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 14 }}>
                   {lang === "tok" ? "Wok bilong yu" : "Your Progress"}
                 </div>
                 <StarProgress pct={profile.lessonProgress} color={accentColor} />
@@ -281,7 +315,7 @@ export default function ProfileScreen({ profile, onContinue, lang }: ProfileScre
             )}
             {isMidGrade && (
               <div style={{ textAlign: "center" }}>
-                <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 14 }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "#FFB82F", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 14 }}>
                   {lang === "tok" ? "Rot bilong lainim" : "Learning Path"}
                 </div>
                 <ProgressPath pct={profile.lessonProgress} />
@@ -305,15 +339,15 @@ export default function ProfileScreen({ profile, onContinue, lang }: ProfileScre
           {/* Bilum collectibles — emoji kept intentionally as cultural collectibles */}
           {profile.bilumItems.length > 0 && (
             <div style={{ width: "100%", animation: "profileFadeUp 0.5s ease 0.45s both" }}>
-              <div style={{ fontSize: 11, fontWeight: 800, color: "rgba(255,255,255,0.25)", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10, textAlign: "center" }}>
+              <div style={{ fontSize: 11, fontWeight: 800, color: "#FFB82F", textTransform: "uppercase", letterSpacing: 1.5, marginBottom: 10, textAlign: "center" }}>
                 {lang === "tok" ? "Bilum bilong yu" : "Your Bilum"}
               </div>
               <div style={{ display: "flex", gap: 8, justifyContent: "center", flexWrap: "wrap" }}>
                 {profile.bilumItems.map((item, i) => (
                   <div key={i} style={{
                     fontSize: isLowGrade ? 28 : 22,
-                    background: "rgba(255,255,255,0.07)",
-                    border: "1px solid rgba(255,255,255,0.1)",
+                    background: "rgba(255,184,47,0.1)",
+                    border: "1px solid rgba(255,184,47,0.25)",
                     borderRadius: "50%",
                     width: isLowGrade ? 50 : 40, height: isLowGrade ? 50 : 40,
                     display: "flex", alignItems: "center", justifyContent: "center",
@@ -359,11 +393,31 @@ export default function ProfileScreen({ profile, onContinue, lang }: ProfileScre
             )}
           </button>
 
+          {/* Tapa border */}
+          <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 40, borderRadius: "0 0 30px 30px", overflow: "hidden" }}>
+            <svg width="100%" height="40" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <pattern id="tapa-profile" x="0" y="0" width="64" height="40" patternUnits="userSpaceOnUse">
+                  <rect width="64" height="40" fill="#1C0900"/>
+                  <rect x="0" y="0" width="64" height="4" fill="#F5E6D3" opacity="0.2"/>
+                  <rect x="0" y="36" width="64" height="4" fill="#F5E6D3" opacity="0.2"/>
+                  <polygon points="2,6 28,20 2,34" fill="#F5E6D3" opacity="0.15"/>
+                  <polygon points="6,12 20,20 6,28" fill="#1C0900"/>
+                  <polygon points="62,6 36,20 62,34" fill="#F5E6D3" opacity="0.15"/>
+                  <polygon points="58,12 44,20 58,28" fill="#1C0900"/>
+                  <polygon points="32,8 44,20 32,32 20,20" fill="#F5E6D3" opacity="0.1"/>
+                  <polygon points="32,13 39,20 32,27 25,20" fill="#1C0900"/>
+                </pattern>
+              </defs>
+              <rect width="100%" height="40" fill="url(#tapa-profile)"/>
+            </svg>
+          </div>
+
         </div>
 
         {/* Bottom hint */}
         <div style={{
-          marginTop: 20, fontSize: 12, color: "rgba(255,255,255,0.18)",
+          marginTop: 20, fontSize: 12, color: "rgba(255,255,255,0.55)",
           fontWeight: 600, letterSpacing: 0.3,
           animation: "profileFadeUp 0.5s ease 0.7s both",
         }}>
