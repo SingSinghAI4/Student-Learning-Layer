@@ -1704,9 +1704,6 @@ export default function MathsCartoonLesson({
     <div
       className="mcl-screen"
       style={{
-        backgroundImage: "url('/MathsScreen.png')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
       }}
     >
       {/* Layer 0 — Background */}
