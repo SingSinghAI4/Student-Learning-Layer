@@ -1422,11 +1422,30 @@ body {
 /* ── Chalkboard activity panel ── */
 .mcl-chalkboard {
   position: absolute; bottom: 0; left: 0; right: 0; z-index: 25;
-  background: #1B3A2A;
+  background:
+    /* Subtle chalk-dust grain — fine noise overlay */
+    repeating-linear-gradient(
+      137deg,
+      transparent 0px, transparent 3px,
+      rgba(255,255,255,0.012) 3px, rgba(255,255,255,0.012) 4px
+    ),
+    repeating-linear-gradient(
+      43deg,
+      transparent 0px, transparent 5px,
+      rgba(255,255,255,0.008) 5px, rgba(255,255,255,0.008) 6px
+    ),
+    /* Faint horizontal ruled lines like a chalkboard */
+    repeating-linear-gradient(
+      180deg,
+      transparent 0px, transparent 28px,
+      rgba(255,255,255,0.04) 28px, rgba(255,255,255,0.04) 29px
+    ),
+    /* Base chalkboard green — slightly textured top-to-bottom */
+    linear-gradient(180deg, #1e4433 0%, #17312a 50%, #122a22 100%);
   border-radius: 28px 28px 0 0;
-  border-top: 3px solid rgba(82,183,136,0.28);
+  border-top: 3px solid rgba(82,183,136,0.35);
   padding: 12px 18px 16px;
-  box-shadow: 0 -8px 48px rgba(0,0,0,0.65);
+  box-shadow: 0 -8px 48px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.06);
 }
 .chk-label {
   font-size: 10px; font-weight: 900; letter-spacing: 2px;

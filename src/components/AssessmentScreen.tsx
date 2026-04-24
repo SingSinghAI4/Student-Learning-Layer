@@ -144,11 +144,21 @@ export default function AssessmentScreen({
       overflow: "hidden",
     }}>
 
-      {/* ── Cartoon sky ── */}
+      {/* ── Background image ── */}
+      <div style={{
+        position: "absolute", inset: 0, zIndex: 0,
+        backgroundImage: "url('/AssessmentBg.png')",
+        backgroundSize: "115%",
+        backgroundPosition: "center center",
+      }}>
+        <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.22)" }} />
+      </div>
+
+      {/* ── Cartoon sky (hidden — kept for cloud/sun children) ── */}
       <div style={{
         position: "absolute", top: 0, left: 0, right: 0, bottom: "22%",
-        background: "linear-gradient(to bottom, #0d47a1 0%, #1976d2 45%, #64b5f6 100%)",
-        zIndex: 0, overflow: "hidden",
+        background: "transparent",
+        zIndex: 1, overflow: "hidden",
       }}>
         <motion.div style={{
           position: "absolute", top: "10%", right: "8%",
@@ -182,17 +192,18 @@ export default function AssessmentScreen({
         />
       </div>
 
-      {/* ── Ground ── */}
+      {/* ── Ground ── (commented out — background image provides ground)
       <div style={{
         position: "absolute", bottom: 0, left: 0, right: 0, height: "22%",
         background: "linear-gradient(to bottom, #2d6a1a 0%, #1a4a0a 100%)",
-        zIndex: 0,
+        zIndex: 1,
       }}>
         <div style={{
           position: "absolute", top: 0, left: 0, right: 0, height: 6,
           background: "linear-gradient(to right, #52B788 0%, #40916C 30%, #74c69d 60%, #52B788 100%)",
         }} />
       </div>
+      */}
 
       {/* ── Floating particles ── */}
       {PARTICLES.map((p, i) => (
@@ -473,7 +484,7 @@ export default function AssessmentScreen({
         </AnimatePresence>
       </div>
 
-      {/* ── Beni mascot ── */}
+      {/* ── Beni mascot (commented out)
       <div style={{
         position: "absolute", bottom: "20%", right: "5%",
         zIndex: 10, pointerEvents: "none",
@@ -481,6 +492,7 @@ export default function AssessmentScreen({
       }}>
         <BeniCharacter state={mascotState} size={110} flipX />
       </div>
+      */}
 
       {/* ── Counting overlay ── */}
       <AnimatePresence>
