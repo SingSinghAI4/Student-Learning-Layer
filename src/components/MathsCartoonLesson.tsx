@@ -1233,7 +1233,6 @@ function PNGMapBackground() {
       <motion.svg
         viewBox="0 0 360 240"
         width="38%"
-        height="auto"
         style={{ maxWidth: 180, opacity: 0 }}
         animate={{ opacity: [0.03, 0.05, 0.03] }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}

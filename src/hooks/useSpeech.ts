@@ -1,93 +1,127 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useRef } from "react";
 
 export interface SpeakOptions {
+  onWordChange?: (wordIdx: number) => void;
   rate?: number;
   pitch?: number;
   volume?: number;
 }
 
-// Preferred voices in order — soft, warm, female voices that work well for kids
-const PREFERRED_VOICES = [
-  "Moana",            // macOS — Hawaiian/Pacific, warm and soft
-  "Karen",            // macOS — Australian female, gentle
-  "Samantha",         // macOS — default US female, clear
-  "Tessa",            // macOS — South African female, soft
-  "Serena",           // macOS — UK female, warm
-  "Google UK English Female",
-  "Google US English",
-  "Microsoft Zira",   // Windows — female, soft
-  "Microsoft Aria",   // Windows — modern female
-];
+// ── ElevenLabs config (commented out to preserve API credits) ──
+// const EL_API_KEY  = "sk_038eb11c08e10490e8ad208c724a37120929fa72d140ec4f";
+// const EL_VOICE_ID = "CzB4M3PjIseM76XNOtZe";
+// const EL_ENDPOINT = `https://api.elevenlabs.io/v1/text-to-speech/${EL_VOICE_ID}/with-timestamps`;
 
-function pickVoice(): SpeechSynthesisVoice | null {
-  const voices = window.speechSynthesis.getVoices();
-  if (!voices.length) return null;
+// Module-level singleton so narration + AI responses never clash
+let activeAudio: HTMLAudioElement | null = null;
+let activeAbort: AbortController | null  = null;
+let activeRaf:   number                  = 0;
 
-  // Try preferred list first
-  for (const name of PREFERRED_VOICES) {
-    const match = voices.find(v => v.name.includes(name));
-    if (match) return match;
+function stopAll() {
+  activeAbort?.abort();
+  activeAbort = null;
+  cancelAnimationFrame(activeRaf);
+  activeRaf = 0;
+  if (activeAudio) {
+    activeAudio.pause();
+    activeAudio.src = "";
+    activeAudio = null;
   }
-
-  // Fall back to any English female-sounding voice
-  const female = voices.find(v =>
-    v.lang.startsWith("en") &&
-    /female|girl|woman|zira|aria|karen|samantha|moana/i.test(v.name)
-  );
-  if (female) return female;
-
-  // Last resort: any English voice
-  return voices.find(v => v.lang.startsWith("en")) ?? null;
+  window.speechSynthesis?.cancel();
 }
 
 export function useSpeech() {
   const [speaking, setSpeaking] = useState(false);
-  const [voiceReady, setVoiceReady] = useState(false);
-  const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
-
-  // Voices load asynchronously — wait for them
-  useEffect(() => {
-    function loadVoices() {
-      const v = pickVoice();
-      voiceRef.current = v;
-      setVoiceReady(true);
-    }
-
-    // Already loaded (common in Chrome)
-    if (window.speechSynthesis.getVoices().length > 0) {
-      loadVoices();
-    }
-    // Safari / Firefox fire this event
-    window.speechSynthesis.addEventListener("voiceschanged", loadVoices);
-    return () => {
-      window.speechSynthesis.removeEventListener("voiceschanged", loadVoices);
-      window.speechSynthesis.cancel();
-    };
-  }, []);
-
-  const speak = useCallback((text: string, options: SpeakOptions = {}) => {
-    if (!window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-
-    const utterance = new SpeechSynthesisUtterance(text);
-
-    if (voiceRef.current) utterance.voice = voiceRef.current;
-    utterance.lang   = "en-US";
-    utterance.rate   = options.rate   ?? 0.78;  // slow and clear for kids
-    utterance.pitch  = options.pitch  ?? 1.25;  // warm, slightly higher = friendlier
-    utterance.volume = options.volume ?? 0.95;
-
-    utterance.onstart = () => setSpeaking(true);
-    utterance.onend   = () => setSpeaking(false);
-    utterance.onerror = () => setSpeaking(false);
-
-    window.speechSynthesis.speak(utterance);
-  }, [voiceReady]); // eslint-disable-line react-hooks/exhaustive-deps
+  const pendingRef = useRef(false);
 
   const stop = useCallback(() => {
-    window.speechSynthesis?.cancel();
+    stopAll();
+    pendingRef.current = false;
     setSpeaking(false);
   }, []);
+
+  const speak = useCallback(async (text: string, options: SpeakOptions = {}) => {
+    const { onWordChange, rate = 1, pitch = 1, volume = 1 } = options;
+
+    if (pendingRef.current) return;
+    stopAll();
+    pendingRef.current = true;
+    setSpeaking(true);
+
+    // ── ElevenLabs (disabled — uncomment to re-enable) ──
+    /*
+    const controller = new AbortController();
+    activeAbort = controller;
+    try {
+      const friendlyText = text.replace(/\.\s+/g, "... ").replace(/!/g, "! ");
+      const res = await fetch(EL_ENDPOINT, {
+        method: "POST",
+        signal: controller.signal,
+        headers: {
+          "xi-api-key":   EL_API_KEY,
+          "Content-Type": "application/json",
+          "Accept":       "application/json",
+        },
+        body: JSON.stringify({
+          text: friendlyText,
+          model_id: "eleven_multilingual_v2",
+          voice_settings: {
+            stability:         0.52,
+            similarity_boost:  0.78,
+            style:             0.42,
+            use_speaker_boost: true,
+          },
+        }),
+      });
+      if (!res.ok) throw new Error(`ElevenLabs ${res.status}: ${await res.text()}`);
+      const data = await res.json();
+      const binary = atob(data.audio_base64);
+      const bytes  = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      const blob = new Blob([bytes], { type: "audio/mpeg" });
+      const url  = URL.createObjectURL(blob);
+      // ... (word timestamps + audio playback)
+    } catch (err: any) {
+      if (err?.name !== "AbortError") console.error("[EL] TTS failed:", err);
+      pendingRef.current = false;
+      setSpeaking(false);
+    }
+    */
+
+    // ── Fallback: browser Web Speech API ──
+    try {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate   = rate;
+      utterance.pitch  = pitch;
+      utterance.volume = volume;
+
+      utterance.onboundary = (e) => {
+        if (e.name === "word" && onWordChange) {
+          // approximate word index from char position
+          const upTo = text.slice(0, e.charIndex);
+          const idx  = upTo.split(/\s+/).filter(Boolean).length;
+          onWordChange(idx);
+        }
+      };
+
+      utterance.onend = () => {
+        pendingRef.current = false;
+        setSpeaking(false);
+        onWordChange?.(-1);
+      };
+
+      utterance.onerror = () => {
+        pendingRef.current = false;
+        setSpeaking(false);
+      };
+
+      window.speechSynthesis.speak(utterance);
+    } catch (err) {
+      console.error("[Speech] TTS failed:", err);
+      pendingRef.current = false;
+      setSpeaking(false);
+    }
+  }, [stop]);
 
   return { speaking, speak, stop };
 }

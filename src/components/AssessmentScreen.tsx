@@ -147,8 +147,8 @@ export default function AssessmentScreen({
       {/* ── Background image ── */}
       <div style={{
         position: "absolute", inset: 0, zIndex: 0,
-        backgroundImage: "url('/AssessmentBg.png')",
-        backgroundSize: "115%",
+        backgroundImage: "url('/AssesmentBg1.png')",
+        backgroundSize: "cover",
         backgroundPosition: "center center",
       }}>
         <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.22)" }} />

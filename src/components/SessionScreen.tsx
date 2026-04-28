@@ -14,6 +14,15 @@ import DavidCharacter from "./DavidCharacter";
 import MathsCartoonLesson from "./MathsCartoonLesson";
 import type { CompanionAvatar } from "./AvatarPicker";
 
+const CHARACTERS = [
+  { name: "Savi",   role: "The Leader",   img: "/s1.png" },
+  { name: "Sibo",   role: "The Explorer", img: "/s2.png" },
+  { name: "Enok",   role: "The Thinker",  img: "/s3.png" },
+  { name: "Mari",   role: "The Thinker",  img: "/s4.png" },
+  { name: "Laka",   role: "The Explorer", img: "/s5.png" },
+  { name: "Henari", role: "The Leader",   img: "/s6.png" },
+];
+
 interface Props {
   companion?: CompanionAvatar | null;
   profile: StudentProfile;
@@ -69,7 +78,6 @@ export default function SessionScreen({
     ? (mathsPath === "sione" ? MATHS_ACTIVITIES_SIONE : MATHS_ACTIVITIES_MERI)
     : chapter === 1 ? ACTIVITIES : ACTIVITIES_2;
 
-  const { speaking: storySpeaking, speak: speakStory, stop: stopStory } = useSpeech();
   const { speaking: tutorSpeaking, speak: speakTutor } = useSpeech();
   const { speak: speakAct } = useSpeech();
 
@@ -190,15 +198,6 @@ export default function SessionScreen({
         { emoji:"🍃", left:"89%", size:18, dur:11, delay:2.5 },
         { emoji:"✨", left:"60%", size:14, dur:9,  delay:7   },
       ];
-
-  // Speak story page Tok Pisin text when page changes
-  useEffect(() => {
-    if (sessionMode !== "story") return;
-    const page = storyPages[storyPage];
-    if (page) speakStory(page.tok, { rate: 0.78 });
-    return () => stopStory();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storyPage, sessionMode]);
 
   // Speak tutor message when it appears
   useEffect(() => {
@@ -323,8 +322,13 @@ export default function SessionScreen({
               className="s-avatar"
               animate={{ rotate: [0, -8, 8, 0] }}
               transition={{ delay: 0.5, duration: 0.5 }}
+              style={{ width: 52, height: 64, borderRadius: 10, overflow: "hidden", background: "rgba(255,255,255,0.05)" }}
             >
-              {AVATARS[selectedAvatar].emoji}
+              <img
+                src={CHARACTERS[profile.avatarIdx % CHARACTERS.length].img}
+                alt={CHARACTERS[profile.avatarIdx % CHARACTERS.length].name}
+                style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center top" }}
+              />
             </motion.div>
             <div>
               <div className="s-name">{profile.name}</div>
@@ -461,7 +465,7 @@ export default function SessionScreen({
                   </div>
 
                   <div style={{ display: "flex", justifyContent: "center", margin: "8px 0 2px" }}>
-                    <VoiceWaveform active={storySpeaking} lang={lang} size="md" />
+                    <VoiceWaveform active={litWordIdx >= 0} lang={lang} size="md" />
                   </div>
 
                   <div className="story-tr">{page.en}</div>

@@ -47,6 +47,16 @@ interface LoginScreenProps {
   onLogin: (profile: StudentProfile, isNew: boolean) => void;
 }
 
+// ── CHARACTER MAP ──────────────────────────────────────
+const CHARACTERS = [
+  { name: "Savi",   role: "The Leader",   img: "/s1.png" },
+  { name: "Sibo",   role: "The Explorer", img: "/s2.png" },
+  { name: "Enok",   role: "The Thinker",  img: "/s3.png" },
+  { name: "Mari",   role: "The Thinker",  img: "/s4.png" },
+  { name: "Laka",   role: "The Explorer", img: "/s5.png" },
+  { name: "Henari", role: "The Leader",   img: "/s6.png" },
+];
+
 // ── CONSTANTS ──────────────────────────────────────────
 const AVATAR_COLORS = [
   { bg: "#1B4332", accent: "#52B788" },
@@ -72,7 +82,7 @@ const MOCK_PROFILES: StudentProfile[] = [
   {
     id: "beni-001",
     name: "Beni",
-    avatarIdx: 1,
+    avatarIdx: 0,
     grade: 2,
     lessonProgress: 68,
     streak: 4,
@@ -98,7 +108,7 @@ const MOCK_PROFILES: StudentProfile[] = [
   {
     id: "meri-003",
     name: "Meri",
-    avatarIdx: 3,
+    avatarIdx: 1,
     grade: 2,
     lessonProgress: 45,
     streak: 2,
@@ -136,7 +146,7 @@ const MOCK_PROFILES: StudentProfile[] = [
   {
     id: "sione-006",
     name: "Sione",
-    avatarIdx: 5,
+    avatarIdx: 2,
     grade: 2,
     lessonProgress: 55,
     streak: 3,
@@ -148,7 +158,7 @@ const MOCK_PROFILES: StudentProfile[] = [
   {
     id: "raka-007",
     name: "Raka",
-    avatarIdx: 0,
+    avatarIdx: 3,
     grade: 2,
     lessonProgress: 20,
     streak: 1,
@@ -160,7 +170,7 @@ const MOCK_PROFILES: StudentProfile[] = [
   {
     id: "tura-008",
     name: "Tura",
-    avatarIdx: 3,
+    avatarIdx: 4,
     grade: 2,
     lessonProgress: 91,
     streak: 9,
@@ -172,7 +182,7 @@ const MOCK_PROFILES: StudentProfile[] = [
   {
     id: "garo-009",
     name: "Garo",
-    avatarIdx: 1,
+    avatarIdx: 5,
     grade: 2,
     lessonProgress: 38,
     streak: 0,
@@ -368,11 +378,13 @@ function StudentCard({
         }}
       />
 
-      <InitialAvatar
-        name={profile.name}
-        avatarIdx={profile.avatarIdx}
-        size={80}
-      />
+      <div style={{ width: 130, height: 160, overflow: "hidden", borderRadius: 12, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <img
+          src={CHARACTERS[profile.avatarIdx % CHARACTERS.length].img}
+          alt={CHARACTERS[profile.avatarIdx % CHARACTERS.length].name}
+          style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center top" }}
+        />
+      </div>
 
       <div
         style={{
@@ -384,6 +396,9 @@ function StudentCard({
         }}
       >
         {profile.name}
+      </div>
+      <div style={{ fontSize: 11, color: "#F5A623", fontWeight: 800, letterSpacing: 0.5 }}>
+        {CHARACTERS[profile.avatarIdx % CHARACTERS.length].role}
       </div>
       <div
         style={{
@@ -1721,6 +1736,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
           box-shadow: 0 0 10px rgba(74,222,128,0.9); flex-shrink: 0;
         }
 
+
         /* ══ GRADE SCREEN ══ */
         .grade-wrap {
           flex: 1; display: flex; flex-direction: column;
@@ -1749,13 +1765,13 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
         /* ══ PROFILES SCREEN ══ */
         .profiles-wrap {
           flex: 1; display: flex; flex-direction: column;
-          align-items: center; padding: 100px 48px 48px;
+          align-items: center; padding: 72px 48px 24px;
           width: 100%; max-width: 1100px; margin: 0 auto;
         }
 
         .profiles-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+          grid-template-columns: repeat(3, 1fr);
           gap: 18px; width: 100%; margin-bottom: 24px;
         }
 
@@ -1956,11 +1972,29 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
         <div
           className="ls-page"
           style={{
-            backgroundImage: "url('/Login-Background.png')",
+            backgroundImage: "url('/Login-Background1.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
         >
+          {/* Brand overlay — left side over open sky */}
+          <div style={{
+            position: "absolute",
+            top: "8%",
+            left: "4%",
+            zIndex: 1,
+            pointerEvents: "none",
+          }}>
+            <img
+              src="/LOGOTEXTLOGIN.png"
+              alt="Stori Bilong Yu"
+              style={{
+                width: "clamp(380px, 48vw, 680px)",
+                height: "auto",
+                filter: "drop-shadow(0 2px 12px rgba(0,0,0,0.9)) drop-shadow(0 0 40px rgba(0,0,0,0.7))",
+              }}
+            />
+          </div>
 
           <div className="ls-lang-bar">
             <button

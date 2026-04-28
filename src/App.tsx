@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useSpeech } from "./hooks/useSpeech";
 import "./App.css";
 import { StudentProfile } from "./LoginScreen";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,6 +28,7 @@ interface AppProps {
 }
 
 export default function App({ profile, isNew, onSessionEnd }: AppProps) {
+  const { speak: narrateStory, stop: stopNarration } = useSpeech();
   const [lang, setLang] = useState<"tok" | "en">("tok");
   const [screen, setScreen] = useState<Screen>("subject");
   const [selectedSubject, setSelectedSubject] = useState<SubjectId>("english");
@@ -154,23 +156,27 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
     if (logRef.current) logRef.current.scrollTop = logRef.current.scrollHeight;
   }, [sessionAILog, diagAILog]);
 
-  // ── Word highlight ──
+  // ── Word highlight — synced to ElevenLabs audio timestamps ──
   useEffect(() => {
+    if (screen !== "session") return;
     if (sessionMode !== "story") return;
     const pages = mathsPath != null ? MATHS_STORY_PAGES
       : chapter === 1 ? STORY_PAGES : STORY_PAGES_2;
     if (!pages[storyPage]) return;
-    const { words } = pages[storyPage];
+    const page = pages[storyPage];
+    const text = lang === "tok" ? page.tok : page.en;
     setLitWordIdx(0);
-    let i = 0;
-    const iv = setInterval(() => {
-      i++;
-      if (i >= words.length) { clearInterval(iv); setLitWordIdx(-1); }
-      else setLitWordIdx(i);
-    }, 600);
-    return () => clearInterval(iv);
+    // Delay page 0 so Kumi's greeting (fires ~1200ms after mount) can play first
+    const delay = storyPage === 0 ? 5500 : 0;
+    const timer = setTimeout(() => {
+      narrateStory(text, { onWordChange: (idx) => setLitWordIdx(idx) });
+    }, delay);
+    return () => {
+      clearTimeout(timer);
+      stopNarration();
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [storyPage, sessionMode]);
+  }, [storyPage, sessionMode, lang, screen]);
 
   // ── Diagnostic handlers ──
   function addDiagLog(entry: AIEntry) {
