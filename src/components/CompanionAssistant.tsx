@@ -646,38 +646,6 @@ Rules:
             />
           ))}
 
-        {/* Sparkle stars around avatar */}
-        {!isActivity &&
-          [0, 72, 144, 216, 288].map((angle, i) => {
-            const rad = (angle * Math.PI) / 180;
-            const r = avatarSize * 0.62;
-            return (
-              <motion.div
-                key={i}
-                animate={{ scale: [0.6, 1.3, 0.6], opacity: [0.4, 1, 0.4] }}
-                transition={{
-                  duration: 1.8,
-                  repeat: Infinity,
-                  delay: i * 0.36,
-                  ease: "easeInOut",
-                }}
-                style={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  width: 10,
-                  height: 10,
-                  marginTop: -5,
-                  marginLeft: -5,
-                  transform: `translate(${Math.cos(rad) * r}px, ${Math.sin(rad) * r}px)`,
-                  fontSize: 10,
-                  pointerEvents: "none",
-                }}
-              >
-                ★
-              </motion.div>
-            );
-          })}
 
         {/* Avatar image — dark backing ensures contrast on any background */}
         <div

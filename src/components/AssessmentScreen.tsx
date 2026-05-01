@@ -154,43 +154,6 @@ export default function AssessmentScreen({
         <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.22)" }} />
       </div>
 
-      {/* ── Cartoon sky (hidden — kept for cloud/sun children) ── */}
-      <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, bottom: "22%",
-        background: "transparent",
-        zIndex: 1, overflow: "hidden",
-      }}>
-        <motion.div style={{
-          position: "absolute", top: "10%", right: "8%",
-          width: 60, height: 60, borderRadius: "50%",
-          background: "radial-gradient(circle, #FFE566 35%, #FFB300 100%)",
-          boxShadow: "0 0 44px 22px rgba(255,190,0,0.38), 0 0 88px 44px rgba(255,150,0,0.16)",
-          pointerEvents: "none",
-        }}
-          animate={{ scale: [1, 1.07, 1] }}
-          transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div style={{
-          position: "absolute", top: "16%",
-          width: 180, height: 48, borderRadius: 24,
-          background: "rgba(255,255,255,0.92)",
-          boxShadow: "34px -16px 0 9px rgba(255,255,255,0.92), -20px -10px 0 4px rgba(255,255,255,0.92), 80px -20px 0 14px rgba(255,255,255,0.92)",
-          pointerEvents: "none",
-        }}
-          animate={{ x: ["-220px", "110vw"] }}
-          transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
-        />
-        <motion.div style={{
-          position: "absolute", top: "38%",
-          width: 130, height: 34, borderRadius: 17,
-          background: "rgba(255,255,255,0.78)",
-          boxShadow: "24px -12px 0 6px rgba(255,255,255,0.78), 60px -14px 0 10px rgba(255,255,255,0.78)",
-          pointerEvents: "none",
-        }}
-          animate={{ x: ["-160px", "110vw"] }}
-          transition={{ duration: 36, repeat: Infinity, ease: "linear", delay: 14 }}
-        />
-      </div>
 
       {/* ── Ground ── (commented out — background image provides ground)
       <div style={{

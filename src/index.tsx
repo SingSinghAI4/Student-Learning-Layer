@@ -6,6 +6,8 @@ import LoginScreen, { StudentProfile } from "./LoginScreen";
 import ProfileScreen from "./ProfileScreen";
 import reportWebVitals from "./reportWebVitals";
 import AILogPage, { MERI_LOG_DATA, TURA_LOG_DATA } from "./AILogPage";
+import TeacherDashboard from "./components/TeacherDashboard";
+import GovernmentDashboard from "./components/GovernmentDashboard";
 
 type RootView = "login" | "profile" | "app";
 
@@ -64,8 +66,10 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    {pathname === "/ai-log-meri" ? <AILogPage {...MERI_LOG_DATA} />
+    {pathname === "/ai-log-meri"  ? <AILogPage {...MERI_LOG_DATA} />
      : pathname === "/ai-log-tura" ? <AILogPage {...TURA_LOG_DATA} />
+     : pathname === "/teacherview"     ? <TeacherDashboard lang="en" />
+     : pathname === "/governmentview"  ? <GovernmentDashboard />
      : <Root />}
   </React.StrictMode>,
 );

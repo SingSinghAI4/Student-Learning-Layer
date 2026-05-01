@@ -10,14 +10,6 @@ interface ProfileScreenProps {
 }
 
 // ── CHARACTER MAP ──────────────────────────────────────
-const CHARACTERS = [
-  { name: "Savi",   role: "The Leader",   img: "/s1.png" },
-  { name: "Sibo",   role: "The Explorer", img: "/s2.png" },
-  { name: "Enok",   role: "The Thinker",  img: "/s3.png" },
-  { name: "Mari",   role: "The Thinker",  img: "/s4.png" },
-  { name: "Laka",   role: "The Explorer", img: "/s5.png" },
-  { name: "Henari", role: "The Leader",   img: "/s6.png" },
-];
 
 // ── AVATAR COLOURS (matches LoginScreen) ───────────────
 const AVATAR_COLORS = [
@@ -267,14 +259,6 @@ export default function ProfileScreen({ profile, onContinue, onBack, lang, setLa
             </div>
           )}
 
-          {/* Avatar */}
-          <div style={{ animation: avatarPop ? "avatarPop 0.6s ease both" : "none", width: isLowGrade ? 160 : 130, height: isLowGrade ? 190 : 160 }}>
-            <img
-              src={CHARACTERS[profile.avatarIdx % CHARACTERS.length].img}
-              alt={CHARACTERS[profile.avatarIdx % CHARACTERS.length].name}
-              style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center top" }}
-            />
-          </div>
 
           {/* Name */}
           <div style={{ textAlign: "center" }}>

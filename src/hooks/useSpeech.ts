@@ -7,10 +7,9 @@ export interface SpeakOptions {
   volume?: number;
 }
 
-// ── ElevenLabs config (commented out to preserve API credits) ──
-// const EL_API_KEY  = "sk_038eb11c08e10490e8ad208c724a37120929fa72d140ec4f";
-// const EL_VOICE_ID = "CzB4M3PjIseM76XNOtZe";
-// const EL_ENDPOINT = `https://api.elevenlabs.io/v1/text-to-speech/${EL_VOICE_ID}/with-timestamps`;
+const EL_API_KEY  = "sk_038eb11c08e10490e8ad208c724a37120929fa72d140ec4f";
+const EL_VOICE_ID = "CzB4M3PjIseM76XNOtZe";
+const EL_ENDPOINT = `https://api.elevenlabs.io/v1/text-to-speech/${EL_VOICE_ID}/with-timestamps`;
 
 // Module-level singleton so narration + AI responses never clash
 let activeAudio: HTMLAudioElement | null = null;
@@ -41,15 +40,14 @@ export function useSpeech() {
   }, []);
 
   const speak = useCallback(async (text: string, options: SpeakOptions = {}) => {
-    const { onWordChange, rate = 1, pitch = 1, volume = 1 } = options;
+    const { onWordChange } = options;
 
     if (pendingRef.current) return;
     stopAll();
     pendingRef.current = true;
     setSpeaking(true);
 
-    // ── ElevenLabs (disabled — uncomment to re-enable) ──
-    /*
+    // ── ElevenLabs ──
     const controller = new AbortController();
     activeAbort = controller;
     try {
@@ -80,46 +78,63 @@ export function useSpeech() {
       for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
       const blob = new Blob([bytes], { type: "audio/mpeg" });
       const url  = URL.createObjectURL(blob);
-      // ... (word timestamps + audio playback)
-    } catch (err: any) {
-      if (err?.name !== "AbortError") console.error("[EL] TTS failed:", err);
-      pendingRef.current = false;
-      setSpeaking(false);
-    }
-    */
 
-    // ── Fallback: browser Web Speech API ──
-    try {
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate   = rate;
-      utterance.pitch  = pitch;
-      utterance.volume = volume;
-
-      utterance.onboundary = (e) => {
-        if (e.name === "word" && onWordChange) {
-          // approximate word index from char position
-          const upTo = text.slice(0, e.charIndex);
-          const idx  = upTo.split(/\s+/).filter(Boolean).length;
-          onWordChange(idx);
+      // Build word-level timing from character-level alignment
+      const alignment = data.alignment as {
+        characters: string[];
+        character_start_times_seconds: number[];
+        character_end_times_seconds: number[];
+      } | undefined;
+      const wordTimings: { start: number }[] = [];
+      if (alignment) {
+        const { characters: chars, character_start_times_seconds: starts } = alignment;
+        let inWord = false;
+        for (let i = 0; i < chars.length; i++) {
+          const isSpace = chars[i] === " " || chars[i] === "\n";
+          if (!isSpace && !inWord) {
+            wordTimings.push({ start: starts[i] });
+            inWord = true;
+          } else if (isSpace) {
+            inWord = false;
+          }
         }
+      }
+
+      const audio = new Audio(url);
+      activeAudio = audio;
+      let wordIdx = 0;
+
+      const tick = () => {
+        if (!activeAudio || activeAudio.paused) return;
+        const t = activeAudio.currentTime;
+        while (wordIdx < wordTimings.length && t >= wordTimings[wordIdx].start) {
+          onWordChange?.(wordIdx);
+          wordIdx++;
+        }
+        activeRaf = requestAnimationFrame(tick);
       };
 
-      utterance.onend = () => {
+      audio.onplay = () => { activeRaf = requestAnimationFrame(tick); };
+      audio.onended = () => {
+        cancelAnimationFrame(activeRaf);
+        URL.revokeObjectURL(url);
         pendingRef.current = false;
         setSpeaking(false);
         onWordChange?.(-1);
       };
-
-      utterance.onerror = () => {
+      audio.onerror = () => {
+        cancelAnimationFrame(activeRaf);
+        URL.revokeObjectURL(url);
         pendingRef.current = false;
         setSpeaking(false);
       };
-
-      window.speechSynthesis.speak(utterance);
-    } catch (err) {
-      console.error("[Speech] TTS failed:", err);
+      audio.play();
+      return;
+    } catch (err: any) {
+      if (err?.name !== "AbortError") console.error("[EL] TTS failed:", err);
       pendingRef.current = false;
       setSpeaking(false);
+      return;
     }
   }, [stop]);
 

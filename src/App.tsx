@@ -402,7 +402,7 @@ export default function App({ profile, isNew, onSessionEnd }: AppProps) {
   return (
     <div className="app">
       {/* Top bar — profile card + language toggle inline (hidden during lesson) */}
-      {screen !== "session" && (
+      {screen !== "session" && screen !== "dashboard" && (
         <div className="top-bar">
           {/* Profile card */}
           <div className="student-bar">

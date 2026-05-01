@@ -49,12 +49,12 @@ interface LoginScreenProps {
 
 // ── CHARACTER MAP ──────────────────────────────────────
 const CHARACTERS = [
-  { name: "Savi",   role: "The Leader",   img: "/s1.png" },
-  { name: "Sibo",   role: "The Explorer", img: "/s2.png" },
-  { name: "Enok",   role: "The Thinker",  img: "/s3.png" },
-  { name: "Mari",   role: "The Thinker",  img: "/s4.png" },
-  { name: "Laka",   role: "The Explorer", img: "/s5.png" },
-  { name: "Henari", role: "The Leader",   img: "/s6.png" },
+  { name: "Savi", role: "The Leader", img: "/s1.png" },
+  { name: "Sibo", role: "The Explorer", img: "/s2.png" },
+  { name: "Enok", role: "The Thinker", img: "/s3.png" },
+  { name: "Mari", role: "The Thinker", img: "/s4.png" },
+  { name: "Laka", role: "The Explorer", img: "/s5.png" },
+  { name: "Henari", role: "The Leader", img: "/s6.png" },
 ];
 
 // ── CONSTANTS ──────────────────────────────────────────
@@ -289,28 +289,54 @@ function ProgressBar({ pct }: { pct: number }) {
 function TapaBorder({ id }: { id: string }) {
   const pid = `tapa-${id}`;
   return (
-    <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 40, borderRadius: "0 0 18px 18px", overflow: "hidden" }}>
-      <svg width="100%" height="40" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <div
+      style={{
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 40,
+        borderRadius: "0 0 18px 18px",
+        overflow: "hidden",
+      }}
+    >
+      <svg
+        width="100%"
+        height="40"
+        preserveAspectRatio="xMidYMid slice"
+        xmlns="http://www.w3.org/2000/svg"
+      >
         <defs>
-          <pattern id={pid} x="0" y="0" width="64" height="40" patternUnits="userSpaceOnUse">
+          <pattern
+            id={pid}
+            x="0"
+            y="0"
+            width="64"
+            height="40"
+            patternUnits="userSpaceOnUse"
+          >
             {/* Dark background */}
-            <rect width="64" height="40" fill="#1C0900"/>
+            <rect width="64" height="40" fill="#1C0900" />
             {/* Top gold band */}
-            <rect x="0" y="0" width="64" height="4" fill="#F5E6D3"/>
+            <rect x="0" y="0" width="64" height="4" fill="#F5E6D3" />
             {/* Bottom gold band */}
-            <rect x="0" y="36" width="64" height="4" fill="#F5E6D3"/>
+            <rect x="0" y="36" width="64" height="4" fill="#F5E6D3" />
             {/* Left arrow/chevron pointing right */}
-            <polygon points="2,6 28,20 2,34" fill="#F5E6D3" opacity="0.15"/>
-            <polygon points="6,12 20,20 6,28" fill="#1C0900"/>
+            <polygon points="2,6 28,20 2,34" fill="#F5E6D3" opacity="0.15" />
+            <polygon points="6,12 20,20 6,28" fill="#1C0900" />
             {/* Right arrow/chevron pointing left */}
-            <polygon points="62,6 36,20 62,34" fill="#F5E6D3" opacity="0.15"/>
-            <polygon points="58,12 44,20 58,28" fill="#1C0900"/>
+            <polygon points="62,6 36,20 62,34" fill="#F5E6D3" opacity="0.15" />
+            <polygon points="58,12 44,20 58,28" fill="#1C0900" />
             {/* Center diamond */}
-            <polygon points="32,8 44,20 32,32 20,20" fill="#F5E6D3" opacity="0.1"/>
-            <polygon points="32,13 39,20 32,27 25,20" fill="#1C0900"/>
+            <polygon
+              points="32,8 44,20 32,32 20,20"
+              fill="#F5E6D3"
+              opacity="0.1"
+            />
+            <polygon points="32,13 39,20 32,27 25,20" fill="#1C0900" />
           </pattern>
         </defs>
-        <rect width="100%" height="40" fill={`url(#${pid})`}/>
+        <rect width="100%" height="40" fill={`url(#${pid})`} />
       </svg>
     </div>
   );
@@ -332,23 +358,24 @@ function StudentCard({
     <button
       onClick={onSelect}
       style={{
-        background: "rgba(13,27,38,0.85)",
-        border: `2px solid ${c.accent}55`,
-        borderRadius: 20,
-        padding: "32px 20px 28px",
+        background: "rgba(13,27,38,0.82)",
+        border: `2px solid ${c.accent}44`,
+        borderRadius: 16,
+        padding: "32px 24px",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: 14,
+        justifyContent: "center",
+        gap: 10,
         cursor: "pointer",
         transition: "all 0.22s ease",
         width: "100%",
+        minHeight: 140,
         position: "relative",
-        overflow: "hidden",
         animation: `cardReveal 0.45s ease ${delay}s both`,
         textAlign: "center" as const,
-        backdropFilter: "blur(8px)",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.45)",
+        backdropFilter: "blur(12px)",
+        boxShadow: "0 4px 24px rgba(0,0,0,0.35)",
       }}
       onMouseEnter={(e) => {
         const el = e.currentTarget as HTMLButtonElement;
@@ -365,53 +392,35 @@ function StudentCard({
         el.style.background = "rgba(13,27,38,0.85)";
       }}
     >
-      <div
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: 3,
-          background: c.accent,
-          borderRadius: "20px 20px 0 0",
-          opacity: 0.65,
-        }}
-      />
-
-      <div style={{ width: 130, height: 160, overflow: "hidden", borderRadius: 12, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <img
-          src={CHARACTERS[profile.avatarIdx % CHARACTERS.length].img}
-          alt={CHARACTERS[profile.avatarIdx % CHARACTERS.length].name}
-          style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center top" }}
-        />
+      {/* Initials circle */}
+      <div style={{
+        width: 64, height: 64, borderRadius: "50%",
+        background: c.bg,
+        border: `2px solid ${c.accent}88`,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        flexShrink: 0,
+      }}>
+        <span style={{
+          fontFamily: "'Baloo 2', cursive", fontWeight: 900,
+          fontSize: 26, color: c.accent,
+        }}>
+          {profile.name.charAt(0).toUpperCase()}
+        </span>
       </div>
 
-      <div
-        style={{
-          fontSize: 22,
-          fontWeight: 900,
-          fontFamily: "'Baloo 2', cursive",
-          color: "#fff",
-          lineHeight: 1,
-        }}
-      >
+      <div style={{
+        fontSize: 22, fontWeight: 900,
+        fontFamily: "'Baloo 2', cursive",
+        color: "#fff", lineHeight: 1,
+      }}>
         {profile.name}
       </div>
-      <div style={{ fontSize: 11, color: "#F5A623", fontWeight: 800, letterSpacing: 0.5 }}>
-        {CHARACTERS[profile.avatarIdx % CHARACTERS.length].role}
-      </div>
-      <div
-        style={{
-          fontSize: 11,
-          color: "rgba(255,255,255,0.65)",
-          fontWeight: 700,
-          marginBottom: 24,
-        }}
-      >
+      <div style={{
+        fontSize: 12, color: "rgba(255,255,255,0.45)", fontWeight: 700,
+      }}>
         Grade {profile.grade}
       </div>
 
-      <TapaBorder id={profile.id} />
     </button>
   );
 }
@@ -1501,7 +1510,6 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
     null,
   );
   const [newName, setNewName] = useState("");
-  const [newAvatar, setNewAvatar] = useState<number | null>(null);
   const [newGrade, setNewGrade] = useState<number | null>(null);
   const [newProvince, setNewProvince] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -1527,16 +1535,16 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
   }
 
   function handleNewStudent() {
-    if (!newName.trim() || newAvatar === null || newGrade === null) return;
+    if (!newName.trim() || newGrade === null) return;
     setView("province");
   }
 
   function handleCreateProfile(province: string) {
-    if (!newName.trim() || newAvatar === null || newGrade === null) return;
+    if (!newName.trim() || newGrade === null) return;
     const profile: StudentProfile = {
       id: `${newName.toLowerCase()}-${Date.now()}`,
       name: newName.trim(),
-      avatarIdx: newAvatar,
+      avatarIdx: 0,
       grade: newGrade,
       lessonProgress: 0,
       streak: 0,
@@ -1575,20 +1583,6 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
         .ls-lang-bar {
           position: absolute; top: 24px; right: 28px;
           display: flex; gap: 8px; z-index: 10;
-        }
-        .ls-lang-btn {
-          background: rgba(20,10,0,0.75);
-          border: none;
-          border-radius: 50px; padding: 10px 22px;
-          font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.85);
-          cursor: pointer; font-family: 'Nunito', sans-serif;
-          transition: all 0.2s; letter-spacing: 0.3px;
-          backdrop-filter: blur(8px);
-        }
-        .ls-lang-btn:hover { background: rgba(40,20,0,0.85); }
-        .ls-lang-btn.active {
-          background: linear-gradient(135deg, #FFB82F 0%, #E84D2A 100%);
-          color: #fff;
         }
 
         /* ── BACK BUTTON ── */
@@ -1752,7 +1746,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
         }
         .screen-sub {
           font-size: 22px; color: #0D1B26;
-          font-weight: 800; margin-bottom: 56px; text-align: center;
+          font-weight: 800; margin-bottom: 28px; text-align: center;
           text-shadow: 0 1px 4px rgba(255,220,150,0.5);
         }
 
@@ -1765,14 +1759,15 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
         /* ══ PROFILES SCREEN ══ */
         .profiles-wrap {
           flex: 1; display: flex; flex-direction: column;
-          align-items: center; padding: 72px 48px 24px;
-          width: 100%; max-width: 1100px; margin: 0 auto;
+          align-items: center; justify-content: center;
+          padding: 20px 60px;
+          width: 100%; max-width: 780px; margin: 0 auto;
         }
 
         .profiles-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 18px; width: 100%; margin-bottom: 24px;
+          gap: 16px; width: 100%; margin-bottom: 24px;
         }
 
         .divider {
@@ -1972,39 +1967,21 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
         <div
           className="ls-page"
           style={{
-            backgroundImage: "url('/Login-Background1.png')",
-            backgroundSize: "cover",
+            backgroundImage: "url('/Login-Background.png')",
+            backgroundSize: "100%",
             backgroundPosition: "center",
           }}
         >
-          {/* Brand overlay — left side over open sky */}
-          <div style={{
-            position: "absolute",
-            top: "8%",
-            left: "4%",
-            zIndex: 1,
-            pointerEvents: "none",
-          }}>
-            <img
-              src="/LOGOTEXTLOGIN.png"
-              alt="Stori Bilong Yu"
-              style={{
-                width: "clamp(380px, 48vw, 680px)",
-                height: "auto",
-                filter: "drop-shadow(0 2px 12px rgba(0,0,0,0.9)) drop-shadow(0 0 40px rgba(0,0,0,0.7))",
-              }}
-            />
-          </div>
 
           <div className="ls-lang-bar">
             <button
-              className={`ls-lang-btn${lang === "tok" ? " active" : ""}`}
+              className={`lang-btn${lang === "tok" ? " active" : ""}`}
               onClick={() => setLang("tok")}
             >
               Tok Pisin
             </button>
             <button
-              className={`ls-lang-btn${lang === "en" ? " active" : ""}`}
+              className={`lang-btn${lang === "en" ? " active" : ""}`}
               onClick={() => setLang("en")}
             >
               English
@@ -2134,19 +2111,26 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
       {/* ══ GRADE SELECTION SCREEN ══ */}
       {view === "grade" && (
-        <div className="ls-page" style={{ backgroundImage: "url('/GradeScreen.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
+        <div
+          className="ls-page"
+          style={{
+            backgroundImage: "url('/GradeScreen.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
           <button className="ls-back" onClick={() => setView("welcome")}>
             ← {lang === "tok" ? "Go Bek" : "Back"}
           </button>
           <div className="ls-lang-bar">
             <button
-              className={`ls-lang-btn${lang === "tok" ? " active" : ""}`}
+              className={`lang-btn${lang === "tok" ? " active" : ""}`}
               onClick={() => setLang("tok")}
             >
               Tok Pisin
             </button>
             <button
-              className={`ls-lang-btn${lang === "en" ? " active" : ""}`}
+              className={`lang-btn${lang === "en" ? " active" : ""}`}
               onClick={() => setLang("en")}
             >
               English
@@ -2190,19 +2174,26 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
 
       {/* ══ STUDENT SELECTION SCREEN ══ */}
       {view === "profiles" && (
-        <div className="ls-page" style={{ backgroundImage: "url('/ClasscodeScreen.png')", backgroundSize: "cover", backgroundPosition: "center" }}>
+        <div
+          className="ls-page"
+          style={{
+            backgroundImage: "url('/ClasscodeScreen.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
           <button className="ls-back" onClick={() => setView("grade")}>
             ← {lang === "tok" ? "Go Bek" : "Back"}
           </button>
           <div className="ls-lang-bar">
             <button
-              className={`ls-lang-btn${lang === "tok" ? " active" : ""}`}
+              className={`lang-btn${lang === "tok" ? " active" : ""}`}
               onClick={() => setLang("tok")}
             >
               Tok Pisin
             </button>
             <button
-              className={`ls-lang-btn${lang === "en" ? " active" : ""}`}
+              className={`lang-btn${lang === "en" ? " active" : ""}`}
               onClick={() => setLang("en")}
             >
               English
@@ -2283,13 +2274,13 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
           </button>
           <div className="ls-lang-bar">
             <button
-              className={`ls-lang-btn${lang === "tok" ? " active" : ""}`}
+              className={`lang-btn${lang === "tok" ? " active" : ""}`}
               onClick={() => setLang("tok")}
             >
               Tok Pisin
             </button>
             <button
-              className={`ls-lang-btn${lang === "en" ? " active" : ""}`}
+              className={`lang-btn${lang === "en" ? " active" : ""}`}
               onClick={() => setLang("en")}
             >
               English
@@ -2329,53 +2320,6 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               <div className="form-section">
                 <label className="form-label">
                   {lang === "tok"
-                    ? "Makim animal bilong yu"
-                    : "Choose your animal"}
-                </label>
-                <div className="avatar-grid-new">
-                  {AVATAR_ANIMALS.map((av, i) => {
-                    const c = AVATAR_COLORS[i % AVATAR_COLORS.length];
-                    return (
-                      <button
-                        key={i}
-                        className={`avatar-btn-new${newAvatar === i ? " sel" : ""}`}
-                        onClick={() => setNewAvatar(i)}
-                      >
-                        <div
-                          style={{
-                            width: 40,
-                            height: 40,
-                            borderRadius: "50%",
-                            background: c.bg,
-                            border: `2px solid ${c.accent}55`,
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontFamily: "'Baloo 2', cursive",
-                              fontWeight: 900,
-                              fontSize: 18,
-                              color: c.accent,
-                            }}
-                          >
-                            {av.symbol}
-                          </span>
-                        </div>
-                        <span className="av-nm">
-                          {lang === "tok" ? av.tok : av.name}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="form-section">
-                <label className="form-label">
-                  {lang === "tok"
                     ? "Wanem klas bilong yu?"
                     : "Which grade are you in?"}
                 </label>
@@ -2396,7 +2340,7 @@ export default function LoginScreen({ onLogin }: LoginScreenProps) {
               <button
                 className="start-btn"
                 disabled={
-                  !newName.trim() || newAvatar === null || newGrade === null
+                  !newName.trim() || newGrade === null
                 }
                 onClick={handleNewStudent}
               >
